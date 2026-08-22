@@ -98,3 +98,87 @@ body { min-width: 320px; }
   .lesson-link[aria-current="page"] { border-left-color: transparent; border-bottom-color: #1f765e; }
   .lesson-stage { min-height: 58dvh; padding: 2.2rem 1.5rem; justify-content: flex-start; }
 }
+
+
+.lesson-stage-active {
+  justify-content: flex-start;
+  overflow: auto;
+  padding: clamp(1.35rem, 3.2vw, 3.4rem);
+}
+
+.lesson02-step {
+  width: min(100%, 70rem);
+  margin: auto;
+  color: #223330;
+}
+
+.lesson02-heading { margin-bottom: 1.1rem; }
+.lesson02-kicker { margin: 0; color: #1b765d; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.13em; }
+.lesson02-title { margin: 0.35rem 0 0; font-size: clamp(1.65rem, 3.1vw, 3rem); line-height: 1.18; }
+.lesson02-prompt, .lesson02-question { max-width: 50rem; color: #465a54; font-size: clamp(1rem, 1.2vw, 1.15rem); line-height: 1.65; }
+.lesson02-question { padding-left: 0.9rem; border-left: 3px solid #d98935; }
+.lesson02-formula { margin: 0.85rem 0; color: #164f40; font-size: clamp(1.1rem, 1.65vw, 1.45rem); }
+.lesson02-inline-formula { display: inline-block; margin: 0.25rem 0.55rem 0.25rem 0; color: #1b765d; font-size: 0.98rem; }
+.lesson02-reveal, .lesson02-rule { margin-top: 1rem; padding: 1rem 1.1rem; border: 1px solid #cbdcd4; border-radius: 0.75rem; background: #f3f8f5; }
+.lesson02-action, .lesson02-point-choice, .lesson02-choice-button {
+  min-height: 2.65rem; padding: 0.55rem 0.9rem; border: 1px solid #17634e; border-radius: 0.5rem;
+  background: #17634e; color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+}
+.lesson02-action:hover, .lesson02-point-choice:hover, .lesson02-choice-button:hover { background: #104e3d; }
+.lesson02-action:focus-visible, .lesson02-point-choice:focus-visible, .lesson02-choice-button:focus-visible { outline: 3px solid #da8c35; outline-offset: 2px; }
+.lesson02-action:disabled, .lesson02-point-choice:disabled, .lesson02-choice-button:disabled { cursor: not-allowed; opacity: 0.55; }
+.lesson02-action-secondary { border-color: #768883; background: #f8faf9; color: #334640; }
+
+.lesson02-two-column { display: grid; grid-template-columns: minmax(18rem, 1.1fr) minmax(17rem, 0.9fr); gap: clamp(1rem, 2vw, 2rem); align-items: start; }
+.lesson02-graph-panel, .lesson02-workbench, .lesson02-observe-panel, .lesson02-summary-card, .lesson02-practice-graph {
+  border: 1px solid #d5e0da; border-radius: 0.9rem; background: #fff; box-shadow: 0 0.35rem 1.35rem rgb(25 73 58 / 0.06);
+}
+.lesson02-graph-panel { min-width: 0; padding: 0.55rem; }
+.lesson02-graph-host { min-height: 17rem; }
+.parabola-svg { display: block; width: 100%; height: auto; min-height: 17rem; overflow: visible; }
+.parabola-axis { stroke: #7b8e87; stroke-width: 1.25; }
+.parabola-tick { fill: #60716b; font-size: 12px; text-anchor: middle; }
+.parabola-tick-y { text-anchor: start; }
+.parabola-curve { fill: none; stroke-width: 3.25; stroke-linecap: round; transition: stroke-dashoffset 80ms linear; }
+.parabola-point { fill: #d98935; stroke: #fff; stroke-width: 1.5; }
+.parabola-label { fill: #38524a; font-size: 15px; font-weight: 700; }
+
+.lesson02-workbench, .lesson02-observe-panel { padding: clamp(1rem, 1.7vw, 1.45rem); }
+.lesson02-workbench > :first-child, .lesson02-observe-panel > :first-child { margin-top: 0; }
+.lesson02-choice-grid, .lesson02-practice-options { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.85rem 0; }
+.lesson02-point-choice { min-width: 2.5rem; padding-inline: 0.55rem; background: #fff; color: #17634e; }
+.lesson02-point-choice.is-plotted { border-color: #bdc9c3; background: #edf3ef; color: #687872; }
+.lesson02-progress, .lesson02-status, .lesson02-timer { color: #1a6853; font-weight: 700; }
+.lesson02-calculation { min-height: 2.5rem; }
+.lesson02-data-table, .lesson02-property-table { width: 100%; margin: 0.85rem 0; border-collapse: collapse; font-size: 0.93rem; }
+.lesson02-data-table th, .lesson02-data-table td, .lesson02-property-table th, .lesson02-property-table td { padding: 0.45rem 0.5rem; border-bottom: 1px solid #dce5e0; text-align: left; }
+.lesson02-data-table th, .lesson02-property-table th { color: #40554e; background: #f1f6f3; }
+.lesson02-parabola-name { color: #6652b8; font-size: 1.2rem; font-weight: 800; letter-spacing: 0.05em; }
+.lesson02-slider-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+.lesson02-observe-panel input[type="range"] { width: 100%; accent-color: #17634e; }
+.lesson02-summary-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; margin: 1rem 0; }
+.lesson02-summary-card { min-height: 9.5rem; padding: 1rem; }
+.lesson02-summary-card h3 { margin: 0; color: #17634e; }
+.lesson02-summary-card p { color: #4d6059; line-height: 1.55; }
+.lesson02-practice-graph { max-width: 40rem; margin-top: 1rem; padding: 0.45rem; }
+.lesson02-step-controls { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid #d5e0da; }
+.lesson02-step-count { color: #64746f; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+  .lesson02-two-column { grid-template-columns: 1fr; }
+  .lesson02-summary-cards { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 761px) and (max-height: 760px) {
+  .lesson-stage-active { padding: 0.8rem 1.4rem; }
+  .lesson02-heading { margin-bottom: 0.65rem; }
+  .lesson02-title { font-size: 1.7rem; }
+  .lesson02-prompt, .lesson02-question { margin-block: 0.45rem; font-size: 0.96rem; line-height: 1.4; }
+  .lesson02-formula { margin: 0.45rem 0; font-size: 1.04rem; }
+  .lesson02-graph-host, .parabola-svg { min-height: 12.75rem; }
+  .lesson02-workbench, .lesson02-observe-panel { padding: 0.75rem; }
+  .lesson02-action, .lesson02-point-choice, .lesson02-choice-button { min-height: 2.15rem; padding: 0.35rem 0.65rem; }
+  .lesson02-data-table, .lesson02-property-table { margin: 0.45rem 0; font-size: 0.81rem; }
+  .lesson02-data-table th, .lesson02-data-table td, .lesson02-property-table th, .lesson02-property-table td { padding: 0.25rem 0.35rem; }
+  .lesson02-step-controls { margin-top: 0.75rem; padding-top: 0.6rem; }
+}

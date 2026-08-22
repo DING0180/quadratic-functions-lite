@@ -17,7 +17,7 @@ export function getLessonById(id) {
 }
 
 export function getLessonFromHash(hash) {
-  const lessonId = String(hash ?? "").replace(/^#/, "");
+  const lessonId = String(hash ?? "").replace(/^#/, "").split("/")[0];
   return getLessonById(lessonId) ?? COURSE[0];
 }
 

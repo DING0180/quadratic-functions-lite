@@ -26,6 +26,10 @@ describe("course configuration", () => {
     expect(getLessonFromHash("#not-a-lesson").id).toBe("lesson-01");
   });
 
+  it("resolves a lesson hash that includes a local lesson step", () => {
+    expect(getLessonFromHash("#lesson-02/step-04").id).toBe("lesson-02");
+  });
+
   it("rejects incomplete or duplicate lesson data", () => {
     expect(() => validateCourse([{ id: "lesson-01", number: "01", title: "A" }])).toThrow("11");
     expect(() => validateCourse(Array.from({ length: 11 }, () => ({
