@@ -38,54 +38,27 @@ function renderDual(root, _change, cleanup) { const general = { a: 2, b: -8, c: 
 function choose(values, random) { return values[Math.min(values.length - 1, Math.floor(Math.max(0, Math.min(.999999, Number(random()) || 0)) * values.length))]; }
 function makeChallenge(random) { const vertex = { a: choose([1, 2, -1], random), h: choose([-3, -2, -1, 1, 2, 3], random), k: choose([-3, -2, -1, 1, 2, 3], random) }; return { vertex, general: { a: vertex.a, b: -2 * vertex.a * vertex.h, c: vertex.a * vertex.h * vertex.h + vertex.k } }; }
 function renderChallenge(root, _change, cleanup, random) { const prompt = element("div", "lesson06-question"); const answer = element("div", "lesson06-answer"); answer.dataset.lesson06ChallengeAnswer = ""; answer.hidden = true; const graphPanel = element("div", "lesson06-graph-panel"); graphPanel.hidden = true; const graph = addGraph(graphPanel, { a: 1, h: 0, k: 0 }, cleanup, "随机挑战图象"); const control = reveal("Reveal Answer", "lesson06ChallengeReveal"); const next = button("New Challenge", "lesson06-action lesson06-secondary"); let challenge; function render() { challenge = makeChallenge(random); prompt.replaceChildren(element("span", "", "只给一般式："), formula(generalText(challenge.general), "lesson06-formula lesson06-hero"), element("span", "", "请口答对称轴与顶点。")); answer.hidden = true; graphPanel.hidden = true; } control.addEventListener("click", () => { answer.replaceChildren(formula(vertexText(challenge.vertex)), element("p", "", "对称轴 (axis of symmetry)：x=" + number(challenge.vertex.h) + "；顶点 (vertex)：(" + number(challenge.vertex.h) + ", " + number(challenge.vertex.k) + ")。")); answer.hidden = false; graphPanel.hidden = false; updateGraph(graph, challenge.vertex, vertexText(challenge.vertex) + " 的图象"); }); next.addEventListener("click", render); const actions = element("div", "lesson06-actions"); actions.append(control, next); root.append(element("p", "lesson06-prompt", "题目先从简单顶点式随机展开而来；只练习读对称轴和顶点，不做题库或计分。"), prompt, actions, answer, graphPanel); render(); }
-function appendDerivationLine(host, move, dataset) {
+function appendDerivationLine(host, move, dataset, latex = move.latex) {
   const line = element("article", "lesson06-derivation-line lesson06-tone-" + move.tone);
   line.dataset[dataset] = "";
-  line.append(element("p", "lesson06-card-label", move.label), formula(move.latex, "lesson06-formula lesson06-morph-formula"), element("p", "lesson06-change-note", move.note));
+  line.append(element("p", "lesson06-card-label", move.label), formula(latex, "lesson06-formula lesson06-morph-formula"), element("p", "lesson06-change-note", move.note));
   host.append(line);
+  return line;
 }
 
-function appendTransformationMotion(host, move, dataset, cleanup, onComplete) {
-  const motion = element("section", "lesson06-transform-motion lesson06-tone-" + move.tone);
-  motion.dataset[dataset] = "";
-  motion.setAttribute("aria-live", "polite");
-  const bridge = move.motion;
-  const heading = element("p", "lesson06-motion-heading", bridge.title);
-  const tokens = element("div", "lesson06-motion-track");
-  bridge.tokens.filter(({ from, to }) => from !== to).forEach(({ from, to }, index) => {
-    const token = element("div", "lesson06-motion-token");
-    token.dataset.lesson06MotionToken = "";
-    token.style.setProperty("--motion-delay", String(index * 280) + "ms");
-    token.append(formula(from, "lesson06-motion-term lesson06-motion-from"), element("span", "lesson06-motion-arrow", "→"), formula(to, "lesson06-motion-term lesson06-motion-to"));
-    tokens.append(token);
-  });
-  const progress = element("div", "lesson06-motion-progress");
-  progress.dataset.lesson06MotionProgress = "";
-  motion.append(heading, tokens, progress);
-  host.append(motion);
-  let done = false;
-  let timer;
-  const finish = () => {
-    if (done) return;
-    done = true;
-    window.clearTimeout(timer);
-    motion.classList.add("is-complete");
-    onComplete();
-  };
-  progress.addEventListener("animationend", finish, { once: true });
-  timer = window.setTimeout(finish, 3500);
-  cleanup.push(() => window.clearTimeout(timer));
-  return motion;
+function setDerivationFormula(line, latex) {
+  const host = line.querySelector(".lesson06-morph-formula");
+  renderFormula(host, latex, { ariaLabel: latex, displayMode: true });
 }
 
 function renderDemoDetailed(root, _change, cleanup) {
   const moves = [
-    { label: "原式", latex: "y=2x^2-8x+3", tone: "base", note: "从一般式开始：先只关注含 x 的两项。" },
-    { label: "① 把二次项系数提出", latex: "y=2(x^2-4x)+3", tone: "a", note: "红色：2 提到括号外；因此 -8x ÷ 2 变成 -4x。" },
-    { label: "② 补出完全平方", latex: "y=2[(x^2-4x+4)-4]+3", tone: "square", note: "橙色：(-4 ÷ 2)²=4；必须同时 +4 和 -4，式子的值不变。" },
-    { label: "③ 合成平方", latex: "y=2[(x-2)^2-4]+3", tone: "square", note: "橙色：x²-4x+4 正好就是 (x-2)²。" },
-    { label: "④ 把括号外的 2 分配进去", latex: "y=2(x-2)^2-8+3", tone: "a", note: "红色：2×(-4)=-8；平方部分暂时保持不动。" },
-    { label: "⑤ 合并常数", latex: "y=2(x-2)^2-5", tone: "vertex", note: "蓝色：-8+3=-5；现在与 y=a(x-h)²+k 完全对应。" },
+    { label: "原式", latex: "y=2x^2-8x+3", tone: "base", note: "批注：先观察含 x 的两项。" },
+    { label: "① 把二次项系数提出", latex: "y=2(x^2-4x)+3", fromLatex: "y=\\color{#c25443}{2x^2-8x}+3", toLatex: "y=\\color{#c25443}{2(x^2-4x)}+3", tone: "a", note: "批注：提出公因式 2。" },
+    { label: "② 补出完全平方", latex: "y=2[(x^2-4x+4)-4]+3", fromLatex: "y=2(\\color{#c88818}{x^2-4x})+3", toLatex: "y=2[\\color{#c88818}{(x^2-4x+4)-4}]+3", tone: "square", note: "批注：凑完全平方，补 +4，同时减去 4。" },
+    { label: "③ 合成平方", latex: "y=2[(x-2)^2-4]+3", fromLatex: "y=2[\\color{#197b9b}{x^2-4x+4}-4]+3", toLatex: "y=2[\\color{#197b9b}{(x-2)^2}-4]+3", tone: "vertex", note: "批注：合成完全平方。" },
+    { label: "④ 把括号外的 2 分配进去", latex: "y=2(x-2)^2-8+3", fromLatex: "y=2(x-2)^2+\\color{#1b765d}{2(-4)}+3", toLatex: "y=2(x-2)^2+\\color{#1b765d}{(-8)}+3", tone: "a", note: "批注：把 2 分配给 -4。" },
+    { label: "⑤ 合并常数", latex: "y=2(x-2)^2-5", fromLatex: "y=2(x-2)^2+\\color{#7653a6}{(-8+3)}", toLatex: "y=2(x-2)^2+\\color{#7653a6}{(-5)}", tone: "vertex", note: "批注：合并同类项。" },
   ];
   moves[1].motion = { title: "把 2 从含 x 的两项中提出", before: "y=2x^2-8x+3", after: "y=2(x^2-4x)+3", tokens: [{ from: "2x^2", to: "2\\cdot x^2", cue: "2 留在括号外" }, { from: "-8x", to: "-4x", cue: "-8x ÷ 2" }, { from: "+3", to: "+3", cue: "常数不进括号" }], note: "先看到 2 从 2x² 中“抽出”，再看到 -8x 同时 ÷2 变成 -4x；这就是提出 2 的全过程。" };
   moves[2].motion = { title: "补上 4，也同时减去 4", before: "x^2-4x", after: "x^2-4x+4-4", tokens: [{ from: "-4", to: "-4\\div2=-2", cue: "先取一半" }, { from: "(-2)^2", to: "+4", cue: "把平方补进来" }, { from: "", to: "-4", cue: "同时减回 4" }], note: "新出现的 +4 和 -4 成对加入，括号内的总值没有改变。" };
@@ -93,7 +66,6 @@ function renderDemoDetailed(root, _change, cleanup) {
   moves[4].motion = { title: "把括号外的 2 分配给 -4", before: "2[(x-2)^2-4]+3", after: "2(x-2)^2-8+3", tokens: [{ from: "2", to: "2", cue: "平方部分保持" }, { from: "2\\cdot(-4)", to: "-8", cue: "只分配给常数 -4" }, { from: "+3", to: "+3", cue: "继续保留" }], note: "2 只乘到括号里的 -4，得到 -8；平方项仍是 2(x-2)²。" };
   moves[5].motion = { title: "合并两个常数", before: "-8+3", after: "-5", tokens: [{ from: "-8", to: "-5", cue: "与 +3 合并" }, { from: "+3", to: "", cue: "完成计算" }], note: "常数相加后，顶点式 y=2(x-2)²-5 就完整出现。" };
   let index = 0;
-  let animating = false;
   const sequence = element("div", "lesson06-derivation-sequence");
   const status = element("p", "lesson06-status");
   const actions = element("div", "lesson06-motion-controls");
@@ -103,10 +75,10 @@ function renderDemoDetailed(root, _change, cleanup) {
   const result = element("div", "lesson06-demo-result"); result.dataset.lesson06DemoResult = ""; result.hidden = true;
   const graphPanel = element("div", "lesson06-graph-panel"); graphPanel.hidden = true;
   addGraph(graphPanel, { a: 2, h: 2, k: -5 }, cleanup, "y=2(x-2)²-5 的图象");
-  function syncControls() { const done = index === moves.length; previous.disabled = animating || index <= 1; next.disabled = animating || done; result.hidden = !done; graphPanel.hidden = !done; if (done) result.textContent = "顶点 (vertex)：(2, -5)；对称轴 (axis of symmetry)：x=2。"; }
-  function showLine() { appendDerivationLine(sequence, moves[index], "lesson06DemoLine"); status.textContent = "已展示 " + (index + 1) + " / " + moves.length + " 步；前面的等式保留在上方，便于逐项对照。"; index += 1; animating = false; syncControls(); }
-  function playNext() { if (index >= moves.length || animating) return; animating = true; syncControls(); appendTransformationMotion(sequence, moves[index], "lesson06DemoMotion", cleanup, showLine); }
-  function goPrevious() { if (index <= 1 || animating) return; sequence.lastElementChild.remove(); sequence.lastElementChild.remove(); index -= 1; status.textContent = "已回到第 " + index + " 步；可以再次播放下一次变化。"; syncControls(); }
+  function syncControls() { const done = index === moves.length; previous.disabled = index <= 1; next.disabled = done; result.hidden = !done; graphPanel.hidden = !done; if (done) result.textContent = "顶点 (vertex)：(2, -5)；对称轴 (axis of symmetry)：x=2。"; }
+  function showLine() { appendDerivationLine(sequence, moves[index], "lesson06DemoLine", moves[index].toLatex); status.textContent = "已展示 " + (index + 1) + " / " + moves.length + " 步；相邻两行用同色标出发生变化的项。"; index += 1; syncControls(); }
+  function playNext() { if (index >= moves.length) return; const lines = sequence.querySelectorAll("[data-lesson06-demo-line]"); if (lines.length > 1) setDerivationFormula(lines[lines.length - 2], moves[index - 2].latex); setDerivationFormula(sequence.lastElementChild, moves[index].fromLatex); showLine(); }
+  function goPrevious() { if (index <= 1) return; sequence.lastElementChild.remove(); index -= 1; setDerivationFormula(sequence.lastElementChild, moves[index - 1].toLatex || moves[index - 1].latex); status.textContent = "已回到第 " + index + " 步；可以对照后再看下一步。"; syncControls(); }
   next.addEventListener("click", playNext);
   previous.addEventListener("click", goPrevious);
   root.append(element("p", "lesson06-question", "不要跳步：每一行都保留；点击下一步后，只看关键项如何拆开、移动并合成。"), sequence, actions, status, result, graphPanel);
@@ -115,14 +87,14 @@ function renderDemoDetailed(root, _change, cleanup) {
 
 function renderSymbolicDetailed(root, _change, cleanup) {
   const moves = [
-    { label: "一般式", latex: "y=ax^2+bx+c", tone: "base", note: "从一般式开始，目标是把含 x 的部分凑成一个平方。" },
-    { label: "① 提出 a", latex: "y=a(x^2+\\frac{b}{a}x)+c", tone: "a", note: "红色：把 a 从前两项提出，括号内的一次项变成 (b/a)x。" },
-    { label: "② 计算要补的数", latex: "(\\frac{b}{2a})^2=\\frac{b^2}{4a^2}", tone: "square", note: "橙色：一次项系数 b/a 的一半是 b/(2a)，平方后就是要补的数。" },
-    { label: "③ 同时加减该数", latex: "y=a[(x^2+\\frac{b}{a}x+\\frac{b^2}{4a^2})-\\frac{b^2}{4a^2}]+c", tone: "square", note: "橙色：括号内 + 和 - 同一个数，函数值保持不变。" },
-    { label: "④ 合成完全平方", latex: "y=a[(x+\\frac{b}{2a})^2-\\frac{b^2}{4a^2}]+c", tone: "square", note: "橙色：前三项合成为 (x+b/(2a))²。" },
-    { label: "⑤ 把 a 乘回去", latex: "y=a(x+\\frac{b}{2a})^2-\\frac{b^2}{4a}+c", tone: "a", note: "红色：a×[-b²/(4a²)]=-b²/(4a)。" },
-    { label: "⑥ 合并常数", latex: "y=a(x+\\frac{b}{2a})^2+\\frac{4ac-b^2}{4a}", tone: "vertex", note: "蓝色：c-b²/(4a) 通分后得到 (4ac-b²)/(4a)。" },
-    { label: "⑦ 对齐顶点式", latex: "y=a[x-(-\\frac{b}{2a})]^2+\\frac{4ac-b^2}{4a}", tone: "vertex", note: "蓝色：与 y=a(x-h)²+k 对比，h=-b/(2a)，k=(4ac-b²)/(4a)。" },
+    { label: "一般式", latex: "y=ax^2+bx+c", tone: "base", note: "批注：先观察含 x 的两项。" },
+    { label: "① 提出 a", latex: "y=a(x^2+\\frac{b}{a}x)+c", fromLatex: "y=\\color{#c25443}{ax^2+bx}+c", toLatex: "y=\\color{#c25443}{a(x^2+\\frac{b}{a}x)}+c", tone: "a", note: "批注：提出公因式 a。" },
+    { label: "② 计算要补的数", latex: "(\\frac{b}{2a})^2=\\frac{b^2}{4a^2}", fromLatex: "\\color{#c88818}{\\frac{b}{a}}", toLatex: "\\color{#c88818}{(\\frac{b}{2a})^2=\\frac{b^2}{4a^2}}", tone: "square", note: "批注：取一次项系数的一半，再平方。" },
+    { label: "③ 同时加减该数", latex: "y=a[(x^2+\\frac{b}{a}x+\\frac{b^2}{4a^2})-\\frac{b^2}{4a^2}]+c", fromLatex: "y=a[x^2+\\frac{b}{a}x]+c", toLatex: "y=a[(x^2+\\frac{b}{a}x\\color{#1b765d}{+\\frac{b^2}{4a^2}})\\color{#1b765d}{-\\frac{b^2}{4a^2}}]+c", tone: "square", note: "批注：凑完全平方，同时加减同一个数。" },
+    { label: "④ 合成完全平方", latex: "y=a[(x+\\frac{b}{2a})^2-\\frac{b^2}{4a^2}]+c", fromLatex: "y=a[\\color{#197b9b}{x^2+\\frac{b}{a}x+\\frac{b^2}{4a^2}}-\\frac{b^2}{4a^2}]+c", toLatex: "y=a[\\color{#197b9b}{(x+\\frac{b}{2a})^2}-\\frac{b^2}{4a^2}]+c", tone: "vertex", note: "批注：合成完全平方。" },
+    { label: "⑤ 把 a 乘回去", latex: "y=a(x+\\frac{b}{2a})^2-\\frac{b^2}{4a}+c", fromLatex: "y=a(x+\\frac{b}{2a})^2+\\color{#c25443}{a(-\\frac{b^2}{4a^2})}+c", toLatex: "y=a(x+\\frac{b}{2a})^2\\color{#c25443}{-\\frac{b^2}{4a}}+c", tone: "a", note: "批注：把 a 分配给补偿项。" },
+    { label: "⑥ 合并常数", latex: "y=a(x+\\frac{b}{2a})^2+\\frac{4ac-b^2}{4a}", fromLatex: "y=a(x+\\frac{b}{2a})^2+\\color{#7653a6}{c-\\frac{b^2}{4a}}", toLatex: "y=a(x+\\frac{b}{2a})^2+\\color{#7653a6}{\\frac{4ac-b^2}{4a}}", tone: "vertex", note: "批注：通分后合并同类项。" },
+    { label: "⑦ 对齐顶点式", latex: "y=a[x-(-\\frac{b}{2a})]^2+\\frac{4ac-b^2}{4a}", fromLatex: "y=a[\\color{#197b9b}{x+\\frac{b}{2a}}]^2+\\frac{4ac-b^2}{4a}", toLatex: "y=a[\\color{#197b9b}{x-(-\\frac{b}{2a})}]^2+\\frac{4ac-b^2}{4a}", tone: "vertex", note: "批注：改写成 x-h，便于读出 h 与 k。" },
   ];
   moves[1].motion = { title: "把 a 从前两项提出", before: "y=ax^2+bx+c", after: "y=a(x^2+\\frac{b}{a}x)+c", tokens: [{ from: "ax^2", to: "a\\cdot x^2", cue: "a 提到括号外" }, { from: "bx", to: "\\frac{b}{a}x", cue: "bx ÷ a → (b/a)x" }, { from: "+c", to: "+c", cue: "常数留在外面" }], note: "a 向外移动后，括号内每一项都要除以 a；因此 bx 变成 (b/a)x。" };
   moves[2].motion = { title: "从一次项系数找到补数", before: "\\frac{b}{a}", after: "(\\frac{b}{2a})^2=\\frac{b^2}{4a^2}", tokens: [{ from: "\\frac{b}{a}", to: "\\frac{b}{2a}", cue: "先取一半" }, { from: "\\frac{b}{2a}", to: "(\\frac{b}{2a})^2", cue: "再平方" }, { from: "", to: "\\frac{b^2}{4a^2}", cue: "得到补数" }], note: "这一步不是跳出新公式：它把一次项系数 b/a 依次“除以 2、再平方”。" };
@@ -132,7 +104,6 @@ function renderSymbolicDetailed(root, _change, cleanup) {
   moves[6].motion = { title: "把常数通分到同一分母", before: "c-\\frac{b^2}{4a}", after: "\\frac{4ac-b^2}{4a}", tokens: [{ from: "c", to: "\\frac{4ac}{4a}", cue: "c 通分" }, { from: "-\\frac{b^2}{4a}", to: "-\\frac{b^2}{4a}", cue: "分母不变" }], note: "c 先写成 4ac/(4a)，再与 -b²/(4a) 合并为一个常数项。" };
   moves[7].motion = { title: "把加号写成顶点式里的减号", before: "x+\\frac{b}{2a}", after: "x-(-\\frac{b}{2a})", tokens: [{ from: "+\\frac{b}{2a}", to: "-(-\\frac{b}{2a})", cue: "同一个量" }, { from: "\\frac{4ac-b^2}{4a}", to: "k", cue: "平方外常数" }], note: "x+b/(2a) 改写为 x-(-b/(2a)) 后，就能一眼对齐 x-h，直接读出 h 与 k。" };
   let index = 0;
-  let animating = false;
   const sequence = element("div", "lesson06-derivation-sequence");
   const actions = element("div", "lesson06-motion-controls");
   const previous = button("回到上一步", "lesson06-action lesson06-secondary"); previous.dataset.lesson06SymbolicPrevious = "";
@@ -152,10 +123,10 @@ function renderSymbolicDetailed(root, _change, cleanup) {
     element("p", "", "记住这两个公式后，平时不必每次都重新配方；配方用于理解公式从哪里来，公式用于快速读图。"),
   );
   hkReveal.addEventListener("click", () => { hkAnswer.hidden = false; });
-  function syncControls() { const done = index === moves.length; previous.disabled = animating || index <= 1; next.disabled = animating || done; hkPanel.hidden = !done; hkReveal.hidden = !done; if (!done) hkAnswer.hidden = true; }
-  function showLine() { appendDerivationLine(sequence, moves[index], "lesson06SymbolicLine"); index += 1; animating = false; syncControls(); }
-  function playNext() { if (index >= moves.length || animating) return; animating = true; syncControls(); appendTransformationMotion(sequence, moves[index], "lesson06SymbolicMotion", cleanup, showLine); }
-  function goPrevious() { if (index <= 1 || animating) return; sequence.lastElementChild.remove(); sequence.lastElementChild.remove(); index -= 1; syncControls(); }
+  function syncControls() { const done = index === moves.length; previous.disabled = index <= 1; next.disabled = done; hkPanel.hidden = !done; hkReveal.hidden = !done; if (!done) hkAnswer.hidden = true; }
+  function showLine() { appendDerivationLine(sequence, moves[index], "lesson06SymbolicLine", moves[index].toLatex); index += 1; syncControls(); }
+  function playNext() { if (index >= moves.length) return; const lines = sequence.querySelectorAll("[data-lesson06-symbolic-line]"); if (lines.length > 1) setDerivationFormula(lines[lines.length - 2], moves[index - 2].latex); setDerivationFormula(sequence.lastElementChild, moves[index].fromLatex); showLine(); }
+  function goPrevious() { if (index <= 1) return; sequence.lastElementChild.remove(); index -= 1; setDerivationFormula(sequence.lastElementChild, moves[index - 1].toLatex || moves[index - 1].latex); syncControls(); }
   next.addEventListener("click", playNext);
   previous.addEventListener("click", goPrevious);
   hkPanel.append(hkPrompt, mapping, hkReveal, hkAnswer);
