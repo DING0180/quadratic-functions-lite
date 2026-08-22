@@ -50,6 +50,7 @@ describe("Lesson 03 y=ax²+k migration", () => {
     slider.dispatchEvent(new Event("input", { bubbles: true }));
 
     expect(stage.textContent).toContain("当前顶点：(0, -2)");
+    expect(stage.textContent).toContain("当前 a = 1；当前 k = -2；当前函数：y=x²-2");
     expect(conclusion.hidden).toBe(false);
     lesson.destroy();
   });
@@ -69,6 +70,16 @@ describe("Lesson 03 y=ax²+k migration", () => {
     kSlider.value = "2";
     kSlider.dispatchEvent(new Event("input", { bubbles: true }));
     expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(2);
+    expect(stage.textContent).toContain("当前 a = 1；当前 k = 2；当前函数：y=x²+2");
     lesson.destroy();
+  });
+
+  it("uses compact graph panels in the tall animation and lab steps", () => {
+    [3, 4, 7, 8].forEach((step) => {
+      const stage = document.createElement("main");
+      const lesson = renderLesson03(stage, { step, onStepChange() {} });
+      expect(stage.querySelector(".lesson03-compact-graph")).not.toBeNull();
+      lesson.destroy();
+    });
   });
 });
