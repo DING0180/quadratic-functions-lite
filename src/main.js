@@ -2,6 +2,7 @@ import "./styles.css";
 import { COURSE, getLessonFromHash } from "./course.js";
 import { renderFormula } from "./formula.js";
 import { renderLesson02 } from "./lessons/lesson02.js";
+import { renderLesson03 } from "./lessons/lesson03.js";
 
 const root = document.querySelector("#app");
 
@@ -16,14 +17,14 @@ function createElement(tag, className, text = "") {
   return element;
 }
 
-function lesson02StepFromHash(hash) {
-  const match = String(hash ?? "").match(/^#lesson-02\/step-(\d{2})$/);
+function lessonStepFromHash(hash, lessonId, totalSteps) {
+  const match = String(hash ?? "").match(new RegExp("^#" + lessonId + "/step-(\\d{2})$"));
   const step = Number(match?.[1]);
-  return Number.isInteger(step) && step >= 1 && step <= 12 ? step : 1;
+  return Number.isInteger(step) && step >= 1 && step <= totalSteps ? step : 1;
 }
 
-function lesson02Hash(step) {
-  return "#lesson-02/step-" + String(step).padStart(2, "0");
+function lessonStepHash(lessonId, step) {
+  return "#" + lessonId + "/step-" + String(step).padStart(2, "0");
 }
 
 const classroom = createElement("div", "classroom");
@@ -53,7 +54,7 @@ const stageMessage = createElement("p", "stage-message", "本课教学内容将�
 classroom.append(sidebar, stage);
 root.replaceChildren(classroom);
 
-let activeLesson02 = null;
+let activeLesson = null;
 
 function renderSidebar(activeLessonId) {
   lessonList.replaceChildren(...COURSE.map((item) => {
@@ -80,13 +81,15 @@ function renderGenericLesson(lesson) {
 }
 
 function render() {
-  activeLesson02?.destroy();
-  activeLesson02 = null;
+  activeLesson?.destroy();
+  activeLesson = null;
 
   const lesson = getLessonFromHash(window.location.hash);
   const isLesson02 = lesson.id === "lesson-02";
-  const step = isLesson02 ? lesson02StepFromHash(window.location.hash) : null;
-  const canonicalHash = isLesson02 ? lesson02Hash(step) : "#" + lesson.id;
+  const isLesson03 = lesson.id === "lesson-03";
+  const stepCount = isLesson02 ? 12 : isLesson03 ? 10 : 0;
+  const step = stepCount ? lessonStepFromHash(window.location.hash, lesson.id, stepCount) : null;
+  const canonicalHash = stepCount ? lessonStepHash(lesson.id, step) : "#" + lesson.id;
   if (window.location.hash !== canonicalHash) {
     window.history.replaceState(null, "", canonicalHash);
   }
@@ -94,12 +97,13 @@ function render() {
   document.title = lesson.number + " · " + lesson.title + "｜二次函数互动课堂";
   renderSidebar(lesson.id);
 
-  if (isLesson02) {
+  if (isLesson02 || isLesson03) {
     stage.classList.add("lesson-stage-active");
-    activeLesson02 = renderLesson02(stage, {
+    const renderer = isLesson02 ? renderLesson02 : renderLesson03;
+    activeLesson = renderer(stage, {
       step,
       onStepChange(nextStep) {
-        window.location.hash = lesson02Hash(nextStep);
+        window.location.hash = lessonStepHash(lesson.id, nextStep);
       },
     });
     return;
