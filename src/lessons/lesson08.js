@@ -6,8 +6,8 @@ const COLORS = Object.freeze({ curve: "#19735d", muted: "#a8bbb4", root: "#d9893
 const ROOT_FUNCTION = Object.freeze({ a: 1, h: 0, k: -2 });
 
 export const LESSON08_STEP_TITLES = Object.freeze([
-  "Bridge In：不漂亮的根",
-  "Equation → Function",
+  "Bridge In：函数世界与方程世界",
+  "同一条式子：交点就是解",
   "First Bracket：根在哪两个整数之间？",
   "Root Finder Zoom",
   "Interval Shrink：越来越准确",
@@ -109,31 +109,55 @@ function layoutWithGraph(root, cleanup, options, workbench) {
   return graph;
 }
 
-function renderBridge(root, cleanup) {
-  const bracket = createRootBracket(ROOT_FUNCTION, 1, 2);
-  const workbench = element("div", "lesson08-workbench");
-  const answer = element("p", "lesson08-reveal"); answer.hidden = true; answer.dataset.lesson08BridgeAnswer = "";
-  const reveal = button("Reveal：根的粗略位置");
-  reveal.addEventListener("click", () => { answer.textContent = "x-intercept 不在整数刻度上：正根位于 1 与 2 之间。接下来不是猜答案，而是不断缩小这个区间。"; answer.hidden = false; });
-  workbench.append(element("p", "lesson08-prompt", "复习：root ↔ x-intercept。现在这条曲线与 x 轴的正交点落在哪两个整数之间？"), formula("y=x^2-2", "y=x²-2", "lesson08-formula lesson08-current"), element("p", "lesson08-status", "先看大区间：x∈" + rootIntervalText(bracket)), reveal, answer);
-  layoutWithGraph(root, cleanup, { viewport: { xMin: 0, xMax: 3, yMin: -2.5, yMax: 5, yTickStep: 1 }, points: [{ x: 1, y: -1, color: COLORS.root, radius: 6 }, { x: 2, y: 2, color: COLORS.root, radius: 6 }], labels: [{ x: 1.05, y: -1.35, text: "f(1)<0" }, { x: 2.05, y: 2.35, text: "f(2)>0" }], highlightedCurves: [{ ...ROOT_FUNCTION, xMin: 1, xMax: 2, color: COLORS.root }], ariaLabel: "y=x²-2 的图象，正根在 1 与 2 之间" }, workbench);
+function renderBridge(root) {
+  const question = element("p", "lesson08-question", "同一个式子，一次写成函数 y=x²−2，一次写成方程 x²−2=0。它们在说同一件事吗？");
+  question.dataset.lesson08BridgeQuestion = "";
+  const cards = element("div", "lesson08-equation-sequence");
+  const functionCard = element("div", "lesson08-sequence-card");
+  functionCard.append(element("p", "lesson08-status", "函数世界 (function)"), formula("y=x^2-2", "y=x²-2", "lesson08-formula"));
+  const equationCard = element("div", "lesson08-sequence-card");
+  equationCard.append(element("p", "lesson08-status", "方程世界 (equation)"), formula("x^2-2=0", "x²-2=0", "lesson08-formula"));
+  cards.append(functionCard, equationCard);
+  const hint = element("p", "lesson08-reveal"); hint.dataset.lesson08BridgeHint = ""; hint.hidden = true;
+  const prompt = button("给一个提示：先想 y=0"); prompt.dataset.lesson08BridgePrompt = "";
+  prompt.addEventListener("click", () => { hint.textContent = "提示：把函数值设成 y=0，函数式 y=x²−2 就会变成方程 x²−2=0。下一页把这一步画在图上。"; hint.hidden = false; });
+  root.append(element("p", "lesson08-prompt", "先不要急着求解。带着这个问题进入图象：函数世界与方程世界之间，缺少的那座桥是什么？"), question, cards, prompt, hint);
 }
 
-function renderEquationFunction(root) {
-  const sequence = ["x^2-2=0", "y=x^2-2", "\\text{where }y=0? "];
-  let shown = 1;
-  const cards = element("div", "lesson08-equation-sequence");
-  const reveal = element("p", "lesson08-reveal"); reveal.hidden = true;
-  const next = button("下一步：换成图象语言");
+function renderEquationFunction(root, cleanup) {
+  const rootValue = Math.sqrt(2);
+  let phase = 0;
+  const workbench = element("div", "lesson08-workbench");
+  const phaseLabel = element("p", "lesson08-status");
+  const currentFormula = element("div", "lesson08-formula lesson08-current"); currentFormula.dataset.lesson08BridgeCurrentFormula = "";
+  const explanation = element("p", "lesson08-prompt");
+  const next = button("继续：令 y=0"); next.dataset.lesson08BridgeNext = "";
+  const reveal = button("Reveal：交点就是解"); reveal.dataset.lesson08BridgeReveal = ""; reveal.hidden = true;
+  const conclusion = element("p", "lesson08-reveal"); conclusion.dataset.lesson08BridgeConclusion = ""; conclusion.hidden = true;
+  const graph = layoutWithGraph(root, cleanup, { viewport: { xMin: -2.5, xMax: 2.5, yMin: -2.5, yMax: 4.5, yTickStep: 1 }, ariaLabel: "二次函数 y=x²-2 的图象" }, workbench);
+  root.querySelector(".lesson08-graph-panel").dataset.lesson08BridgeGraph = "";
+
+  const phases = [
+    { label: "函数世界：先画出 y=x²−2", latex: "y=x^2-2", ariaLabel: "y=x²-2", explanation: "曲线上每个点都在报告一个函数值 y。现在请找一找：哪些点的 y 值会恰好等于 0？", graph: {} },
+    { label: "搭桥：令 y=0", latex: "x^2-2=0", ariaLabel: "x²-2=0", explanation: "当 y=0 时，点正好落在 x 轴上。所以函数式立刻变成了同一个一元二次方程。", graph: { horizontalGuides: [{ y: 0, label: "y=0，也就是 x 轴", color: COLORS.root, dash: "" }] } },
+    { label: "方程世界：读出横坐标", latex: "x=\\pm\\sqrt{2}", ariaLabel: "x=±√2", explanation: "曲线在 x 轴上留下两个交点。读出它们的横坐标。", graph: { horizontalGuides: [{ y: 0, label: "y=0", color: COLORS.root, dash: "" }], points: [{ x: -rootValue, y: 0, color: COLORS.root, radius: 7 }, { x: rootValue, y: 0, color: COLORS.root, radius: 7 }], labels: [{ x: -rootValue, y: 0.45, text: "x=−√2" }, { x: rootValue, y: 0.45, text: "x=√2" }] } },
+  ];
+
   function render() {
-    cards.replaceChildren(...sequence.map((item, index) => { const card = formula(item, item, "lesson08-sequence-card"); card.hidden = index >= shown; return card; }));
-    next.textContent = shown < sequence.length ? "下一步：换成图象语言" : "Reveal 核心连接";
+    const current = phases[phase];
+    phaseLabel.textContent = current.label;
+    renderFormula(currentFormula, current.latex, { ariaLabel: current.ariaLabel, displayMode: true });
+    explanation.textContent = current.explanation;
+    next.hidden = phase === phases.length - 1;
+    if (phase === 0) next.textContent = "继续：令 y=0";
+    if (phase === 1) next.textContent = "继续：读交点横坐标";
+    reveal.hidden = phase !== phases.length - 1;
+    updateGraph(graph, { viewport: { xMin: -2.5, xMax: 2.5, yMin: -2.5, yMax: 4.5, yTickStep: 1 }, ariaLabel: "y=x²-2：" + current.label, ...current.graph });
   }
-  next.addEventListener("click", () => {
-    if (shown < sequence.length) { shown += 1; render(); return; }
-    reveal.textContent = "求根 (solve for roots) 就是在图象上寻找 y=0，也就是曲线与 x 轴的交点 (x-intercept)。"; reveal.hidden = false;
-  });
-  root.append(element("p", "lesson08-prompt", "把同一个对象从方程语言翻译到函数语言，再问：图上哪里 y=0？"), cards, next, reveal); render();
+  next.addEventListener("click", () => { if (phase < phases.length - 1) { phase += 1; render(); } });
+  reveal.addEventListener("click", () => { conclusion.textContent = "核心连接：二次函数 y=x²−2 与 x 轴交点的横坐标 x=±√2，就是一元二次方程 x²−2=0 的解。"; conclusion.hidden = false; });
+  workbench.append(phaseLabel, currentFormula, explanation, next, reveal, conclusion);
+  render();
 }
 
 function renderFirstBracket(root, cleanup) {

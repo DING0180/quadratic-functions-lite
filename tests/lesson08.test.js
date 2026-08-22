@@ -23,8 +23,33 @@ describe("Lesson 08 approximate roots and graph inequalities", () => {
 
   it("lists exactly the ten compact teaching stages", () => {
     expect(lesson08.LESSON08_STEP_TITLES).toHaveLength(10);
+    expect(lesson08.LESSON08_STEP_TITLES[0]).toContain("函数世界");
+    expect(lesson08.LESSON08_STEP_TITLES[1]).toContain("交点就是解");
     expect(lesson08.LESSON08_STEP_TITLES[3]).toContain("Root Finder Zoom");
     expect(lesson08.LESSON08_STEP_TITLES[7]).toContain("两个函数比较");
+  });
+
+  it("uses the first two stages to bridge function and equation language through one graph", () => {
+    const stage = document.createElement("main");
+    let lesson = lesson08.renderLesson08(stage, { step: 1, onStepChange() {} });
+    expect(stage.querySelector("[data-lesson08-bridge-question]")).not.toBeNull();
+    expect(stage.querySelector("[data-lesson08-bridge-hint]").hidden).toBe(true);
+    stage.querySelector("[data-lesson08-bridge-prompt]").click();
+    expect(stage.querySelector("[data-lesson08-bridge-hint]").textContent).toContain("y=0");
+    lesson.destroy();
+
+    lesson = lesson08.renderLesson08(stage, { step: 2, onStepChange() {} });
+    const next = stage.querySelector("[data-lesson08-bridge-next]");
+    expect(stage.querySelector("[data-lesson08-bridge-conclusion]").hidden).toBe(true);
+    expect(stage.querySelectorAll("[data-lesson08-bridge-graph] .parabola-point")).toHaveLength(0);
+    next.click();
+    expect(stage.querySelector("[data-lesson08-bridge-current-formula]").getAttribute("aria-label")).toBe("x²-2=0");
+    expect(stage.querySelectorAll("[data-lesson08-bridge-graph] .parabola-horizontal-guide")).toHaveLength(1);
+    next.click();
+    expect(stage.querySelectorAll("[data-lesson08-bridge-graph] .parabola-point")).toHaveLength(2);
+    stage.querySelector("[data-lesson08-bridge-reveal]").click();
+    expect(stage.querySelector("[data-lesson08-bridge-conclusion]").textContent).toContain("x=±√2");
+    lesson.destroy();
   });
 
   it("keeps root and inequality conclusions hidden until Reveal", () => {
