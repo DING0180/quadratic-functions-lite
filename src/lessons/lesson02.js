@@ -1,8 +1,10 @@
 import { createParabolaGraph } from "../graph/parabola-svg.js";
 import { renderFormula } from "../formula.js";
+import "./lesson02.css";
 import {
   LESSON02_X_VALUES,
   createPairChallenge,
+  createCurveToggleState,
   createPlotterState,
   createQuickCheck,
   createSingleChallenge,
@@ -16,6 +18,15 @@ const COLORS = Object.freeze({
   wide: "#16718a",
   accent: "#d98935",
 });
+
+const COMPARISON_CURVES = Object.freeze([
+  { id: "four", a: 4, latex: "y=4x^2", color: "#7c3aed" },
+  { id: "two", a: 2, latex: "y=2x^2", color: "#2563eb" },
+  { id: "half", a: 0.5, latex: "y=\\frac{1}{2}x^2", color: "#16718a" },
+  { id: "negative-half", a: -0.5, latex: "y=-\\frac{1}{2}x^2", color: "#d97706" },
+  { id: "negative-one", a: -1, latex: "y=-x^2", color: "#cf684e" },
+  { id: "negative-two", a: -2, latex: "y=-2x^2", color: "#9f2d63" },
+]);
 
 const STEP_TITLES = Object.freeze([
   "从一般式到 y=ax²",
@@ -423,8 +434,8 @@ function renderMagnitude(root, onStepChange, cleanup) {
   const sliderReadout = element("div", "lesson02-slider-readout");
   const slider = document.createElement("input");
   slider.type = "range";
-  slider.min = "0.2";
-  slider.max = "4";
+  slider.min = "-5";
+  slider.max = "5";
   slider.step = "0.2";
   slider.value = "1";
 
@@ -434,7 +445,10 @@ function renderMagnitude(root, onStepChange, cleanup) {
       element("p", "lesson02-slider-value", "当前 a = " + a),
       formula(formatFunctionLatex(a), "当前函数 y 等于 a x 平方", "lesson02-slider-formula"),
     );
-    graph.update({ curves: [{ a, color: a > 0 ? COLORS.positive : COLORS.negative }] });
+    if (a === 0) {
+      sliderReadout.append(element("p", "lesson02-slider-boundary", "边界：y=0，已不是二次函数。"));
+    }
+    graph.update({ curves: [{ a, color: a > 0 ? COLORS.positive : a < 0 ? COLORS.negative : "#7b8e87" }] });
   }
   slider.addEventListener("input", updateSlider);
 
@@ -637,46 +651,56 @@ function renderPairPractice(root, onStepChange, cleanup) {
 function renderMisconception(root, onStepChange, cleanup) {
   root.classList.add("lesson02-misconception-step");
   const graph = addGraph(root, {
-    curves: [
-      { a: 1, color: COLORS.positive },
-      { a: -1, color: COLORS.negative },
-      { a: 2, color: COLORS.narrow },
-      { a: 4, color: "#5a3f9d" },
-    ],
+    curves: [],
     ariaLabel: "正负系数与绝对值比较的综合图象",
   }, cleanup);
   const panel = element("div", "lesson02-observe-panel");
-  const rule = element("div", "lesson02-rule");
-  rule.hidden = true;
-  rule.append(formula("\\boxed{\\text{符号决定方向，绝对值决定宽窄}}"));
-  let negativeFour = false;
+  const selection = createCurveToggleState(COMPARISON_CURVES.map((curve) => curve.id));
+  const toggles = element("div", "lesson02-curve-toggles");
+  const status = element("p", "lesson02-curve-status", "点击一个函数，把它画到同一坐标系；再次点击可隐藏它。");
 
-  const toggle = button("切换 y=-4x²");
-  toggle.addEventListener("click", () => {
-    negativeFour = !negativeFour;
+  function updateComparison() {
+    const selected = selection.selectedIds;
     graph.update({
-      curves: [
-        { a: 1, color: COLORS.positive },
-        { a: -1, color: COLORS.negative },
-        { a: 2, color: COLORS.narrow },
-        { a: negativeFour ? -4 : 4, color: "#5a3f9d" },
-      ],
+      curves: COMPARISON_CURVES
+        .filter((curve) => selected.includes(curve.id))
+        .map(({ a, color }) => ({ a, color })),
     });
-    toggle.textContent = negativeFour ? "切回 y=4x²" : "切换 y=-4x²";
-  });
-  const finalRule = button("Final Rule");
-  finalRule.addEventListener("click", () => {
-    rule.hidden = false;
+    COMPARISON_CURVES.forEach((curve) => {
+      const toggle = toggles.querySelector('[data-curve-id="' + curve.id + '"]');
+      const active = selected.includes(curve.id);
+      toggle.classList.toggle("is-active", active);
+      toggle.setAttribute("aria-pressed", String(active));
+    });
+    status.textContent = selected.length === 0
+      ? "点击一个函数，把它画到同一坐标系；再次点击可隐藏它。"
+      : "当前显示 " + selected.length + " 条曲线：比较 a 的正负决定方向，|a| 决定开口宽窄。";
+  }
+
+  COMPARISON_CURVES.forEach((curve) => {
+    const toggle = button("", "lesson02-curve-toggle");
+    toggle.dataset.curveId = curve.id;
+    toggle.style.setProperty("--curve-color", curve.color);
+    toggle.setAttribute("aria-pressed", "false");
+    toggle.append(element("span", "lesson02-curve-swatch"));
+    const label = element("span", "lesson02-curve-label");
+    renderFormula(label, curve.latex, { ariaLabel: curve.latex });
+    toggle.append(label);
+    toggle.addEventListener("click", () => {
+      selection.toggle(curve.id);
+      updateComparison();
+    });
+    toggles.append(toggle);
   });
 
   panel.append(
-    element("h3", "", "关键难点综合图"),
-    element("p", "lesson02-question", "y=x² 与 y=-x² 的开口大小一样吗？为什么 y=4x² 比 y=2x² 更窄？"),
-    toggle,
-    finalRule,
-    rule,
+    element("h3", "", "点选函数，比较 a 的正负与大小"),
+    element("p", "lesson02-question", "把多条曲线放在同一坐标系中：哪一些向上开口？哪一些向下开口？同向时，谁更窄？"),
+    toggles,
+    status,
   );
   root.append(panel);
+  updateComparison();
 }
 
 function renderBridgeOut(root, onStepChange, cleanup) {
