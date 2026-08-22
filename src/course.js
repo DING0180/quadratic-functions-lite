@@ -3,7 +3,7 @@ export const COURSE = Object.freeze([
   { id: "lesson-02", number: "02", title: "y=ax²" },
   { id: "lesson-03", number: "03", title: "y=ax²+k" },
   { id: "lesson-04", number: "04", title: "y=a(x-h)²" },
-  { id: "lesson-05", number: "05", title: "y=a(x-h)²+k" },
+  { id: "lesson-05", number: "05", title: "y=a(x-h)²+k", stepCount: 6 },
   { id: "lesson-06", number: "06", title: "y=ax²+bx+c" },
   { id: "lesson-07", number: "07", title: "二次函数图象与 x 轴的交点" },
   { id: "lesson-08", number: "08", title: "利用二次函数图象求一元二次方程近似解" },
