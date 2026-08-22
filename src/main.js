@@ -4,6 +4,7 @@ import { renderFormula } from "./formula.js";
 import { renderLesson02 } from "./lessons/lesson02.js";
 import { renderLesson03 } from "./lessons/lesson03.js";
 import { renderLesson04 } from "./lessons/lesson04.js";
+import { renderLesson05 } from "./lessons/lesson05.js";
 
 const root = document.querySelector("#app");
 
@@ -89,7 +90,8 @@ function render() {
   const isLesson02 = lesson.id === "lesson-02";
   const isLesson03 = lesson.id === "lesson-03";
   const isLesson04 = lesson.id === "lesson-04";
-  const stepCount = isLesson02 ? 12 : isLesson03 ? 10 : isLesson04 ? 5 : 0;
+  const isLesson05 = lesson.id === "lesson-05";
+  const stepCount = isLesson02 ? 12 : isLesson03 ? 10 : isLesson04 ? 5 : isLesson05 ? 6 : 0;
   const step = stepCount ? lessonStepFromHash(window.location.hash, lesson.id, stepCount) : null;
   const canonicalHash = stepCount ? lessonStepHash(lesson.id, step) : "#" + lesson.id;
   if (window.location.hash !== canonicalHash) {
@@ -99,9 +101,9 @@ function render() {
   document.title = lesson.number + " · " + lesson.title + "｜二次函数互动课堂";
   renderSidebar(lesson.id);
 
-  if (isLesson02 || isLesson03 || isLesson04) {
+  if (isLesson02 || isLesson03 || isLesson04 || isLesson05) {
     stage.classList.add("lesson-stage-active");
-    const renderer = isLesson02 ? renderLesson02 : isLesson03 ? renderLesson03 : renderLesson04;
+    const renderer = isLesson02 ? renderLesson02 : isLesson03 ? renderLesson03 : isLesson04 ? renderLesson04 : renderLesson05;
     activeLesson = renderer(stage, {
       step,
       onStepChange(nextStep) {
