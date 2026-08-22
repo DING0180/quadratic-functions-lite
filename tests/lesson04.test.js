@@ -8,77 +8,57 @@ afterEach(() => {
 });
 
 describe("Lesson 04 horizontal-shift migration", () => {
-  it("preserves the five legacy discovery stages", () => {
+  it("starts with paired same-x plotting and ends with the k exploration page", () => {
     expect(LESSON04_STEP_TITLES).toEqual([
-      "猜一猜：图象向哪边移？",
-      "描点：生成 y=x²",
-      "描点：生成 y=(x-1)²",
-      "比较两个图象",
-      "对应点的水平平移",
+      "同 x 描点：两组点",
+      "连接两条抛物线",
+      "观察：向右平移 1 个单位",
+      "对应点验证",
+      "探索：y=(x-k)²",
     ]);
   });
 
-  it("records a horizontal-shift guess and keeps the conclusion hidden until reveal", () => {
+  it("plots a blue and red point together for each shared x-value", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson04(stage, { step: 1, onStepChange() {} });
 
-    const right = stage.querySelector('[data-lesson04-guess="right"]');
-    const conclusion = stage.querySelector("[data-lesson04-conclusion]");
-    expect(conclusion.hidden).toBe(true);
+    stage.querySelector("[data-lesson04-generate-pair]").click();
 
-    right.click();
-    expect(right.getAttribute("aria-pressed")).toBe("true");
-    stage.querySelector("[data-lesson04-reveal]").click();
-    expect(conclusion.hidden).toBe(false);
+    expect(stage.querySelectorAll(".parabola-point")).toHaveLength(2);
+    expect(stage.querySelector("[data-lesson04-point-table]").textContent).toContain("(-4, 16)");
+    expect(stage.querySelector("[data-lesson04-point-table]").textContent).toContain("(-4, 25)");
     lesson.destroy();
   });
 
-  it("connects the baseline curve only after all nine legacy points are generated", () => {
+  it("connects both curves only after all nine blue-red pairs are generated", () => {
     const stage = document.createElement("main");
-    const lesson = renderLesson04(stage, { step: 2, onStepChange() {} });
-    const generate = stage.querySelector("[data-lesson04-generate-base]");
+    const lesson = renderLesson04(stage, { step: 1, onStepChange() {} });
+    const generate = stage.querySelector("[data-lesson04-generate-pair]");
+    const connect = stage.querySelector("[data-lesson04-connect-pairs]");
 
     for (let index = 0; index < 8; index += 1) generate.click();
-    expect(stage.querySelectorAll(".parabola-point")).toHaveLength(8);
+    expect(stage.querySelectorAll(".parabola-point")).toHaveLength(16);
+    expect(connect.disabled).toBe(true);
     expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(0);
 
-    generate.click();
-    expect(stage.querySelectorAll(".parabola-point")).toHaveLength(9);
-    expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(1);
-    lesson.destroy();
-  });
-
-  it("requires ten shifted points before a student can connect the new curve", () => {
-    const stage = document.createElement("main");
-    const lesson = renderLesson04(stage, { step: 3, onStepChange() {} });
-    const generate = stage.querySelector("[data-lesson04-generate-shifted]");
-    const connect = stage.querySelector("[data-lesson04-connect-shifted]");
-
-    for (let index = 0; index < 9; index += 1) generate.click();
-    expect(connect.disabled).toBe(true);
     generate.click();
     expect(connect.disabled).toBe(false);
-    expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(0);
-
     connect.click();
-    expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(1);
+    expect(stage.querySelectorAll(".parabola-point")).toHaveLength(18);
+    expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(2);
     lesson.destroy();
   });
 
-  it("reveals the comparison conclusion and plays rightward arrows", () => {
-    vi.useFakeTimers();
-    const comparisonStage = document.createElement("main");
-    const comparison = renderLesson04(comparisonStage, { step: 4, onStepChange() {} });
-    expect(comparisonStage.querySelector("[data-lesson04-conclusion]").hidden).toBe(true);
-    comparisonStage.querySelector("[data-lesson04-reveal]").click();
-    expect(comparisonStage.querySelector("[data-lesson04-conclusion]").hidden).toBe(false);
-    comparison.destroy();
+  it("moves the red curve left and right when k changes", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson04(stage, { step: 5, onStepChange() {} });
+    const slider = stage.querySelector('[data-lesson04-slider="k"]');
 
-    const arrowStage = document.createElement("main");
-    const arrows = renderLesson04(arrowStage, { step: 5, onStepChange() {} });
-    arrowStage.querySelector("[data-lesson04-play-arrows]").click();
-    expect(arrowStage.querySelectorAll(".parabola-arrow-label")).toHaveLength(1);
-    arrows.destroy();
-    expect(vi.getTimerCount()).toBe(0);
+    slider.value = "-2";
+    slider.dispatchEvent(new Event("input", { bubbles: true }));
+
+    expect(stage.querySelector("[data-lesson04-shift-readout]").textContent).toContain("向左平移 2 个单位");
+    expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(2);
+    lesson.destroy();
   });
 });

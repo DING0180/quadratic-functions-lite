@@ -7,10 +7,10 @@ export const BASE_POINTS = Object.freeze([
 export const SHIFTED_POINTS = Object.freeze([
   { x: -4, y: 25 }, { x: -3, y: 16 }, { x: -2, y: 9 },
   { x: -1, y: 4 }, { x: 0, y: 1 }, { x: 1, y: 0 },
-  { x: 2, y: 1 }, { x: 3, y: 4 }, { x: 4, y: 9 }, { x: 5, y: 16 },
+  { x: 2, y: 1 }, { x: 3, y: 4 }, { x: 4, y: 9 },
 ]);
 
-export const TRANSLATION_ARROWS = Object.freeze(BASE_POINTS.map((from) => ({
+export const TRANSLATION_ARROWS = Object.freeze(BASE_POINTS.slice(0, -1).map((from) => ({
   from,
   to: { x: from.x + 1, y: from.y },
   label: "+1",

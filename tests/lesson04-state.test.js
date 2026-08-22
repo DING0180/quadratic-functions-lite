@@ -8,18 +8,20 @@ import {
 } from "../src/lessons/lesson04-state.js";
 
 describe("Lesson 04 migration mathematics", () => {
-  it("keeps the legacy point tables and nine unit-right translations", () => {
+  it("uses the same nine x-values for blue y=x² points and red y=(x-1)² points", () => {
     expect(BASE_POINTS).toEqual([
       { x: -4, y: 16 }, { x: -3, y: 9 }, { x: -2, y: 4 },
       { x: -1, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 1 },
       { x: 2, y: 4 }, { x: 3, y: 9 }, { x: 4, y: 16 },
     ]);
-    expect(SHIFTED_POINTS).toHaveLength(10);
-    expect(SHIFTED_POINTS.at(-1)).toEqual({ x: 5, y: 16 });
-    expect(TRANSLATION_ARROWS).toHaveLength(9);
-    expect(TRANSLATION_ARROWS.every(({ from, to, label }) => (
-      to.x === from.x + 1 && to.y === from.y && label === "+1"
-    ))).toBe(true);
+    expect(SHIFTED_POINTS).toEqual([
+      { x: -4, y: 25 }, { x: -3, y: 16 }, { x: -2, y: 9 },
+      { x: -1, y: 4 }, { x: 0, y: 1 }, { x: 1, y: 0 },
+      { x: 2, y: 1 }, { x: 3, y: 4 }, { x: 4, y: 9 },
+    ]);
+    expect(SHIFTED_POINTS.map(({ x }) => x)).toEqual(BASE_POINTS.map(({ x }) => x));
+    expect(SHIFTED_POINTS.find(({ x }) => x === 1)).toEqual({ x: 1, y: 0 });
+    expect(TRANSLATION_ARROWS).toHaveLength(8);
   });
 
   it("derives the legacy horizontal-shift properties from a and h", () => {
