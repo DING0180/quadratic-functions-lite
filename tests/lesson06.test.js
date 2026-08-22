@@ -7,6 +7,11 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
+function completeMotion(stage, dataset) {
+  const motions = stage.querySelectorAll("[data-" + dataset + "]");
+  motions[motions.length - 1].querySelector("[data-lesson06-motion-progress]").dispatchEvent(new Event("animationend"));
+}
+
 describe("Lesson 06 general-form to vertex-form classroom", () => {
   it("keeps the requested eight-step knowledge-first flow", () => {
     expect(LESSON06_STEP_TITLES).toEqual([
@@ -41,10 +46,28 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
 
     expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(1);
     next.click();
+    completeMotion(stage, "lesson06-demo-motion");
     expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(2);
     expect(stage.textContent).toContain("原式");
     expect(stage.textContent).toContain("把二次项系数提出");
     expect(stage.querySelectorAll(".lesson06-change-note")).toHaveLength(2);
+    lesson.destroy();
+  });
+
+  it("animates a numeric transformation before adding the next retained equality", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson06(stage, { step: 2, onStepChange() {} });
+    const next = stage.querySelector("[data-lesson06-demo-next]");
+
+    next.click();
+    const motion = stage.querySelector("[data-lesson06-demo-motion]");
+    expect(motion).not.toBeNull();
+    expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(1);
+    expect(motion.querySelectorAll("[data-lesson06-motion-token]").length).toBeGreaterThan(1);
+    completeMotion(stage, "lesson06-demo-motion");
+    expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(2);
+    expect(stage.textContent).toContain("-8x");
+    expect(stage.textContent).toContain("-4x");
     lesson.destroy();
   });
 
@@ -54,11 +77,28 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     const next = stage.querySelector("[data-lesson06-symbolic-next]");
 
     next.click();
+    completeMotion(stage, "lesson06-symbolic-motion");
     next.click();
+    completeMotion(stage, "lesson06-symbolic-motion");
     expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(3);
     expect(stage.textContent).toContain("一般式");
     expect(stage.textContent).toContain("计算要补的数");
     expect(stage.querySelectorAll(".lesson06-change-note")).toHaveLength(3);
+    lesson.destroy();
+  });
+
+  it("uses the same in-between motion for each symbolic derivation move", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson06(stage, { step: 4, onStepChange() {} });
+    const next = stage.querySelector("[data-lesson06-symbolic-next]");
+
+    next.click();
+    const motion = stage.querySelector("[data-lesson06-symbolic-motion]");
+    expect(motion).not.toBeNull();
+    expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(1);
+    expect(motion.textContent).toContain("b/a");
+    completeMotion(stage, "lesson06-symbolic-motion");
+    expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(2);
     lesson.destroy();
   });
 
@@ -67,7 +107,10 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     const lesson = renderLesson06(stage, { step: 4, onStepChange() {} });
     const next = stage.querySelector("[data-lesson06-symbolic-next]");
 
-    for (let index = 0; index < 7; index += 1) next.click();
+    for (let index = 0; index < 7; index += 1) {
+      next.click();
+      completeMotion(stage, "lesson06-symbolic-motion");
+    }
     const answer = stage.querySelector("[data-lesson06-hk-answer]");
     expect(answer.hidden).toBe(true);
     stage.querySelector("[data-lesson06-hk-reveal]").click();
