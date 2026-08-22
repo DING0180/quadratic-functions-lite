@@ -122,3 +122,23 @@ export function createQuickCheck(createChallenge) {
     },
   };
 }
+
+export function createCurveToggleState(ids) {
+  const available = new Set(ids);
+  const selected = new Set();
+
+  return {
+    get selectedIds() {
+      return ids.filter((id) => selected.has(id));
+    },
+    toggle(id) {
+      if (!available.has(id)) return false;
+      if (selected.has(id)) {
+        selected.delete(id);
+        return false;
+      }
+      selected.add(id);
+      return true;
+    },
+  };
+}
