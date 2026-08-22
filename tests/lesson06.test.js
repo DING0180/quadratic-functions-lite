@@ -34,6 +34,49 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     lesson.destroy();
   });
 
+  it("keeps every numeric completing-square line visible and annotates the new change", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson06(stage, { step: 2, onStepChange() {} });
+    const next = stage.querySelector("[data-lesson06-demo-next]");
+
+    expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(1);
+    next.click();
+    expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(2);
+    expect(stage.textContent).toContain("原式");
+    expect(stage.textContent).toContain("把二次项系数提出");
+    expect(stage.querySelectorAll(".lesson06-change-note")).toHaveLength(2);
+    lesson.destroy();
+  });
+
+  it("builds the symbolic completing-square derivation as a persistent sequence", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson06(stage, { step: 4, onStepChange() {} });
+    const next = stage.querySelector("[data-lesson06-symbolic-next]");
+
+    next.click();
+    next.click();
+    expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(3);
+    expect(stage.textContent).toContain("一般式");
+    expect(stage.textContent).toContain("计算要补的数");
+    expect(stage.querySelectorAll(".lesson06-change-note")).toHaveLength(3);
+    lesson.destroy();
+  });
+
+  it("asks students to identify h and k before revealing the direct general-form reading rule", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson06(stage, { step: 4, onStepChange() {} });
+    const next = stage.querySelector("[data-lesson06-symbolic-next]");
+
+    for (let index = 0; index < 7; index += 1) next.click();
+    const answer = stage.querySelector("[data-lesson06-hk-answer]");
+    expect(answer.hidden).toBe(true);
+    stage.querySelector("[data-lesson06-hk-reveal]").click();
+    expect(answer.hidden).toBe(false);
+    expect(answer.querySelector("[data-lesson06-direct-axis]").getAttribute("aria-label")).toBe("x=-b/(2a)");
+    expect(answer.querySelector("[data-lesson06-direct-vertex]").getAttribute("aria-label")).toBe("(-b/(2a), (4ac-b²)/(4a))");
+    lesson.destroy();
+  });
+
   it("keeps the interactive completing-square answer hidden until Reveal", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson06(stage, { step: 3, onStepChange() {} });
@@ -63,6 +106,7 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     expect(answer.hidden).toBe(false);
     expect(answer.textContent).toContain("x=3");
     expect(stage.querySelector(".parabola-svg")).not.toBeNull();
+    expect(stage.querySelector("[data-lesson06-challenge-graph]").classList.contains("lesson06-challenge-graph")).toBe(true);
     lesson.destroy();
   });
 });

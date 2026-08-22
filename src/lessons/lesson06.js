@@ -38,7 +38,81 @@ function renderDual(root, _change, cleanup) { const general = { a: 2, b: -8, c: 
 function choose(values, random) { return values[Math.min(values.length - 1, Math.floor(Math.max(0, Math.min(.999999, Number(random()) || 0)) * values.length))]; }
 function makeChallenge(random) { const vertex = { a: choose([1, 2, -1], random), h: choose([-3, -2, -1, 1, 2, 3], random), k: choose([-3, -2, -1, 1, 2, 3], random) }; return { vertex, general: { a: vertex.a, b: -2 * vertex.a * vertex.h, c: vertex.a * vertex.h * vertex.h + vertex.k } }; }
 function renderChallenge(root, _change, cleanup, random) { const prompt = element("div", "lesson06-question"); const answer = element("div", "lesson06-answer"); answer.dataset.lesson06ChallengeAnswer = ""; answer.hidden = true; const graphPanel = element("div", "lesson06-graph-panel"); graphPanel.hidden = true; const graph = addGraph(graphPanel, { a: 1, h: 0, k: 0 }, cleanup, "随机挑战图象"); const control = reveal("Reveal Answer", "lesson06ChallengeReveal"); const next = button("New Challenge", "lesson06-action lesson06-secondary"); let challenge; function render() { challenge = makeChallenge(random); prompt.replaceChildren(element("span", "", "只给一般式："), formula(generalText(challenge.general), "lesson06-formula lesson06-hero"), element("span", "", "请口答对称轴与顶点。")); answer.hidden = true; graphPanel.hidden = true; } control.addEventListener("click", () => { answer.replaceChildren(formula(vertexText(challenge.vertex)), element("p", "", "对称轴 (axis of symmetry)：x=" + number(challenge.vertex.h) + "；顶点 (vertex)：(" + number(challenge.vertex.h) + ", " + number(challenge.vertex.k) + ")。")); answer.hidden = false; graphPanel.hidden = false; updateGraph(graph, challenge.vertex, vertexText(challenge.vertex) + " 的图象"); }); next.addEventListener("click", render); const actions = element("div", "lesson06-actions"); actions.append(control, next); root.append(element("p", "lesson06-prompt", "题目先从简单顶点式随机展开而来；只练习读对称轴和顶点，不做题库或计分。"), prompt, actions, answer, graphPanel); render(); }
+function appendDerivationLine(host, move, dataset) {
+  const line = element("article", "lesson06-derivation-line lesson06-tone-" + move.tone);
+  line.dataset[dataset] = "";
+  line.append(element("p", "lesson06-card-label", move.label), formula(move.latex, "lesson06-formula lesson06-morph-formula"), element("p", "lesson06-change-note", move.note));
+  host.append(line);
+}
+
+function renderDemoDetailed(root, _change, cleanup) {
+  const moves = [
+    { label: "原式", latex: "y=2x^2-8x+3", tone: "base", note: "从一般式开始：先只关注含 x 的两项。" },
+    { label: "① 把二次项系数提出", latex: "y=2(x^2-4x)+3", tone: "a", note: "红色：2 提到括号外；因此 -8x ÷ 2 变成 -4x。" },
+    { label: "② 补出完全平方", latex: "y=2[(x^2-4x+4)-4]+3", tone: "square", note: "橙色：(-4 ÷ 2)²=4；必须同时 +4 和 -4，式子的值不变。" },
+    { label: "③ 合成平方", latex: "y=2[(x-2)^2-4]+3", tone: "square", note: "橙色：x²-4x+4 正好就是 (x-2)²。" },
+    { label: "④ 把括号外的 2 分配进去", latex: "y=2(x-2)^2-8+3", tone: "a", note: "红色：2×(-4)=-8；平方部分暂时保持不动。" },
+    { label: "⑤ 合并常数", latex: "y=2(x-2)^2-5", tone: "vertex", note: "蓝色：-8+3=-5；现在与 y=a(x-h)²+k 完全对应。" },
+  ];
+  let index = 0;
+  const sequence = element("div", "lesson06-derivation-sequence");
+  const status = element("p", "lesson06-status");
+  const next = button("显示下一步"); next.dataset.lesson06DemoNext = "";
+  const result = element("div", "lesson06-demo-result"); result.dataset.lesson06DemoResult = ""; result.hidden = true;
+  const graphPanel = element("div", "lesson06-graph-panel"); graphPanel.hidden = true;
+  addGraph(graphPanel, { a: 2, h: 2, k: -5 }, cleanup, "y=2(x-2)²-5 的图象");
+  function showNext() { appendDerivationLine(sequence, moves[index], "lesson06DemoLine"); status.textContent = "已展示 " + (index + 1) + " / " + moves.length + " 步；前面的等式保留在上方，便于逐项对照。"; index += 1; const done = index === moves.length; next.disabled = done; result.hidden = !done; graphPanel.hidden = !done; if (done) result.textContent = "顶点 (vertex)：(2, -5)；对称轴 (axis of symmetry)：x=2。"; }
+  next.addEventListener("click", showNext);
+  root.append(element("p", "lesson06-question", "不要跳步：每一行都保留，用同色说明“这一行相对上一行究竟改变了什么”。"), sequence, next, status, result, graphPanel);
+  showNext();
+}
+
+function renderSymbolicDetailed(root) {
+  const moves = [
+    { label: "一般式", latex: "y=ax^2+bx+c", tone: "base", note: "从一般式开始，目标是把含 x 的部分凑成一个平方。" },
+    { label: "① 提出 a", latex: "y=a(x^2+\\frac{b}{a}x)+c", tone: "a", note: "红色：把 a 从前两项提出，括号内的一次项变成 (b/a)x。" },
+    { label: "② 计算要补的数", latex: "(\\frac{b}{2a})^2=\\frac{b^2}{4a^2}", tone: "square", note: "橙色：一次项系数 b/a 的一半是 b/(2a)，平方后就是要补的数。" },
+    { label: "③ 同时加减该数", latex: "y=a[(x^2+\\frac{b}{a}x+\\frac{b^2}{4a^2})-\\frac{b^2}{4a^2}]+c", tone: "square", note: "橙色：括号内 + 和 - 同一个数，函数值保持不变。" },
+    { label: "④ 合成完全平方", latex: "y=a[(x+\\frac{b}{2a})^2-\\frac{b^2}{4a^2}]+c", tone: "square", note: "橙色：前三项合成为 (x+b/(2a))²。" },
+    { label: "⑤ 把 a 乘回去", latex: "y=a(x+\\frac{b}{2a})^2-\\frac{b^2}{4a}+c", tone: "a", note: "红色：a×[-b²/(4a²)]=-b²/(4a)。" },
+    { label: "⑥ 合并常数", latex: "y=a(x+\\frac{b}{2a})^2+\\frac{4ac-b^2}{4a}", tone: "vertex", note: "蓝色：c-b²/(4a) 通分后得到 (4ac-b²)/(4a)。" },
+    { label: "⑦ 对齐顶点式", latex: "y=a[x-(-\\frac{b}{2a})]^2+\\frac{4ac-b^2}{4a}", tone: "vertex", note: "蓝色：与 y=a(x-h)²+k 对比，h=-b/(2a)，k=(4ac-b²)/(4a)。" },
+  ];
+  let index = 0;
+  const sequence = element("div", "lesson06-derivation-sequence");
+  const next = button("显示下一步"); next.dataset.lesson06SymbolicNext = "";
+  const hkPanel = element("section", "lesson06-hk-panel"); hkPanel.hidden = true;
+  const mapping = document.createElement("table"); mapping.className = "lesson06-hk-table";
+  mapping.innerHTML = "<thead><tr><th>顶点式结构</th><th>本题最终式</th><th>读出的量</th></tr></thead><tbody><tr><td>y=a(x-h)²+k</td><td>y=a[x-(-b/(2a))]²+(4ac-b²)/(4a)</td><td>先找 h 与 k</td></tr><tr><td>括号内 x-h</td><td>x-(-b/(2a))</td><td>h=-b/(2a)</td></tr><tr><td>平方外常数 k</td><td>(4ac-b²)/(4a)</td><td>k=(4ac-b²)/(4a)</td></tr></tbody>";
+  const hkPrompt = element("p", "lesson06-question", "现在先请学生说一说：这一式中 h 是谁？k 是谁？再按顶点式的结构直接读出对称轴与顶点。");
+  const hkReveal = reveal("Reveal h 与 k", "lesson06HkReveal"); hkReveal.hidden = true;
+  const hkAnswer = element("div", "lesson06-answer"); hkAnswer.dataset.lesson06HkAnswer = ""; hkAnswer.hidden = true;
+  hkAnswer.append(
+    element("p", "", "因为对称轴 (axis of symmetry) 是 x=h，所以一般式可以直接读出："),
+    formula("x=-b/(2a)", "lesson06-formula", "lesson06DirectAxis"),
+    element("p", "", "因为顶点 (vertex) 是 (h,k)，所以一般式的顶点是："),
+    formula("(-b/(2a), (4ac-b²)/(4a))", "lesson06-formula", "lesson06DirectVertex"),
+    element("p", "", "记住这两个公式后，平时不必每次都重新配方；配方用于理解公式从哪里来，公式用于快速读图。"),
+  );
+  hkReveal.addEventListener("click", () => { hkAnswer.hidden = false; });
+  function showNext() { appendDerivationLine(sequence, moves[index], "lesson06SymbolicLine"); index += 1; const done = index === moves.length; next.disabled = done; if (done) { hkPanel.hidden = false; hkReveal.hidden = false; } }
+  next.addEventListener("click", showNext);
+  hkPanel.append(hkPrompt, mapping, hkReveal, hkAnswer);
+  root.append(element("p", "lesson06-question", "把数字例题的每一个动作完整搬到字母式：不要直接跳到公式，逐行看清每个量从哪里来。"), sequence, next, hkPanel);
+  showNext();
+}
+
+function renderChallengeDetailed(root, _change, cleanup, random) {
+  root.classList.add("lesson06-challenge-step");
+  const prompt = element("div", "lesson06-question"); const answer = element("div", "lesson06-answer"); answer.dataset.lesson06ChallengeAnswer = ""; answer.hidden = true;
+  const graphPanel = element("div", "lesson06-graph-panel lesson06-challenge-graph"); graphPanel.dataset.lesson06ChallengeGraph = ""; graphPanel.hidden = true;
+  const graph = addGraph(graphPanel, { a: 1, h: 0, k: 0 }, cleanup, "随机挑战图象"); const control = reveal("Reveal Answer", "lesson06ChallengeReveal"); const next = button("New Challenge", "lesson06-action lesson06-secondary"); let challenge;
+  function render() { challenge = makeChallenge(random); prompt.replaceChildren(element("span", "", "只给一般式："), formula(generalText(challenge.general), "lesson06-formula lesson06-hero"), element("span", "", "请口答对称轴与顶点。")); answer.hidden = true; graphPanel.hidden = true; }
+  control.addEventListener("click", () => { answer.replaceChildren(formula(vertexText(challenge.vertex)), element("p", "", "对称轴 (axis of symmetry)：x=" + number(challenge.vertex.h) + "；顶点 (vertex)：(" + number(challenge.vertex.h) + ", " + number(challenge.vertex.k) + ")。")); answer.hidden = false; graphPanel.hidden = false; updateGraph(graph, challenge.vertex, vertexText(challenge.vertex) + " 的图象"); }); next.addEventListener("click", render);
+  const actions = element("div", "lesson06-actions"); actions.append(control, next); root.append(element("p", "lesson06-prompt", "答案揭示后，下方保留一张更大的图像验证；本页可以上下滚动，供课堂仔细读图。"), prompt, actions, answer, graphPanel); render();
+}
+
 function renderSummary(root) { const route = element("div", "lesson06-summary-route"); ["一般式 (general form)", "配方法 (completing the square)", "顶点式 (vertex form)", "顶点 / 对称轴"].forEach((label, index) => { route.append(element("strong", "lesson06-route-node", label)); if (index < 3) route.append(element("span", "lesson06-route-arrow", "→")); }); root.append(route, element("p", "lesson06-bridge-out", "Bridge Out：令 y=0，一般式 y=ax²+bx+c 会变成一元二次方程；下一课将研究它与 x 轴的交点。")); }
 
-const RENDERERS = Object.freeze([renderBridge, renderDemo, renderInteractive, renderSymbolic, renderFormulaCards, renderDual, renderChallenge, renderSummary]);
+const RENDERERS = Object.freeze([renderBridge, renderDemoDetailed, renderInteractive, renderSymbolicDetailed, renderFormulaCards, renderDual, renderChallengeDetailed, renderSummary]);
 export function renderLesson06(stage, { step = 1, onStepChange = () => {}, random = Math.random }) { const safeStep = Math.min(8, Math.max(1, Number(step) || 1)); const cleanup = []; const root = createRoot(safeStep); RENDERERS[safeStep - 1](root, onStepChange, cleanup, random); appendNavigation(root, safeStep, onStepChange); stage.replaceChildren(root); return { destroy() { cleanup.forEach((dispose) => dispose()); } }; }
