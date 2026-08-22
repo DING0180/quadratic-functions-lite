@@ -8,6 +8,7 @@ import { renderLesson05 } from "./lessons/lesson05.js";
 import { renderLesson06 } from "./lessons/lesson06.js";
 import { renderLesson07 } from "./lessons/lesson07.js";
 import { renderLesson08 } from "./lessons/lesson08.js";
+import { renderLesson09 } from "./lessons/lesson09.js";
 
 const root = document.querySelector("#app");
 
@@ -97,7 +98,8 @@ function render() {
   const isLesson06 = lesson.id === "lesson-06";
   const isLesson07 = lesson.id === "lesson-07";
   const isLesson08 = lesson.id === "lesson-08";
-  const stepCount = isLesson02 ? 12 : isLesson03 ? 10 : isLesson04 ? 5 : isLesson05 ? 6 : isLesson06 ? 8 : isLesson07 ? 7 : isLesson08 ? 10 : 0;
+  const isLesson09 = lesson.id === "lesson-09";
+  const stepCount = isLesson02 ? 12 : isLesson03 ? 10 : isLesson04 ? 5 : isLesson05 ? 6 : isLesson06 ? 8 : isLesson07 ? 7 : isLesson08 ? 10 : isLesson09 ? 10 : 0;
   const step = stepCount ? lessonStepFromHash(window.location.hash, lesson.id, stepCount) : null;
   const canonicalHash = stepCount ? lessonStepHash(lesson.id, step) : "#" + lesson.id;
   if (window.location.hash !== canonicalHash) {
@@ -107,9 +109,9 @@ function render() {
   document.title = lesson.number + " · " + lesson.title + "｜二次函数互动课堂";
   renderSidebar(lesson.id);
 
-  if (isLesson02 || isLesson03 || isLesson04 || isLesson05 || isLesson06 || isLesson07 || isLesson08) {
+  if (isLesson02 || isLesson03 || isLesson04 || isLesson05 || isLesson06 || isLesson07 || isLesson08 || isLesson09) {
     stage.classList.add("lesson-stage-active");
-    const renderer = isLesson02 ? renderLesson02 : isLesson03 ? renderLesson03 : isLesson04 ? renderLesson04 : isLesson05 ? renderLesson05 : isLesson06 ? renderLesson06 : isLesson07 ? renderLesson07 : renderLesson08;
+    const renderer = isLesson02 ? renderLesson02 : isLesson03 ? renderLesson03 : isLesson04 ? renderLesson04 : isLesson05 ? renderLesson05 : isLesson06 ? renderLesson06 : isLesson07 ? renderLesson07 : isLesson08 ? renderLesson08 : renderLesson09;
     activeLesson = renderer(stage, {
       step,
       onStepChange(nextStep) {
@@ -124,4 +126,5 @@ function render() {
 
 window.addEventListener("hashchange", render);
 render();
+
 
