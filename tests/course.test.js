@@ -16,7 +16,8 @@ describe("course configuration", () => {
     expect(getLessonById("lesson-06")).toMatchObject({
       id: "lesson-06",
       number: "06",
-      title: "y=ax²+bx+c",
+      title: "一般式与顶点式的转换",
+      stepCount: 8,
     });
   });
 
