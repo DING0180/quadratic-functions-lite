@@ -7,11 +7,6 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
-function completeMotion(stage, dataset) {
-  const motions = stage.querySelectorAll("[data-" + dataset + "]");
-  motions[motions.length - 1].querySelector("[data-lesson06-motion-progress]").dispatchEvent(new Event("animationend"));
-}
-
 describe("Lesson 06 general-form to vertex-form classroom", () => {
   it("keeps the requested eight-step knowledge-first flow", () => {
     expect(LESSON06_STEP_TITLES).toEqual([
@@ -46,7 +41,6 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
 
     expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(1);
     next.click();
-    completeMotion(stage, "lesson06-demo-motion");
     expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(2);
     expect(stage.textContent).toContain("原式");
     expect(stage.textContent).toContain("把二次项系数提出");
@@ -54,20 +48,18 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     lesson.destroy();
   });
 
-  it("animates a numeric transformation before adding the next retained equality", () => {
+  it("uses adjacent color highlighting instead of a separate transformation card", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson06(stage, { step: 2, onStepChange() {} });
     const next = stage.querySelector("[data-lesson06-demo-next]");
 
     next.click();
-    const motion = stage.querySelector("[data-lesson06-demo-motion]");
-    expect(motion).not.toBeNull();
-    expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(1);
-    expect(motion.querySelectorAll("[data-lesson06-motion-token]").length).toBeGreaterThan(1);
-    completeMotion(stage, "lesson06-demo-motion");
+    expect(stage.querySelector("[data-lesson06-demo-motion]")).toBeNull();
     expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(2);
-    expect(stage.textContent).toContain("-8x");
-    expect(stage.textContent).toContain("-4x");
+    const formulas = stage.querySelectorAll("[data-lesson06-demo-line] .lesson06-morph-formula");
+    expect(formulas[0].getAttribute("aria-label")).toContain("\\color");
+    expect(formulas[1].getAttribute("aria-label")).toContain("\\color");
+    expect(stage.textContent).toContain("批注：提出公因式 2。");
     lesson.destroy();
   });
 
@@ -79,11 +71,9 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
 
     expect(previous.disabled).toBe(true);
     next.click();
-    completeMotion(stage, "lesson06-demo-motion");
     expect(previous.disabled).toBe(false);
     previous.click();
     expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(1);
-    expect(stage.querySelectorAll("[data-lesson06-demo-motion]")).toHaveLength(0);
     expect(next.disabled).toBe(false);
     lesson.destroy();
   });
@@ -94,9 +84,7 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     const next = stage.querySelector("[data-lesson06-symbolic-next]");
 
     next.click();
-    completeMotion(stage, "lesson06-symbolic-motion");
     next.click();
-    completeMotion(stage, "lesson06-symbolic-motion");
     expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(3);
     expect(stage.textContent).toContain("一般式");
     expect(stage.textContent).toContain("计算要补的数");
@@ -104,18 +92,15 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     lesson.destroy();
   });
 
-  it("uses the same in-between motion for each symbolic derivation move", () => {
+  it("uses the same adjacent color highlighting for symbolic derivation moves", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson06(stage, { step: 4, onStepChange() {} });
     const next = stage.querySelector("[data-lesson06-symbolic-next]");
 
     next.click();
-    const motion = stage.querySelector("[data-lesson06-symbolic-motion]");
-    expect(motion).not.toBeNull();
-    expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(1);
-    expect(Array.from(motion.querySelectorAll("[aria-label]"), (node) => node.getAttribute("aria-label"))).toContain("\\frac{b}{a}x");
-    completeMotion(stage, "lesson06-symbolic-motion");
+    expect(stage.querySelector("[data-lesson06-symbolic-motion]")).toBeNull();
     expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(2);
+    expect(stage.querySelectorAll("[data-lesson06-symbolic-line] .lesson06-morph-formula")[1].getAttribute("aria-label")).toContain("\\color");
     lesson.destroy();
   });
 
@@ -133,10 +118,7 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     const lesson = renderLesson06(stage, { step: 4, onStepChange() {} });
     const next = stage.querySelector("[data-lesson06-symbolic-next]");
 
-    for (let index = 0; index < 7; index += 1) {
-      next.click();
-      completeMotion(stage, "lesson06-symbolic-motion");
-    }
+    for (let index = 0; index < 7; index += 1) next.click();
     const answer = stage.querySelector("[data-lesson06-hk-answer]");
     expect(answer.hidden).toBe(true);
     stage.querySelector("[data-lesson06-hk-reveal]").click();
