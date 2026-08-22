@@ -4,6 +4,7 @@ import {
   LESSON02_X_VALUES,
   createPairChallenge,
   createPlotterState,
+  createQuickCheck,
   createSingleChallenge,
   formatFunctionLatex,
 } from "./lesson02-state.js";
@@ -419,20 +420,19 @@ function renderMagnitude(root, onStepChange, cleanup) {
     rule.hidden = false;
   });
 
-  const sliderLabel = element("p", "lesson02-slider-label");
+  const sliderReadout = element("div", "lesson02-slider-readout");
   const slider = document.createElement("input");
   slider.type = "range";
-  slider.min = "-4";
+  slider.min = "0.2";
   slider.max = "4";
   slider.step = "0.2";
   slider.value = "1";
 
   function updateSlider() {
     const a = Number(slider.value);
-    if (a === 0) return;
-    sliderLabel.replaceChildren(
-      element("span", "", "探索："),
-      formula("y=" + formatFunctionLatex(a).replace(/^y=/, ""), "当前系数", "lesson02-inline-formula"),
+    sliderReadout.replaceChildren(
+      element("p", "lesson02-slider-value", "当前 a = " + a),
+      formula(formatFunctionLatex(a), "当前函数 y 等于 a x 平方", "lesson02-slider-formula"),
     );
     graph.update({ curves: [{ a, color: a > 0 ? COLORS.positive : COLORS.negative }] });
   }
@@ -446,7 +446,7 @@ function renderMagnitude(root, onStepChange, cleanup) {
     rule,
     element("h4", "", "只用一个参数继续探索"),
     slider,
-    sliderLabel,
+    sliderReadout,
   );
   layout.append(graphPane, panel);
   root.append(layout);
@@ -486,18 +486,21 @@ function renderSummary(root) {
 }
 
 function renderSinglePractice(root, onStepChange, cleanup) {
-  const challenge = createSingleChallenge();
+  const quickCheck = createQuickCheck(createSingleChallenge);
+  let challenge = null;
+  const number = element("p", "lesson02-quick-check-number");
+  const question = element("div", "lesson02-quick-check-question");
   const feedback = element("p", "lesson02-status", "先根据解析式判断，再用图象验证。");
   const options = element("div", "lesson02-practice-options");
   const graphWrap = element("div", "lesson02-practice-graph");
   graphWrap.hidden = true;
   let graph = null;
 
-  const opensUp = challenge.a > 0;
   const direction = button("开口向上", "lesson02-choice-button");
   const downward = button("开口向下", "lesson02-choice-button");
   [direction, downward].forEach((choice) => {
     choice.addEventListener("click", () => {
+      const opensUp = challenge.a > 0;
       const correct = choice === direction ? opensUp : !opensUp;
       challenge.answerWith(choice.textContent);
       feedback.textContent = correct ? "判断正确。接着用图象验证。" : "先保留你的判断，点击图象验证。";
@@ -517,23 +520,43 @@ function renderSinglePractice(root, onStepChange, cleanup) {
         ariaLabel: "随机二次函数图象",
       });
       cleanup.push(() => graph.destroy());
+    } else {
+      graph.update({ curves: [{ a: challenge.a, color: challenge.a > 0 ? COLORS.positive : COLORS.negative }] });
     }
     feedback.textContent = "验证：a=" + challenge.a + "；方向看符号，宽窄看 |a|=" + Math.abs(challenge.a) + "。";
   });
 
+  const next = button("下一题（随机）", "lesson02-action lesson02-action-secondary");
+  function loadNextChallenge() {
+    challenge = quickCheck.next();
+    number.textContent = "Quick Check · 第 " + quickCheck.count + " 题";
+    question.replaceChildren(formula(formatFunctionLatex(challenge.a)));
+    direction.disabled = false;
+    downward.disabled = false;
+    graphWrap.hidden = true;
+    feedback.textContent = "先根据解析式判断，再用图象验证。";
+  }
+  next.addEventListener("click", loadNextChallenge);
+
   root.append(
     element("h3", "", "Can You Read a Parabola?"),
-    formula(formatFunctionLatex(challenge.a)),
+    number,
+    question,
     element("p", "lesson02-question", "只看解析式，图象开口向哪里？"),
     options,
     show,
     feedback,
     graphWrap,
+    next,
   );
+  loadNextChallenge();
 }
 
 function renderPairPractice(root, onStepChange, cleanup) {
-  const pair = createPairChallenge();
+  const quickCheck = createQuickCheck(createPairChallenge);
+  let pair = null;
+  const number = element("p", "lesson02-quick-check-number");
+  const question = element("div", "lesson02-quick-check-question");
   const feedback = element("p", "lesson02-status", "谁的开口更宽？请比较 |a|。");
   const choices = element("div", "lesson02-practice-options");
   const graphWrap = element("div", "lesson02-practice-graph");
@@ -571,21 +594,48 @@ function renderPairPractice(root, onStepChange, cleanup) {
         ariaLabel: "两条随机二次函数图象的比较",
       });
       cleanup.push(() => graph.destroy());
+    } else {
+      graph.update({
+        curves: [
+          { a: pair.a, color: COLORS.positive },
+          { a: pair.b, color: COLORS.negative },
+        ],
+        labels: [
+          { x: -3.5, y: pair.a * 12.25, text: "A" },
+          { x: 3.2, y: pair.b * 10.24, text: "B" },
+        ],
+      });
     }
   });
 
+  const next = button("下一题（随机）", "lesson02-action lesson02-action-secondary");
+  function loadNextChallenge() {
+    pair = quickCheck.next();
+    number.textContent = "Quick Check · 第 " + quickCheck.count + " 题";
+    question.replaceChildren(
+      formula("A:\\ " + formatFunctionLatex(pair.a)),
+      formula("B:\\ " + formatFunctionLatex(pair.b)),
+    );
+    graphWrap.hidden = true;
+    feedback.textContent = "谁的开口更宽？请比较 |a|。";
+  }
+  next.addEventListener("click", loadNextChallenge);
+
   root.append(
     element("h3", "", "Which One Is Wider?"),
-    formula("A:\\ " + formatFunctionLatex(pair.a)),
-    formula("B:\\ " + formatFunctionLatex(pair.b)),
+    number,
+    question,
     choices,
     show,
     feedback,
     graphWrap,
+    next,
   );
+  loadNextChallenge();
 }
 
 function renderMisconception(root, onStepChange, cleanup) {
+  root.classList.add("lesson02-misconception-step");
   const graph = addGraph(root, {
     curves: [
       { a: 1, color: COLORS.positive },
