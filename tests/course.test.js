@@ -30,6 +30,13 @@ describe("course configuration", () => {
     expect(getLessonFromHash("#lesson-02/step-04").id).toBe("lesson-02");
   });
 
+  it("publishes Lesson 05 as a compact six-step local lesson", () => {
+    expect(getLessonById("lesson-05")).toMatchObject({
+      id: "lesson-05",
+      stepCount: 6,
+    });
+  });
+
   it("rejects incomplete or duplicate lesson data", () => {
     expect(() => validateCourse([{ id: "lesson-01", number: "01", title: "A" }])).toThrow("11");
     expect(() => validateCourse(Array.from({ length: 11 }, () => ({
