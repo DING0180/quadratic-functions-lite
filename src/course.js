@@ -6,7 +6,7 @@ export const COURSE = Object.freeze([
   { id: "lesson-05", number: "05", title: "y=a(x-h)²+k", stepCount: 6 },
   { id: "lesson-06", number: "06", title: "一般式与顶点式的转换", stepCount: 8 },
   { id: "lesson-07", number: "07", title: "二次函数图象与 x 轴的交点", stepCount: 7 },
-  { id: "lesson-08", number: "08", title: "利用二次函数图象求一元二次方程近似解" },
+  { id: "lesson-08", number: "08", title: "近似根与图象解不等式", stepCount: 10 },
   { id: "lesson-09", number: "09", title: "实际问题与二次函数（一）" },
   { id: "lesson-10", number: "10", title: "实际问题与二次函数（二）" },
   { id: "lesson-11", number: "11", title: "实际问题与二次函数（三）" },
@@ -44,3 +44,4 @@ export function validateCourse(course) {
 }
 
 validateCourse(COURSE);
+

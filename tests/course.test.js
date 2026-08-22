@@ -45,6 +45,14 @@ describe("course configuration", () => {
     });
   });
 
+  it("publishes Lesson 08 as the ten-step approximate-roots lesson", () => {
+    expect(getLessonById("lesson-08")).toMatchObject({
+      id: "lesson-08",
+      stepCount: 10,
+      title: "近似根与图象解不等式",
+    });
+  });
+
   it("rejects incomplete or duplicate lesson data", () => {
     expect(() => validateCourse([{ id: "lesson-01", number: "01", title: "A" }])).toThrow("11");
     expect(() => validateCourse(Array.from({ length: 11 }, () => ({
@@ -52,3 +60,4 @@ describe("course configuration", () => {
     })))).toThrow("unique");
   });
 });
+

@@ -126,23 +126,49 @@ function appendAxes(svg, scale, id, viewport, customViewport) {
   svg.append(yName);
 }
 
-function curvePath(a, k, h, scale, viewport) {
+function curvePath(a, k, h, scale, viewport, xMin = viewport.xMin, xMax = viewport.xMax) {
   const points = [];
-  for (let x = viewport.xMin; x <= viewport.xMax + 0.001; x += 0.1) {
+  const start = Math.max(viewport.xMin, xMin);
+  const end = Math.min(viewport.xMax, xMax);
+  const increment = Math.max(0.002, (end - start) / 160);
+  for (let x = start; x <= end + increment / 2; x += increment) {
     const command = points.length === 0 ? "M" : "L";
-    points.push(command + scale.x(x).toFixed(2) + " " + scale.y(a * (x - h) * (x - h) + k).toFixed(2));
+    const sample = Math.min(x, end);
+    points.push(command + scale.x(sample).toFixed(2) + " " + scale.y(a * (sample - h) * (sample - h) + k).toFixed(2));
   }
   return points.join(" ");
 }
 
-function appendCurve(svg, curve, scale, progress, viewport) {
-  const path = createSvgElement("path", "parabola-curve");
-  path.setAttribute("d", curvePath(curve.a, curve.k ?? 0, curve.h ?? 0, scale, viewport));
+function appendCurve(svg, curve, scale, progress, viewport, className = "parabola-curve") {
+  const path = createSvgElement("path", className);
+  path.setAttribute("d", curvePath(curve.a, curve.k ?? 0, curve.h ?? 0, scale, viewport, curve.xMin, curve.xMax));
   path.setAttribute("pathLength", "1");
   path.setAttribute("stroke", curve.color ?? "#2563eb");
   path.setAttribute("stroke-dasharray", "1");
   path.setAttribute("stroke-dashoffset", String(1 - Math.max(0, Math.min(1, progress))));
   svg.append(path);
+}
+
+function appendHorizontalGuide(svg, guide, scale, viewport) {
+  if (!Number.isFinite(guide?.y)) return;
+  const line = createSvgElement("line", "parabola-horizontal-guide");
+  line.setAttribute("x1", String(scale.x(viewport.xMin)));
+  line.setAttribute("x2", String(scale.x(viewport.xMax)));
+  line.setAttribute("y1", String(scale.y(guide.y)));
+  line.setAttribute("y2", String(scale.y(guide.y)));
+  line.setAttribute("stroke", guide.color ?? "#7b55b7");
+  line.setAttribute("stroke-dasharray", guide.dash ?? "7 5");
+  line.setAttribute("data-y", String(guide.y));
+  svg.append(line);
+  if (guide.label) {
+    const label = createSvgElement("text", "parabola-horizontal-guide-label");
+    label.setAttribute("x", String(scale.x(viewport.xMax) - 5));
+    label.setAttribute("y", String(scale.y(guide.y) - 7));
+    label.setAttribute("text-anchor", "end");
+    label.setAttribute("fill", guide.color ?? "#7b55b7");
+    label.textContent = guide.label;
+    svg.append(label);
+  }
 }
 
 function appendPoint(svg, point, scale) {
@@ -225,6 +251,8 @@ export function createParabolaGraph(container, initialOptions = {}) {
     labels: [],
     arrows: [],
     guides: [],
+    horizontalGuides: [],
+    highlightedCurves: [],
     curveProgress: 1,
     ...initialOptions,
   };
@@ -242,7 +270,9 @@ export function createParabolaGraph(container, initialOptions = {}) {
     const plotContent = createSvgElement("g", "parabola-plot-content");
     plotContent.setAttribute("clip-path", "url(#" + id + "-plot-area)");
     options.guides.forEach((guide) => appendGuide(plotContent, guide, scale, viewport));
+    options.horizontalGuides.forEach((guide) => appendHorizontalGuide(plotContent, guide, scale, viewport));
     options.curves.forEach((curve) => appendCurve(plotContent, curve, scale, options.curveProgress, viewport));
+    options.highlightedCurves.forEach((curve) => appendCurve(plotContent, curve, scale, options.curveProgress, viewport, "parabola-curve parabola-highlight-curve"));
     options.points.forEach((point) => appendPoint(plotContent, point, scale));
     options.arrows.forEach((arrow) => appendArrow(plotContent, arrow, scale));
     options.labels.forEach((label) => appendLabel(plotContent, label, scale));
@@ -262,3 +292,4 @@ export function createParabolaGraph(container, initialOptions = {}) {
     },
   };
 }
+

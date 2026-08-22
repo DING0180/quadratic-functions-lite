@@ -108,4 +108,22 @@ describe("parabola SVG", () => {
     expect(shiftedContainer.querySelector(".parabola-curve").getAttribute("d"))
       .not.toBe(baseContainer.querySelector(".parabola-curve").getAttribute("d"));
   });
+
+  it("draws a horizontal reference line and a curve segment over a supplied x interval", () => {
+    const container = document.createElement("div");
+
+    createParabolaGraph(container, {
+      viewport: { xMin: 0, xMax: 3, yMin: -2, yMax: 4, yTickStep: 1 },
+      curves: [{ a: 1, h: 1.5, k: -1.5, color: "#a8bbb4" }],
+      highlightedCurves: [{ a: 1, h: 1.5, k: -1.5, xMin: 1, xMax: 2, color: "#19735d" }],
+      horizontalGuides: [{ y: 1, label: "y=1", color: "#7b55b7" }],
+    });
+
+    expect(container.querySelectorAll(".parabola-highlight-curve")).toHaveLength(1);
+    expect(container.querySelector(".parabola-horizontal-guide").getAttribute("data-y")).toBe("1");
+    expect(container.querySelector(".parabola-horizontal-guide-label").textContent).toBe("y=1");
+    expect(container.querySelector(".parabola-highlight-curve").getAttribute("d"))
+      .not.toBe(container.querySelector(".parabola-curve").getAttribute("d"));
+  });
 });
+
