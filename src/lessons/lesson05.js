@@ -39,13 +39,14 @@ function vertexFormText({ a, h, k }) {
 
 function vertexFormLatex(parameters) { return vertexFormText(parameters).replace("²", "^2"); }
 
-function formula(parameters, className = "lesson05-formula", dataset = "") {
+function formulaLatex(latex, ariaLabel, className = "lesson05-formula", dataset = "") {
   const node = element("div", className);
-  const text = vertexFormText(parameters);
   if (dataset) node.dataset[dataset] = "";
-  renderFormula(node, vertexFormLatex(parameters), { ariaLabel: text, displayMode: true });
+  renderFormula(node, latex, { ariaLabel, displayMode: true });
   return node;
 }
+
+function formula(parameters, className = "lesson05-formula", dataset = "") { return formulaLatex(vertexFormLatex(parameters), vertexFormText(parameters), className, dataset); }
 
 function createRoot(step) {
   const root = element("section", "lesson05-step");
@@ -97,13 +98,26 @@ function updateGraph(graph, parameters, options = {}) {
 }
 
 function renderBridge(root) {
-  const roles = element("div", "lesson05-role-grid");
-  [["a", "形状 / 开口 / 宽窄"], ["h", "水平平移"], ["k", "竖直平移"]].forEach(([name, copy]) => {
-    const card = element("article", "lesson05-role lesson05-role-" + name);
-    card.append(element("h3", "", name), element("p", "", copy));
-    roles.append(card);
+  const comparison = element("div", "lesson05-formula-comparison");
+  const base = formula(INITIAL, "lesson05-formula lesson05-hero lesson05-bridge-formula"); base.dataset.lesson05BridgeFormula = "base";
+  const vertex = formulaLatex("y=a(x-h)^2+k", "y=a(x-h)²+k", "lesson05-formula lesson05-hero lesson05-bridge-formula"); vertex.dataset.lesson05BridgeFormula = "vertex";
+  comparison.append(base, vertex);
+  const answers = element("div", "lesson05-bridge-answers");
+  const selections = {};
+  [["a", "a 控制什么？", [["形状、开口和宽窄", "shape"], ["左右平移", "horizontal"], ["上下平移", "vertical"]]], ["h", "h 控制什么？", [["形状、开口和宽窄", "shape"], ["左右平移", "horizontal"], ["上下平移", "vertical"]]], ["k", "k 控制什么？", [["形状、开口和宽窄", "shape"], ["左右平移", "horizontal"], ["上下平移", "vertical"]]]].forEach(([key, label, options]) => {
+    const row = element("label", "lesson05-answer-field lesson05-bridge-field");
+    const select = document.createElement("select"); select.dataset.lesson05BridgeAnswer = key; select.setAttribute("aria-label", label);
+    select.append(new Option("请选择", ""), ...options.map(([text, value]) => new Option(text, value)));
+    row.append(element("span", "", label), select); answers.append(row); selections[key] = select;
   });
-  root.append(element("p", "lesson05-prompt", "把前三课合在一起：a 管形状，h 管左右，k 管上下。"), formula(INITIAL, "lesson05-formula lesson05-hero"), roles);
+  const reveal = element("p", "lesson05-bridge-reveal"); reveal.dataset.lesson05BridgeReveal = ""; reveal.hidden = true;
+  const show = button("显示答案"); show.dataset.lesson05RevealBridge = "";
+  show.addEventListener("click", () => {
+    const correct = selections.a.value === "shape" && selections.h.value === "horizontal" && selections.k.value === "vertical";
+    reveal.textContent = (correct ? "全部正确。" : "答案：") + " a 控制形状、开口和宽窄；h 控制左右平移；k 控制上下平移。";
+    reveal.hidden = false;
+  });
+  root.append(element("p", "lesson05-prompt", "比较两行函数：先选择 a、h、k 各自控制的变化，再显示答案。"), comparison, answers, show, reveal);
 }
 
 function renderLab(root, _onStepChange, cleanup) {
@@ -180,8 +194,10 @@ function choose(values, random) { return values[Math.min(values.length - 1, Math
 
 function createChallenge(random) { return { a: choose([-2, -1, 1, 2], random), h: choose([-3, -2, -1, 1, 2, 3], random), k: choose([-3, -2, -1, 1, 2, 3], random) }; }
 
+function createPropertyChallenge(random) { return { a: 2, h: choose([-3, -2, -1, 1, 2, 3], random), k: choose([-3, -2, -1, 1, 2, 3], random) }; }
+
 function renderShiftChallenge(root, _onStepChange, cleanup, random) {
-  const prompt = element("p", "lesson05-question");
+  const prompt = element("p", "lesson05-question lesson05-shift-question");
   const answer = element("div", "lesson05-answer"); answer.dataset.lesson05ShiftAnswer = "";
   const graphPanel = element("div", "lesson05-challenge-graph"); graphPanel.hidden = true;
   const graph = createGraph(graphPanel, INITIAL, cleanup, { visible: false });
@@ -201,15 +217,52 @@ function renderShiftChallenge(root, _onStepChange, cleanup, random) {
 
 function renderPropertyChallenge(root, _onStepChange, cleanup, random) {
   const question = element("div", "lesson05-question");
-  const answer = element("p", "lesson05-answer", ""); answer.hidden = true;
+  const form = element("div", "lesson05-property-form");
+  const layout = element("div", "lesson05-property-layout");
+  const answer = element("p", "lesson05-answer", ""); answer.dataset.lesson05PropertyFeedback = ""; answer.hidden = true;
   const graphPanel = element("div", "lesson05-challenge-graph"); graphPanel.dataset.lesson05PropertyGraph = ""; graphPanel.hidden = true;
   const graph = createGraph(graphPanel, INITIAL, cleanup, { visible: false });
-  const check = button("Check with Graph"); check.dataset.lesson05CheckProperty = "";
+  const inputs = {};
+  const select = (key, label, options) => {
+    const row = element("label", "lesson05-answer-field");
+    const input = document.createElement("select"); input.dataset.lesson05PropertyAnswer = key; input.setAttribute("aria-label", label);
+    input.append(new Option("请选择", ""), ...options.map(([text, value]) => new Option(text, value)));
+    row.append(element("span", "", label), input); form.append(row); inputs[key] = input;
+  };
+  const numeric = (key, label) => {
+    const row = element("label", "lesson05-answer-field");
+    const input = document.createElement("input"); input.type = "number"; input.step = "1"; input.dataset.lesson05PropertyAnswer = key; input.setAttribute("aria-label", label);
+    row.append(element("span", "", label), input); form.append(row); inputs[key] = input;
+  };
+  select("opening", "开口方向", [["向上", "up"], ["向下", "down"]]);
+  numeric("axis", "对称轴 x=");
+  numeric("vertex-x", "顶点横坐标");
+  numeric("vertex-y", "顶点纵坐标");
+  select("horizontal-direction", "左右平移方向", [["向左", "left"], ["向右", "right"]]);
+  numeric("horizontal-distance", "左右平移单位");
+  select("vertical-direction", "上下平移方向", [["向上", "up"], ["向下", "down"]]);
+  numeric("vertical-distance", "上下平移单位");
+  const check = button("检查作答并显示图像"); check.dataset.lesson05CheckProperty = "";
   const next = button("New Challenge", "lesson05-action lesson05-secondary");
   let challenge;
-  function update() { challenge = createChallenge(random); question.replaceChildren(formula(challenge)); answer.hidden = true; graphPanel.hidden = true; }
-  check.addEventListener("click", () => { answer.textContent = "开口 (opening)：" + (challenge.a > 0 ? "向上" : "向下") + "；对称轴 (axis of symmetry)：x=" + number(challenge.h) + "；顶点 (vertex)：(" + number(challenge.h) + ", " + number(challenge.k) + ")。"; answer.hidden = false; graphPanel.hidden = false; updateGraph(graph, challenge); });
-  next.addEventListener("click", update); root.append(element("p", "lesson05-prompt", "先只看解析式判断开口、对称轴和顶点。"), question, answer, element("div", "lesson05-actions"), graphPanel); root.querySelector(".lesson05-actions").append(check, next); update();
+  function update() {
+    challenge = createPropertyChallenge(random);
+    question.replaceChildren(element("p", "", "从基准函数 y=2x² 出发，先完成右侧作答，再看图象验证。"), formula(challenge));
+    Object.values(inputs).forEach((input) => { input.value = ""; });
+    answer.hidden = true; graphPanel.hidden = true;
+  }
+  check.addEventListener("click", () => {
+    const values = Object.fromEntries(Object.entries(inputs).map(([key, input]) => [key, input.value]));
+    if (Object.values(values).some((value) => value === "")) {
+      answer.textContent = "请先完成所有作答项目，再显示图像。"; answer.hidden = false; return;
+    }
+    const horizontalDirection = challenge.h > 0 ? "right" : "left";
+    const verticalDirection = challenge.k > 0 ? "up" : "down";
+    const correct = values.opening === "up" && Number(values.axis) === challenge.h && Number(values["vertex-x"]) === challenge.h && Number(values["vertex-y"]) === challenge.k && values["horizontal-direction"] === horizontalDirection && Number(values["horizontal-distance"]) === Math.abs(challenge.h) && values["vertical-direction"] === verticalDirection && Number(values["vertical-distance"]) === Math.abs(challenge.k);
+    answer.textContent = (correct ? "全部正确。" : "已提交，核对正确答案：") + " 开口向上；对称轴 x=" + number(challenge.h) + "；顶点 (" + number(challenge.h) + ", " + number(challenge.k) + ")。从 y=2x² 向" + (horizontalDirection === "right" ? "右" : "左") + "平移 " + Math.abs(challenge.h) + " 单位，再向" + (verticalDirection === "up" ? "上" : "下") + "平移 " + Math.abs(challenge.k) + " 单位。";
+    answer.hidden = false; graphPanel.hidden = false; updateGraph(graph, challenge);
+  });
+  next.addEventListener("click", update); layout.append(question, form); root.append(element("p", "lesson05-prompt", "先读解析式，回答开口、对称轴、顶点以及相对 y=2x² 的平移。"), layout, answer, element("div", "lesson05-actions"), graphPanel); root.querySelector(".lesson05-actions").append(check, next); update();
 }
 
 function renderSummary(root) {
