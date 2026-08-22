@@ -4,6 +4,7 @@ import {
   createPairChallenge,
   createPlotterState,
   createQuickCheck,
+  createCurveToggleState,
   createSingleChallenge,
   formatCoefficientLatex,
   formatFunctionLatex,
@@ -61,5 +62,15 @@ describe("lesson 02 mathematics", () => {
     expect(quickCheck.count).toBe(1);
     expect(quickCheck.next()).toEqual({ a: 2 });
     expect(quickCheck.current).toEqual({ a: 2 });
+  });
+
+  it("toggles a selected comparison curve on and off", () => {
+    const selection = createCurveToggleState(["four", "two", "half"]);
+
+    expect(selection.selectedIds).toEqual([]);
+    expect(selection.toggle("two")).toBe(true);
+    expect(selection.selectedIds).toEqual(["two"]);
+    expect(selection.toggle("two")).toBe(false);
+    expect(selection.selectedIds).toEqual([]);
   });
 });
