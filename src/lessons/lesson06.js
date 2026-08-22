@@ -50,23 +50,18 @@ function appendTransformationMotion(host, move, dataset, cleanup, onComplete) {
   motion.dataset[dataset] = "";
   motion.setAttribute("aria-live", "polite");
   const bridge = move.motion;
-  const heading = element("p", "lesson06-motion-heading", "动画回放：" + bridge.title);
-  const equations = element("div", "lesson06-motion-equations");
-  const before = formula(bridge.before, "lesson06-formula lesson06-motion-formula");
-  const arrow = element("span", "lesson06-motion-arrow", "→");
-  const after = formula(bridge.after, "lesson06-formula lesson06-motion-formula");
-  equations.append(before, arrow, after);
-  const tokens = element("div", "lesson06-motion-tokens");
-  bridge.tokens.forEach(({ from, to, cue }, index) => {
+  const heading = element("p", "lesson06-motion-heading", bridge.title);
+  const tokens = element("div", "lesson06-motion-track");
+  bridge.tokens.filter(({ from, to }) => from !== to).forEach(({ from, to }, index) => {
     const token = element("div", "lesson06-motion-token");
     token.dataset.lesson06MotionToken = "";
-    token.style.setProperty("--motion-delay", String(index * 180) + "ms");
-    token.append(formula(from, "lesson06-motion-term lesson06-motion-from"), element("span", "lesson06-motion-arrow", "→"), formula(to, "lesson06-motion-term lesson06-motion-to"), element("span", "lesson06-motion-cue", cue));
+    token.style.setProperty("--motion-delay", String(index * 280) + "ms");
+    token.append(formula(from, "lesson06-motion-term lesson06-motion-from"), element("span", "lesson06-motion-arrow", "→"), formula(to, "lesson06-motion-term lesson06-motion-to"));
     tokens.append(token);
   });
   const progress = element("div", "lesson06-motion-progress");
   progress.dataset.lesson06MotionProgress = "";
-  motion.append(heading, equations, tokens, element("p", "lesson06-motion-note", bridge.note), progress);
+  motion.append(heading, tokens, progress);
   host.append(motion);
   let done = false;
   let timer;
@@ -78,7 +73,7 @@ function appendTransformationMotion(host, move, dataset, cleanup, onComplete) {
     onComplete();
   };
   progress.addEventListener("animationend", finish, { once: true });
-  timer = window.setTimeout(finish, 1600);
+  timer = window.setTimeout(finish, 3500);
   cleanup.push(() => window.clearTimeout(timer));
   return motion;
 }
@@ -98,16 +93,23 @@ function renderDemoDetailed(root, _change, cleanup) {
   moves[4].motion = { title: "把括号外的 2 分配给 -4", before: "2[(x-2)^2-4]+3", after: "2(x-2)^2-8+3", tokens: [{ from: "2", to: "2", cue: "平方部分保持" }, { from: "2\\cdot(-4)", to: "-8", cue: "只分配给常数 -4" }, { from: "+3", to: "+3", cue: "继续保留" }], note: "2 只乘到括号里的 -4，得到 -8；平方项仍是 2(x-2)²。" };
   moves[5].motion = { title: "合并两个常数", before: "-8+3", after: "-5", tokens: [{ from: "-8", to: "-5", cue: "与 +3 合并" }, { from: "+3", to: "", cue: "完成计算" }], note: "常数相加后，顶点式 y=2(x-2)²-5 就完整出现。" };
   let index = 0;
+  let animating = false;
   const sequence = element("div", "lesson06-derivation-sequence");
   const status = element("p", "lesson06-status");
-  const next = button("显示下一步"); next.dataset.lesson06DemoNext = "";
+  const actions = element("div", "lesson06-motion-controls");
+  const previous = button("回到上一步", "lesson06-action lesson06-secondary"); previous.dataset.lesson06DemoPrevious = "";
+  const next = button("下一步（播放变化）"); next.dataset.lesson06DemoNext = "";
+  actions.append(previous, next);
   const result = element("div", "lesson06-demo-result"); result.dataset.lesson06DemoResult = ""; result.hidden = true;
   const graphPanel = element("div", "lesson06-graph-panel"); graphPanel.hidden = true;
   addGraph(graphPanel, { a: 2, h: 2, k: -5 }, cleanup, "y=2(x-2)²-5 的图象");
-  function showLine() { appendDerivationLine(sequence, moves[index], "lesson06DemoLine"); status.textContent = "已展示 " + (index + 1) + " / " + moves.length + " 步；前面的等式保留在上方，便于逐项对照。"; index += 1; const done = index === moves.length; next.disabled = done; result.hidden = !done; graphPanel.hidden = !done; if (done) result.textContent = "顶点 (vertex)：(2, -5)；对称轴 (axis of symmetry)：x=2。"; }
-  function playNext() { if (index >= moves.length || next.disabled) return; next.disabled = true; appendTransformationMotion(sequence, moves[index], "lesson06DemoMotion", cleanup, showLine); }
+  function syncControls() { const done = index === moves.length; previous.disabled = animating || index <= 1; next.disabled = animating || done; result.hidden = !done; graphPanel.hidden = !done; if (done) result.textContent = "顶点 (vertex)：(2, -5)；对称轴 (axis of symmetry)：x=2。"; }
+  function showLine() { appendDerivationLine(sequence, moves[index], "lesson06DemoLine"); status.textContent = "已展示 " + (index + 1) + " / " + moves.length + " 步；前面的等式保留在上方，便于逐项对照。"; index += 1; animating = false; syncControls(); }
+  function playNext() { if (index >= moves.length || animating) return; animating = true; syncControls(); appendTransformationMotion(sequence, moves[index], "lesson06DemoMotion", cleanup, showLine); }
+  function goPrevious() { if (index <= 1 || animating) return; sequence.lastElementChild.remove(); sequence.lastElementChild.remove(); index -= 1; status.textContent = "已回到第 " + index + " 步；可以再次播放下一次变化。"; syncControls(); }
   next.addEventListener("click", playNext);
-  root.append(element("p", "lesson06-question", "不要跳步：每一行都保留，用同色说明“这一行相对上一行究竟改变了什么”。"), sequence, next, status, result, graphPanel);
+  previous.addEventListener("click", goPrevious);
+  root.append(element("p", "lesson06-question", "不要跳步：每一行都保留；点击下一步后，只看关键项如何拆开、移动并合成。"), sequence, actions, status, result, graphPanel);
   showLine();
 }
 
@@ -130,8 +132,12 @@ function renderSymbolicDetailed(root, _change, cleanup) {
   moves[6].motion = { title: "把常数通分到同一分母", before: "c-\\frac{b^2}{4a}", after: "\\frac{4ac-b^2}{4a}", tokens: [{ from: "c", to: "\\frac{4ac}{4a}", cue: "c 通分" }, { from: "-\\frac{b^2}{4a}", to: "-\\frac{b^2}{4a}", cue: "分母不变" }], note: "c 先写成 4ac/(4a)，再与 -b²/(4a) 合并为一个常数项。" };
   moves[7].motion = { title: "把加号写成顶点式里的减号", before: "x+\\frac{b}{2a}", after: "x-(-\\frac{b}{2a})", tokens: [{ from: "+\\frac{b}{2a}", to: "-(-\\frac{b}{2a})", cue: "同一个量" }, { from: "\\frac{4ac-b^2}{4a}", to: "k", cue: "平方外常数" }], note: "x+b/(2a) 改写为 x-(-b/(2a)) 后，就能一眼对齐 x-h，直接读出 h 与 k。" };
   let index = 0;
+  let animating = false;
   const sequence = element("div", "lesson06-derivation-sequence");
-  const next = button("显示下一步"); next.dataset.lesson06SymbolicNext = "";
+  const actions = element("div", "lesson06-motion-controls");
+  const previous = button("回到上一步", "lesson06-action lesson06-secondary"); previous.dataset.lesson06SymbolicPrevious = "";
+  const next = button("下一步（播放变化）"); next.dataset.lesson06SymbolicNext = "";
+  actions.append(previous, next);
   const hkPanel = element("section", "lesson06-hk-panel"); hkPanel.hidden = true;
   const mapping = document.createElement("table"); mapping.className = "lesson06-hk-table";
   mapping.innerHTML = "<thead><tr><th>顶点式结构</th><th>本题最终式</th><th>读出的量</th></tr></thead><tbody><tr><td>y=a(x-h)²+k</td><td>y=a[x-(-b/(2a))]²+(4ac-b²)/(4a)</td><td>先找 h 与 k</td></tr><tr><td>括号内 x-h</td><td>x-(-b/(2a))</td><td>h=-b/(2a)</td></tr><tr><td>平方外常数 k</td><td>(4ac-b²)/(4a)</td><td>k=(4ac-b²)/(4a)</td></tr></tbody>";
@@ -146,11 +152,14 @@ function renderSymbolicDetailed(root, _change, cleanup) {
     element("p", "", "记住这两个公式后，平时不必每次都重新配方；配方用于理解公式从哪里来，公式用于快速读图。"),
   );
   hkReveal.addEventListener("click", () => { hkAnswer.hidden = false; });
-  function showLine() { appendDerivationLine(sequence, moves[index], "lesson06SymbolicLine"); index += 1; const done = index === moves.length; next.disabled = done; if (done) { hkPanel.hidden = false; hkReveal.hidden = false; } }
-  function playNext() { if (index >= moves.length || next.disabled) return; next.disabled = true; appendTransformationMotion(sequence, moves[index], "lesson06SymbolicMotion", cleanup, showLine); }
+  function syncControls() { const done = index === moves.length; previous.disabled = animating || index <= 1; next.disabled = animating || done; hkPanel.hidden = !done; hkReveal.hidden = !done; if (!done) hkAnswer.hidden = true; }
+  function showLine() { appendDerivationLine(sequence, moves[index], "lesson06SymbolicLine"); index += 1; animating = false; syncControls(); }
+  function playNext() { if (index >= moves.length || animating) return; animating = true; syncControls(); appendTransformationMotion(sequence, moves[index], "lesson06SymbolicMotion", cleanup, showLine); }
+  function goPrevious() { if (index <= 1 || animating) return; sequence.lastElementChild.remove(); sequence.lastElementChild.remove(); index -= 1; syncControls(); }
   next.addEventListener("click", playNext);
+  previous.addEventListener("click", goPrevious);
   hkPanel.append(hkPrompt, mapping, hkReveal, hkAnswer);
-  root.append(element("p", "lesson06-question", "把数字例题的每一个动作完整搬到字母式：不要直接跳到公式，逐行看清每个量从哪里来。"), sequence, next, hkPanel);
+  root.append(element("p", "lesson06-question", "把数字例题的每一个动作完整搬到字母式：每次只看关键量怎样移动，完成后再读下一条等式。"), sequence, actions, hkPanel);
   showLine();
 }
 

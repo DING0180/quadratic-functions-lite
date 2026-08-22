@@ -71,6 +71,23 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     lesson.destroy();
   });
 
+  it("lets students return to the previous retained equality before replaying the next slow move", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson06(stage, { step: 2, onStepChange() {} });
+    const next = stage.querySelector("[data-lesson06-demo-next]");
+    const previous = stage.querySelector("[data-lesson06-demo-previous]");
+
+    expect(previous.disabled).toBe(true);
+    next.click();
+    completeMotion(stage, "lesson06-demo-motion");
+    expect(previous.disabled).toBe(false);
+    previous.click();
+    expect(stage.querySelectorAll("[data-lesson06-demo-line]")).toHaveLength(1);
+    expect(stage.querySelectorAll("[data-lesson06-demo-motion]")).toHaveLength(0);
+    expect(next.disabled).toBe(false);
+    lesson.destroy();
+  });
+
   it("builds the symbolic completing-square derivation as a persistent sequence", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson06(stage, { step: 4, onStepChange() {} });
@@ -96,9 +113,18 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     const motion = stage.querySelector("[data-lesson06-symbolic-motion]");
     expect(motion).not.toBeNull();
     expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(1);
-    expect(motion.textContent).toContain("b/a");
+    expect(Array.from(motion.querySelectorAll("[aria-label]"), (node) => node.getAttribute("aria-label"))).toContain("\\frac{b}{a}x");
     completeMotion(stage, "lesson06-symbolic-motion");
     expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(2);
+    lesson.destroy();
+  });
+
+  it("provides previous and next controls for the symbolic move sequence", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson06(stage, { step: 4, onStepChange() {} });
+
+    expect(stage.querySelector("[data-lesson06-symbolic-previous]").disabled).toBe(true);
+    expect(stage.querySelector("[data-lesson06-symbolic-next]")).not.toBeNull();
     lesson.destroy();
   });
 
