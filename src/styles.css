@@ -143,6 +143,8 @@ body { min-width: 320px; }
 .parabola-curve { fill: none; stroke-width: 3.25; stroke-linecap: round; transition: stroke-dashoffset 80ms linear; }
 .parabola-point { fill: #d98935; stroke: #fff; stroke-width: 1.5; }
 .parabola-label { fill: #38524a; font-size: 15px; font-weight: 700; }
+.parabola-arrow { stroke-width: 2; stroke-linecap: round; }
+.parabola-arrow-label { font-size: 13px; font-weight: 800; }
 
 .lesson02-connect-step > .lesson02-graph-panel { width: min(100%, 38rem); margin-inline: auto; }
 .lesson02-connect-step .lesson02-graph-host, .lesson02-connect-step .parabola-svg { min-height: 0; }
@@ -262,4 +264,61 @@ body { min-width: 320px; }
   .lesson03-data-table, .lesson03-property-table { margin: 0.45rem 0; font-size: 0.78rem; }
   .lesson03-data-table th, .lesson03-data-table td, .lesson03-property-table th, .lesson03-property-table td { padding: 0.25rem 0.35rem; }
   .lesson03-step-controls { margin-top: 0.75rem; padding-top: 0.6rem; }
+}
+
+.lesson04-step {
+  width: min(100%, 70rem);
+  margin: auto;
+  color: #223330;
+}
+
+.lesson04-heading { margin-bottom: 1.1rem; }
+.lesson04-kicker { margin: 0; color: #1b765d; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.13em; }
+.lesson04-title { margin: 0.35rem 0 0; font-size: clamp(1.65rem, 3.1vw, 3rem); line-height: 1.18; }
+.lesson04-layout { display: grid; grid-template-columns: minmax(18rem, 63fr) minmax(17rem, 37fr); gap: clamp(1rem, 2vw, 1.75rem); align-items: start; }
+.lesson04-graph-panel, .lesson04-workbench {
+  border: 1px solid #d5e0da;
+  border-radius: 0.9rem;
+  background: #fff;
+  box-shadow: 0 0.35rem 1.35rem rgb(25 73 58 / 0.06);
+}
+.lesson04-graph-panel { min-width: 0; padding: 0.55rem; background: #fbfdfc; }
+.lesson04-graph-host { min-height: 19rem; }
+.lesson04-workbench { display: grid; align-content: start; gap: 0.9rem; padding: clamp(1rem, 1.7vw, 1.45rem); }
+.lesson04-formula { margin: 0; color: #164f40; font-size: clamp(1.05rem, 1.5vw, 1.35rem); }
+.lesson04-prompt { margin: 0; color: #465a54; font-size: clamp(1rem, 1.2vw, 1.15rem); font-weight: 700; line-height: 1.65; }
+.lesson04-status { min-height: 1.5em; margin: 0; color: #1a6853; font-weight: 700; }
+.lesson04-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.lesson04-action {
+  min-height: 2.65rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #17634e;
+  border-radius: 0.5rem;
+  background: #17634e;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.lesson04-action:hover { background: #104e3d; }
+.lesson04-action:focus-visible { outline: 3px solid #da8c35; outline-offset: 2px; }
+.lesson04-action:disabled { cursor: not-allowed; opacity: 0.55; }
+.lesson04-action[aria-pressed="true"] { background: #104e3d; box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.4); }
+.lesson04-secondary { border-color: #768883; background: #f8faf9; color: #334640; }
+.lesson04-conclusion { margin: 0; padding: 0.8rem 0.9rem; border-left: 5px solid #1f8a70; border-radius: 0.6rem; background: #ecf8f4; color: #155f4d; font-weight: 800; line-height: 1.55; }
+.lesson04-step-controls { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid #d5e0da; }
+.lesson04-step-count { color: #64746f; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 860px) {
+  .lesson04-layout { grid-template-columns: 1fr; }
+  .lesson04-graph-host { min-height: 17rem; }
+}
+
+@media (min-width: 761px) and (max-height: 760px) {
+  .lesson04-heading { margin-bottom: 0.65rem; }
+  .lesson04-title { font-size: 1.7rem; }
+  .lesson04-graph-host { min-height: 14rem; }
+  .lesson04-workbench { gap: 0.55rem; padding: 0.75rem; }
+  .lesson04-action { min-height: 2.15rem; padding: 0.35rem 0.65rem; }
+  .lesson04-step-controls { margin-top: 0.75rem; padding-top: 0.6rem; }
 }
