@@ -1,5 +1,6 @@
 import { renderFormula } from "../formula.js";
 import { createParabolaGraph } from "../graph/parabola-svg.js";
+import "./lesson03.css";
 import {
   LESSON03_POINT_X_VALUES,
   createLesson03PointState,
@@ -40,6 +41,11 @@ function formula(latex, label = latex, className = "lesson03-formula") {
   return node;
 }
 
+function formatAkFunction(a, k) {
+  const coefficient = a === 1 ? "" : a === -1 ? "-" : String(a);
+  return "y=" + coefficient + "x²" + (k === 0 ? "" : k > 0 ? "+" + k : k);
+}
+
 function createRoot(step) {
   const root = element("section", "lesson03-step");
   const header = element("header", "lesson03-heading");
@@ -63,8 +69,8 @@ function appendNavigation(root, step, onStepChange) {
   root.append(controls);
 }
 
-function addGraph(container, options, cleanup) {
-  const panel = element("div", "lesson03-graph-panel");
+function addGraph(container, options, cleanup, panelClass = "") {
+  const panel = element("div", ("lesson03-graph-panel " + panelClass).trim());
   const host = element("div", "lesson03-graph-host");
   panel.append(host);
   container.append(panel);
@@ -175,7 +181,7 @@ function renderShift(root, _onStepChange, cleanup) {
   const graph = addGraph(root, {
     curves: [{ a: 1, k: 0, color: COLORS.base }, { a: 1, k: 0, color: COLORS.curve }],
     labels: [{ x: 2.15, y: 6.5, text: "重合" }], ariaLabel: "抛物线从 y 等于 x 平方上移到 y 等于 x 平方加一",
-  }, cleanup);
+  }, cleanup, "lesson03-compact-graph");
   const vertex = element("p", "lesson03-vertex-path", "顶点：(0, 0) → (0, 1)");
   const replay = button("Replay Shift");
   replay.addEventListener("click", () => {
@@ -190,8 +196,9 @@ function renderShift(root, _onStepChange, cleanup) {
 }
 
 function renderKLab(root, _onStepChange, cleanup) {
-  const graph = addGraph(root, { curves: [{ a: 1, k: 0, color: COLORS.curve }], ariaLabel: "拖动 k 观察二次函数上下平移" }, cleanup);
+  const graph = addGraph(root, { curves: [{ a: 1, k: 0, color: COLORS.curve }], ariaLabel: "拖动 k 观察二次函数上下平移" }, cleanup, "lesson03-compact-graph");
   const readout = element("p", "lesson03-status", "当前顶点：(0, 0)；k=0");
+  const functionReadout = element("p", "lesson03-function-readout", "当前 a = 1；当前 k = 0；当前函数：y=x²");
   const slider = document.createElement("input");
   slider.type = "range"; slider.min = "-4"; slider.max = "4"; slider.step = "1"; slider.value = "0";
   slider.dataset.lesson03Slider = "k";
@@ -201,9 +208,10 @@ function renderKLab(root, _onStepChange, cleanup) {
     const k = Number(slider.value);
     graph.update({ curves: [{ a: 1, k, color: COLORS.curve }], labels: [{ x: 2.15, y: Math.min(14, 5 + k), text: "k=" + k }] });
     readout.textContent = "当前顶点：(0, " + k + ")；k=" + (k > 0 ? "+" : "") + k;
+    functionReadout.textContent = "当前 a = 1；当前 k = " + k + "；当前函数：" + formatAkFunction(1, k);
   }
   slider.addEventListener("input", () => { update(); conclusion.hidden = false; });
-  root.append(element("p", "lesson03-lock", "a = 1 🔒"), element("p", "lesson03-prompt", "固定 a=1，拖动 k，观察顶点和整条图象的位置。"), slider, readout, conclusion);
+  root.append(element("p", "lesson03-lock", "a = 1 🔒"), element("p", "lesson03-prompt", "固定 a=1，拖动 k，观察顶点和整条图象的位置。"), slider, functionReadout, readout, conclusion);
 }
 
 function renderInvariants(root) {
@@ -241,7 +249,7 @@ function renderProperties(root) {
 }
 
 function renderExamples(root, _onStepChange, cleanup) {
-  const graph = addGraph(root, { curves: [{ a: 1, k: 0, color: COLORS.curve }], ariaLabel: "例题的二次函数图象" }, cleanup);
+  const graph = addGraph(root, { curves: [{ a: 1, k: 0, color: COLORS.curve }], ariaLabel: "例题的二次函数图象" }, cleanup, "lesson03-compact-graph");
   const question = element("p", "lesson03-question");
   const hint = element("p", "lesson03-prompt"); hint.hidden = true;
   const answer = element("p", "lesson03-rule"); answer.hidden = true;
@@ -264,7 +272,7 @@ function renderExamples(root, _onStepChange, cleanup) {
 }
 
 function renderParameterLab(root, _onStepChange, cleanup) {
-  const graph = addGraph(root, { curves: [{ a: 1, k: 0, color: COLORS.curve }], ariaLabel: "a 和 k 双参数二次函数实验室" }, cleanup);
+  const graph = addGraph(root, { curves: [{ a: 1, k: 0, color: COLORS.curve }], ariaLabel: "a 和 k 双参数二次函数实验室" }, cleanup, "lesson03-compact-graph");
   const controls = element("div", "lesson03-controls");
   const aInput = document.createElement("input"); aInput.type = "range"; aInput.min = "-3"; aInput.max = "3"; aInput.step = "0.5"; aInput.value = "1"; aInput.dataset.lesson03Slider = "a";
   const kInput = document.createElement("input"); kInput.type = "range"; kInput.min = "-4"; kInput.max = "4"; kInput.step = "1"; kInput.value = "0"; kInput.dataset.lesson03Slider = "k";
@@ -280,7 +288,7 @@ function renderParameterLab(root, _onStepChange, cleanup) {
     if (state.previous) curves.push({ ...state.previous, color: COLORS.base });
     curves.push({ a, k, color: a < 0 ? COLORS.negative : COLORS.curve });
     graph.update({ curves, labels: [{ x: 2.1, y: Math.min(14, 5 + k), text: "a=" + a + ", k=" + k }] });
-    readout.textContent = "当前函数：y=" + a + "x²" + (k >= 0 ? "+" : "") + k + "；顶点 " + (a === 0 ? "—" : info.vertex) + "；" + (a === 0 ? "" : "开口" + info.opening);
+    readout.textContent = "当前 a = " + a + "；当前 k = " + k + "；当前函数：" + formatAkFunction(a, k) + "；顶点 " + (a === 0 ? "—" : info.vertex) + "；" + (a === 0 ? "" : "开口" + info.opening);
     notice.hidden = a !== 0;
   }
   aInput.addEventListener("input", () => update({ preserve: true })); kInput.addEventListener("input", () => update({ preserve: true }));
