@@ -87,6 +87,18 @@ describe("parabola SVG", () => {
     expect(Number(points[1].getAttribute("cx"))).toBeLessThanOrEqual(482);
   });
 
+  it("labels every tenth on the x axis when a zoomed viewport requests decimal ticks", () => {
+    const container = document.createElement("div");
+
+    createParabolaGraph(container, {
+      viewport: { xMin: 1, xMax: 2, xTickStep: 0.1, yMin: -1, yMax: 2, yTickStep: 1 },
+      curves: [{ a: 1, k: -2 }],
+    });
+
+    const xTicks = Array.from(container.querySelectorAll(".parabola-tick:not(.parabola-tick-y)"), (tick) => tick.textContent);
+    expect(xTicks).toEqual(["1", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "2"]);
+  });
+
   it("moves a curve vertically when its constant term changes", () => {
     const baseContainer = document.createElement("div");
     const shiftedContainer = document.createElement("div");

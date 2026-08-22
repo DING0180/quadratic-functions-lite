@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 describe("Lesson 08 classroom routing", () => {
-  it("opens a local ten-step Lesson 08 stage from the existing sidebar hash route", async () => {
+  it("opens a local twelve-step Lesson 08 stage from the existing sidebar hash route", async () => {
     document.body.innerHTML = '<div id="app"></div>';
     window.history.replaceState(null, "", "/#lesson-08/step-04");
 
@@ -16,7 +16,7 @@ describe("Lesson 08 classroom routing", () => {
 
     expect(window.location.hash).toBe("#lesson-08/step-04");
     expect(document.querySelector(".lesson08-step")).not.toBeNull();
-    expect(document.querySelector(".lesson08-kicker").textContent).toContain("04 / 10");
+    expect(document.querySelector(".lesson08-kicker").textContent).toContain("04 / 12");
   });
 });
 

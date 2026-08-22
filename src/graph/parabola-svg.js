@@ -21,11 +21,12 @@ function getViewport(options) {
     xMax: X_MAX,
     yMin: Y_MIN,
     yMax: Y_MAX,
+    xTickStep: 1,
     yTickStep: 4,
     ...(options.viewport ?? {}),
   };
-  if (![viewport.xMin, viewport.xMax, viewport.yMin, viewport.yMax, viewport.yTickStep].every(Number.isFinite)
-    || viewport.xMin >= viewport.xMax || viewport.yMin >= viewport.yMax || viewport.yTickStep <= 0) {
+  if (![viewport.xMin, viewport.xMax, viewport.yMin, viewport.yMax, viewport.xTickStep, viewport.yTickStep].every(Number.isFinite)
+    || viewport.xMin >= viewport.xMax || viewport.yMin >= viewport.yMax || viewport.xTickStep <= 0 || viewport.yTickStep <= 0) {
     throw new TypeError("viewport needs finite increasing bounds");
   }
   return viewport;
@@ -89,9 +90,11 @@ function appendAxes(svg, scale, id, viewport, customViewport) {
   yAxis.setAttribute("marker-end", "url(#" + id + "-axis-arrow)");
   svg.append(yAxis);
 
-  const xTickStart = customViewport ? Math.ceil(viewport.xMin) : X_MIN;
-  const xTickEnd = customViewport ? Math.floor(viewport.xMax) : X_MAX;
-  for (let value = xTickStart; value <= xTickEnd; value += 1) {
+  const xTickStep = customViewport ? viewport.xTickStep : 1;
+  const xTickStart = customViewport ? Math.ceil((viewport.xMin - 1e-9) / xTickStep) : X_MIN;
+  const xTickEnd = customViewport ? Math.floor((viewport.xMax + 1e-9) / xTickStep) : X_MAX;
+  for (let index = xTickStart; index <= xTickEnd; index += 1) {
+    const value = Number((index * xTickStep).toFixed(8));
     if (value === 0) continue;
     const tick = createSvgElement("text", "parabola-tick");
     tick.setAttribute("x", String(scale.x(value)));

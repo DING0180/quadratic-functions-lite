@@ -45,10 +45,10 @@ describe("course configuration", () => {
     });
   });
 
-  it("publishes Lesson 08 as the ten-step approximate-roots lesson", () => {
+  it("publishes Lesson 08 as the twelve-step approximate-roots lesson", () => {
     expect(getLessonById("lesson-08")).toMatchObject({
       id: "lesson-08",
-      stepCount: 10,
+      stepCount: 12,
       title: "近似根与图象解不等式",
     });
   });

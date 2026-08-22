@@ -2,8 +2,9 @@ import { renderFormula } from "../formula.js";
 import { createParabolaGraph } from "../graph/parabola-svg.js";
 import "./lesson08.css";
 
-const COLORS = Object.freeze({ curve: "#19735d", muted: "#a8bbb4", root: "#d98935", guide: "#7b55b7", compare: "#197b9b" });
+const COLORS = Object.freeze({ curve: "#19735d", muted: "#a8bbb4", root: "#d98935", guide: "#7b55b7", compare: "#197b9b", signBase: "#c84f42", signHighlight: "#16815f" });
 const ROOT_FUNCTION = Object.freeze({ a: 1, h: 0, k: -2 });
+const LESSON08_STEP_COUNT = 12;
 
 export const LESSON08_STEP_TITLES = Object.freeze([
   "Bridge In：函数世界与方程世界",
@@ -12,7 +13,9 @@ export const LESSON08_STEP_TITLES = Object.freeze([
   "Root Finder Zoom",
   "Interval Shrink：越来越准确",
   "从 =0 到 >0 / <0",
+  "Quick Check：固定图象读符号",
   "≥ / ≤ 与水平线 y=k",
+  "Quick Check：随机图象读符号",
   "两个函数比较",
   "Quick Random Practice",
   "Summary + Bridge Out",
@@ -41,7 +44,9 @@ function functionText(parameters, { latex = false } = {}) {
 function rootsOf(parameters) {
   if (parameters.a === 0 || -parameters.k / parameters.a < 0) return [];
   const offset = Math.sqrt(-parameters.k / parameters.a);
-  return [clean(parameters.h - offset), clean(parameters.h + offset)];
+  const left = clean(parameters.h - offset);
+  const right = clean(parameters.h + offset);
+  return left === right ? [left] : [left, right];
 }
 
 export function createRootBracket(parameters, left, right) {
@@ -64,7 +69,7 @@ function rootAnswer(bracket) {
 function createRoot(step) {
   const root = element("section", "lesson08-step");
   const heading = element("header", "lesson08-heading");
-  heading.append(element("p", "lesson08-kicker", "LESSON 08 · " + String(step).padStart(2, "0") + " / 10"), element("h2", "lesson08-title", LESSON08_STEP_TITLES[step - 1]));
+  heading.append(element("p", "lesson08-kicker", "LESSON 08 · " + String(step).padStart(2, "0") + " / " + LESSON08_STEP_COUNT), element("h2", "lesson08-title", LESSON08_STEP_TITLES[step - 1]));
   root.append(heading);
   return root;
 }
@@ -74,9 +79,9 @@ function appendNavigation(root, step, onStepChange) {
   navigation.setAttribute("aria-label", "Lesson 8 步骤导航");
   const previous = button("上一步", "lesson08-action lesson08-secondary"); previous.disabled = step === 1;
   previous.addEventListener("click", () => onStepChange(Math.max(1, step - 1)));
-  const next = button(step === 10 ? "回到本课开始" : "下一步");
-  next.addEventListener("click", () => onStepChange(step === 10 ? 1 : step + 1));
-  navigation.append(previous, element("span", "lesson08-step-count", step + " / 10"), next);
+  const next = button(step === LESSON08_STEP_COUNT ? "回到本课开始" : "下一步");
+  next.addEventListener("click", () => onStepChange(step === LESSON08_STEP_COUNT ? 1 : step + 1));
+  navigation.append(previous, element("span", "lesson08-step-count", step + " / " + LESSON08_STEP_COUNT), next);
   root.append(navigation);
 }
 
@@ -171,9 +176,10 @@ function renderFirstBracket(root, cleanup) {
 }
 
 const ZOOM_STAGES = Object.freeze([
-  { bracket: [1, 2], viewport: { xMin: 0.8, xMax: 2.2, yMin: -1.4, yMax: 2.4, yTickStep: 0.5 }, samples: [1, 1.4, 1.5, 2] },
-  { bracket: [1.4, 1.5], viewport: { xMin: 1.35, xMax: 1.55, yMin: -0.3, yMax: 0.35, yTickStep: 0.1 }, samples: [1.4, 1.41, 1.42, 1.5] },
-  { bracket: [1.41, 1.42], viewport: { xMin: 1.405, xMax: 1.425, yMin: -0.03, yMax: 0.03, yTickStep: 0.01 }, samples: [1.41, 1.414, 1.42] },
+  { bracket: [1, 2], viewport: { xMin: 1, xMax: 2, yMin: -1.2, yMax: 2.2, xTickStep: 0.1, yTickStep: 0.5 }, samples: [1, 1.3, 1.4, 1.5, 1.6, 2] },
+  { bracket: [1.3, 1.6], viewport: { xMin: 1.3, xMax: 1.6, yMin: -0.4, yMax: 0.7, xTickStep: 0.1, yTickStep: 0.1 }, samples: [1.3, 1.4, 1.42, 1.5, 1.6] },
+  { bracket: [1.4, 1.5], viewport: { xMin: 1.4, xMax: 1.5, yMin: -0.06, yMax: 0.28, xTickStep: 0.01, yTickStep: 0.05 }, samples: [1.4, 1.41, 1.42, 1.43, 1.44, 1.45, 1.49, 1.5] },
+  { bracket: [1.41, 1.42], viewport: { xMin: 1.41, xMax: 1.42, yMin: -0.015, yMax: 0.02, xTickStep: 0.001, yTickStep: 0.005 }, samples: [1.41, 1.413, 1.414, 1.415, 1.42] },
 ]);
 
 function renderZoom(root, cleanup) {
@@ -183,7 +189,7 @@ function renderZoom(root, cleanup) {
   const viewportReadout = element("p", "lesson08-status"); viewportReadout.dataset.lesson08ViewportReadout = "";
   const selectedReadout = element("p", "lesson08-selected"); selectedReadout.dataset.lesson08SelectedSample = "";
   const sliderLabel = element("label", "lesson08-slider"); sliderLabel.append(element("span", "", "Zoom level"));
-  const slider = document.createElement("input"); slider.type = "range"; slider.min = "0"; slider.max = "2"; slider.step = "1"; slider.value = "0"; slider.dataset.lesson08Zoom = ""; slider.setAttribute("aria-label", "Root Finder Zoom"); sliderLabel.append(slider);
+  const slider = document.createElement("input"); slider.type = "range"; slider.min = "0"; slider.max = String(ZOOM_STAGES.length - 1); slider.step = "1"; slider.value = "0"; slider.dataset.lesson08Zoom = ""; slider.setAttribute("aria-label", "Root Finder Zoom"); sliderLabel.append(slider);
   const table = element("div", "lesson08-value-table");
   const graph = layoutWithGraph(root, cleanup, { viewport: ZOOM_STAGES[0].viewport }, workbench);
   function render() {
@@ -193,7 +199,7 @@ function renderZoom(root, cleanup) {
     viewportReadout.textContent = "当前坐标范围：x∈[" + number(stage.viewport.xMin) + ", " + number(stage.viewport.xMax) + "]";
     selectedReadout.textContent = "选中的函数值：f(" + number(selected) + ")=" + number(evaluate(ROOT_FUNCTION, selected));
     table.replaceChildren(...stage.samples.map((x) => { const sample = button("x=" + number(x) + " → " + number(evaluate(ROOT_FUNCTION, x)), "lesson08-sample"); sample.dataset.lesson08Sample = String(x); sample.setAttribute("aria-pressed", String(x === selected)); sample.addEventListener("click", () => { selected = x; render(); }); return sample; }));
-    updateGraph(graph, { viewport: stage.viewport, points: [{ x: bracket.left, y: bracket.leftValue, color: COLORS.root, radius: 6 }, { x: bracket.right, y: bracket.rightValue, color: COLORS.root, radius: 6 }, { x: selected, y: evaluate(ROOT_FUNCTION, selected), color: COLORS.guide, radius: 8 }], highlightedCurves: [{ ...ROOT_FUNCTION, xMin: bracket.left, xMax: bracket.right, color: COLORS.root }], ariaLabel: "Root Finder Zoom，当前根区间 " + rootIntervalText(bracket) });
+    updateGraph(graph, { viewport: stage.viewport, points: [{ x: bracket.left, y: bracket.leftValue, color: COLORS.root, radius: 6 }, { x: bracket.right, y: bracket.rightValue, color: COLORS.root, radius: 6 }, { x: selected, y: evaluate(ROOT_FUNCTION, selected), color: COLORS.guide, radius: 8 }], highlightedCurves: [{ ...ROOT_FUNCTION, xMin: bracket.left, xMax: bracket.right, color: COLORS.root }], ariaLabel: "Root Finder Zoom，当前根区间 " + rootIntervalText(bracket) + "，x 轴刻度每 " + number(stage.viewport.xTickStep) });
   }
   slider.addEventListener("input", () => { index = Number(slider.value); render(); });
   workbench.append(element("p", "lesson08-prompt", "拖动 Zoom：真正改变坐标范围。点击函数值表的一行，图上的同一个取样点会亮起。"), formula("y=x^2-2", "y=x²-2", "lesson08-formula lesson08-current"), bracketReadout, viewportReadout, sliderLabel, table, selectedReadout); render();
@@ -234,7 +240,7 @@ function renderInequality(root, cleanup) {
     const isPositive = condition === "positive";
     conditionText.textContent = isPositive ? "当前条件：f(x)>0" : "当前条件：f(x)<0";
     answer.hidden = true;
-    updateGraph(graph, { viewport: { xMin: -3, xMax: 3, yMin: -3, yMax: 7, yTickStep: 2 }, highlightedCurves: positiveSegments(condition).map((segment) => ({ ...ROOT_FUNCTION, ...segment, color: COLORS.root })), ariaLabel: conditionText.textContent + " 的高亮曲线段" });
+    updateGraph(graph, { viewport: { xMin: -3, xMax: 3, yMin: -3, yMax: 7, yTickStep: 2 }, curves: [{ ...ROOT_FUNCTION, color: COLORS.signBase }], highlightedCurves: positiveSegments(condition).map((segment) => ({ ...ROOT_FUNCTION, ...segment, color: COLORS.signHighlight })), ariaLabel: conditionText.textContent + " 的绿色高亮曲线段" });
   }
   [["positive", "f(x)>0"], ["negative", "f(x)<0"]].forEach(([value, label]) => { const control = button(label, "lesson08-action lesson08-secondary"); control.addEventListener("click", () => { condition = value; render(); }); controls.append(control); });
   reveal.addEventListener("click", () => { answer.textContent = condition === "positive" ? "f(x)>0：图象在 x 轴上方，对应 x<−√2 或 x>√2。" : "f(x)<0：图象在 x 轴下方，对应 −√2<x<√2。"; answer.hidden = false; });
@@ -248,8 +254,113 @@ function renderLevelLine(root, cleanup) {
   reveal.addEventListener("click", () => { answer.textContent = "f(x)≤1 表示曲线在水平线 y=1 下方或重合。交点 x=±√3 也包含在内：−√3≤x≤√3。"; answer.hidden = false; });
   workbench.append(element("p", "lesson08-prompt", "等号意味着边界点也要保留。观察曲线与水平线 y=1 的位置关系。"), formula("x^2-2\\leq1", "x²-2≤1", "lesson08-formula lesson08-current"), reveal, answer);
   const bound = Math.sqrt(3);
-  layoutWithGraph(root, cleanup, { viewport: { xMin: -3, xMax: 3, yMin: -3, yMax: 7, yTickStep: 2 }, highlightedCurves: [{ ...ROOT_FUNCTION, xMin: -bound, xMax: bound, color: COLORS.root }], horizontalGuides: [{ y: 1, label: "y=1", color: COLORS.guide }], points: [{ x: -bound, y: 1, color: COLORS.root, radius: 6 }, { x: bound, y: 1, color: COLORS.root, radius: 6 }] }, workbench);
+  layoutWithGraph(root, cleanup, { viewport: { xMin: -3, xMax: 3, yMin: -3, yMax: 7, yTickStep: 2 }, curves: [{ ...ROOT_FUNCTION, color: COLORS.signBase }], highlightedCurves: [{ ...ROOT_FUNCTION, xMin: -bound, xMax: bound, color: COLORS.signHighlight }], horizontalGuides: [{ y: 1, label: "y=1", color: COLORS.guide }], points: [{ x: -bound, y: 1, color: COLORS.signHighlight, radius: 6 }, { x: bound, y: 1, color: COLORS.signHighlight, radius: 6 }] }, workbench);
 }
+
+const SIGN_CHECK_CONDITIONS = Object.freeze([
+  { key: "ge", label: "f(x)≥0" },
+  { key: "lt", label: "f(x)<0" },
+  { key: "le", label: "f(x)≤0" },
+]);
+
+const FIXED_SIGN_CHECK = Object.freeze({
+  name: "固定图象：开口向下",
+  parameters: Object.freeze({ a: -1, h: 1, k: 4 }),
+});
+
+const RANDOM_SIGN_CHECKS = Object.freeze([
+  Object.freeze({ name: "随机图象：开口向上，两处交点", parameters: Object.freeze({ a: 1, h: 0, k: -4 }) }),
+  Object.freeze({ name: "随机图象：开口向下，两处交点", parameters: Object.freeze({ a: -1, h: 1, k: 4 }) }),
+  Object.freeze({ name: "随机图象：开口向上，切于 x 轴", parameters: Object.freeze({ a: 1, h: -1, k: 0 }) }),
+  Object.freeze({ name: "随机图象：开口向下，没有交点", parameters: Object.freeze({ a: -1, h: 0, k: -1 }) }),
+]);
+
+function signedNumber(value) { return number(value).replace("-", "−"); }
+
+function signSolution(parameters, condition) {
+  const roots = rootsOf(parameters);
+  if (roots.length === 2) {
+    const [left, right] = roots.map(signedNumber);
+    const upward = parameters.a > 0;
+    if (condition === "ge") return upward ? "x≤" + left + " 或 x≥" + right : left + "≤x≤" + right;
+    if (condition === "lt") return upward ? left + "<x<" + right : "x<" + left + " 或 x>" + right;
+    return upward ? left + "≤x≤" + right : "x≤" + left + " 或 x≥" + right;
+  }
+  if (roots.length === 1) {
+    const root = signedNumber(roots[0]);
+    if (parameters.a > 0) return condition === "ge" ? "所有实数" : condition === "lt" ? "无解" : "x=" + root;
+    return condition === "ge" ? "x=" + root : condition === "lt" ? "x≠" + root : "所有实数";
+  }
+  if (parameters.a > 0) return condition === "ge" ? "所有实数" : "无解";
+  return condition === "ge" ? "无解" : "所有实数";
+}
+
+function signSegments(parameters, condition) {
+  const roots = rootsOf(parameters);
+  if (roots.length === 2) {
+    const [left, right] = roots;
+    const upward = parameters.a > 0;
+    const inside = condition === "ge" ? !upward : condition === "lt" ? upward : upward;
+    return inside ? [{ xMin: left, xMax: right }] : [{ xMin: -4, xMax: left }, { xMin: right, xMax: 4 }];
+  }
+  return signSolution(parameters, condition) === "所有实数" ? [{ xMin: -4, xMax: 4 }] : [];
+}
+
+function signCheckPoints(parameters) {
+  return rootsOf(parameters).map((x) => ({ x, y: 0, color: COLORS.signHighlight, radius: 7 }));
+}
+
+function signCheckLabels(parameters) {
+  return rootsOf(parameters).map((x) => ({ x, y: 0.5, text: "x=" + signedNumber(x) }));
+}
+
+function renderSignQuickCheck(root, cleanup, { random = null } = {}) {
+  let challenge = random ? RANDOM_SIGN_CHECKS[Math.min(RANDOM_SIGN_CHECKS.length - 1, Math.floor(Math.max(0, Math.min(.99999, Number(random()) || 0)) * RANDOM_SIGN_CHECKS.length))] : FIXED_SIGN_CHECK;
+  let condition = "ge";
+  let revealed = false;
+  const workbench = element("div", "lesson08-workbench");
+  const prompt = element("p", "lesson08-question");
+  const rootsReadout = element("p", "lesson08-status");
+  const controls = element("div", "lesson08-actions");
+  const reveal = button("Check Answer"); reveal.dataset.lesson08SignCheckReveal = "";
+  const answer = element("p", "lesson08-reveal"); answer.dataset.lesson08SignCheckAnswer = ""; answer.hidden = true;
+  const graph = layoutWithGraph(root, cleanup, { viewport: { xMin: -4, xMax: 4, yMin: -5, yMax: 5, yTickStep: 1 } }, workbench);
+
+  function render() {
+    const parameters = challenge.parameters;
+    const roots = rootsOf(parameters);
+    const activeCondition = SIGN_CHECK_CONDITIONS.find((item) => item.key === condition);
+    prompt.textContent = challenge.name + "。观察已经标出的 x 轴交点，先口答：" + activeCondition.label + " 的解集是什么？";
+    rootsReadout.textContent = roots.length === 2 ? "已标交点：x=" + signedNumber(roots[0]) + "，x=" + signedNumber(roots[1]) : roots.length === 1 ? "已标交点：x=" + signedNumber(roots[0]) : "图象与 x 轴没有交点。";
+    answer.textContent = activeCondition.label + " 的解集：" + signSolution(parameters, condition) + "。";
+    answer.hidden = !revealed;
+    updateGraph(graph, { parameters, viewport: { xMin: -4, xMax: 4, yMin: -5, yMax: 5, yTickStep: 1 }, curves: [{ ...parameters, color: COLORS.signBase }], highlightedCurves: revealed ? signSegments(parameters, condition).map((segment) => ({ ...parameters, ...segment, color: COLORS.signHighlight })) : [], points: signCheckPoints(parameters), labels: signCheckLabels(parameters), ariaLabel: challenge.name + "，" + activeCondition.label + " 快速检查" });
+  }
+
+  SIGN_CHECK_CONDITIONS.forEach(({ key, label }) => {
+    const control = button(label, "lesson08-action lesson08-secondary");
+    control.dataset.lesson08SignCheckCondition = key;
+    control.addEventListener("click", () => { condition = key; revealed = false; render(); });
+    controls.append(control);
+  });
+  reveal.addEventListener("click", () => { revealed = true; render(); });
+  if (random) {
+    const newChallenge = button("New Random Graph", "lesson08-action lesson08-secondary");
+    newChallenge.dataset.lesson08SignCheckNew = "";
+    newChallenge.addEventListener("click", () => {
+      challenge = RANDOM_SIGN_CHECKS[Math.min(RANDOM_SIGN_CHECKS.length - 1, Math.floor(Math.max(0, Math.min(.99999, Number(random()) || 0)) * RANDOM_SIGN_CHECKS.length))];
+      revealed = false;
+      render();
+    });
+    controls.append(newChallenge);
+  }
+  controls.append(reveal);
+  workbench.append(element("p", "lesson08-prompt", "Quick Check：先用图象判断正负和等号是否包含边界，再点击 Check Answer 核对。"), prompt, rootsReadout, controls, answer);
+  render();
+}
+
+function renderFixedSignQuickCheck(root, cleanup) { renderSignQuickCheck(root, cleanup); }
+function renderRandomSignQuickCheck(root, cleanup, random) { renderSignQuickCheck(root, cleanup, { random }); }
 
 function renderComparison(root, cleanup) {
   const compare = { a: -1, h: 0, k: 1 };
@@ -286,10 +397,10 @@ function renderSummary(root) {
   root.append(element("p", "lesson08-prompt", "Graph Language Translator：把式子先翻译成图上的位置关系。"), grid, element("p", "lesson08-bridge-out", "Bridge Out：真实问题里的 x 往往还有实际取值范围。进入 Lesson 09。"));
 }
 
-const RENDERERS = Object.freeze([renderBridge, renderEquationFunction, renderFirstBracket, renderZoom, renderShrink, renderInequality, renderLevelLine, renderComparison, renderPractice, renderSummary]);
+const RENDERERS = Object.freeze([renderBridge, renderEquationFunction, renderFirstBracket, renderZoom, renderShrink, renderInequality, renderFixedSignQuickCheck, renderLevelLine, renderRandomSignQuickCheck, renderComparison, renderPractice, renderSummary]);
 
 export function renderLesson08(stage, { step = 1, onStepChange = () => {}, random = Math.random } = {}) {
-  const safeStep = Math.min(10, Math.max(1, Number(step) || 1));
+  const safeStep = Math.min(LESSON08_STEP_COUNT, Math.max(1, Number(step) || 1));
   const cleanup = [];
   const root = createRoot(safeStep);
   RENDERERS[safeStep - 1](root, cleanup, random);
