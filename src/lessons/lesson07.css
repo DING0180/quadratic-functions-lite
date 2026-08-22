@@ -1,0 +1,56 @@
+.lesson07-step { width: min(100%, 70rem); margin: auto; color: #223330; }
+.lesson07-heading { margin-bottom: 1rem; }
+.lesson07-kicker { margin: 0; color: #1b765d; font-size: .78rem; font-weight: 800; letter-spacing: .13em; }
+.lesson07-title { margin: .35rem 0 0; font-size: clamp(1.65rem, 3.1vw, 3rem); line-height: 1.18; }
+.lesson07-prompt, .lesson07-question { max-width: 54rem; color: #465a54; font-size: clamp(1rem, 1.2vw, 1.15rem); line-height: 1.6; }
+.lesson07-question { padding-left: .9rem; border-left: 3px solid #d98935; font-weight: 700; }
+.lesson07-formula { margin: .75rem 0; color: #164f40; font-size: clamp(1.08rem, 1.55vw, 1.4rem); }
+.lesson07-hero { margin: 0; padding: 1rem; border: 1px solid #d5e0da; border-radius: .8rem; background: #fff; }
+.lesson07-current { padding: .65rem .8rem; border-left: 4px solid #1f8a70; border-radius: .45rem; background: #f2f8f4; }
+.lesson07-bridge-pair { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .8rem; align-items: center; max-width: 52rem; margin: 1.2rem 0; }
+.lesson07-arrow { color: #b45f06; font-weight: 800; white-space: nowrap; }
+.lesson07-layout { display: grid; grid-template-columns: minmax(20rem, 1.2fr) minmax(17rem, .8fr); gap: clamp(1rem, 2vw, 1.8rem); align-items: start; }
+.lesson07-graph-panel, .lesson07-workbench, .lesson07-summary-card { border: 1px solid #d5e0da; border-radius: .9rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / .06); }
+.lesson07-graph-panel { min-width: 0; padding: .55rem; }
+.lesson07-graph-host { min-height: 19rem; }
+.lesson07-workbench { display: grid; align-content: start; gap: .7rem; padding: clamp(1rem, 1.7vw, 1.35rem); }
+.lesson07-workbench > :first-child { margin-top: 0; }
+.lesson07-action { min-height: 2.55rem; padding: .5rem .82rem; border: 1px solid #17634e; border-radius: .5rem; background: #17634e; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.lesson07-action:hover { background: #104e3d; }
+.lesson07-action:focus-visible { outline: 3px solid #da8c35; outline-offset: 2px; }
+.lesson07-action:disabled { cursor: not-allowed; opacity: .55; }
+.lesson07-secondary { border-color: #768883; background: #f8faf9; color: #334640; }
+.lesson07-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.lesson07-reveal, .lesson07-mapping { margin: .3rem 0 0; padding: .8rem .95rem; border-left: 4px solid #d98935; border-radius: .5rem; background: #fff7ec; color: #55442e; line-height: 1.55; }
+.lesson07-reveal p, .lesson07-mapping p { margin: .35rem 0; }
+.lesson07-status { margin: 0; color: #17634e; font-weight: 700; line-height: 1.55; }
+.lesson07-slider { display: grid; gap: .45rem; color: #40554e; font-weight: 700; }
+.lesson07-slider input { width: 100%; accent-color: #17634e; }
+.lesson07-slider-value { color: #17634e; font-variant-numeric: tabular-nums; }
+.lesson07-challenge-graph { width: min(100%, 32rem); margin: .9rem 0; }
+.lesson07-summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0; }
+.lesson07-summary-card { min-height: 10.2rem; padding: 1rem; }
+.lesson07-summary-card h3 { margin: 0; color: #17634e; }
+.lesson07-summary-card p { color: #4d6059; line-height: 1.5; }
+.lesson07-bridge-out { margin-top: 1.15rem; padding: .9rem 1rem; border-radius: .7rem; background: #eaf5ef; color: #155b48; font-weight: 800; line-height: 1.55; }
+.lesson07-step-controls { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: 1.3rem; padding-top: 1rem; border-top: 1px solid #d5e0da; }
+.lesson07-step-count { color: #64746f; font-size: .9rem; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+  .lesson07-layout, .lesson07-summary-grid { grid-template-columns: 1fr; }
+  .lesson07-bridge-pair { grid-template-columns: 1fr; }
+  .lesson07-arrow { text-align: center; }
+}
+
+@media (min-width: 761px) and (max-height: 760px) {
+  .lesson07-heading { margin-bottom: .55rem; }
+  .lesson07-title { font-size: 1.7rem; }
+  .lesson07-prompt, .lesson07-question { margin-block: .4rem; font-size: .95rem; line-height: 1.38; }
+  .lesson07-formula { margin: .4rem 0; font-size: 1.02rem; }
+  .lesson07-graph-host { min-height: 14.5rem; }
+  .lesson07-challenge-graph { margin-block: .45rem; }
+  .lesson07-workbench { gap: .45rem; padding: .75rem; }
+  .lesson07-action { min-height: 2.1rem; padding: .3rem .6rem; }
+  .lesson07-step-controls { margin-top: .7rem; padding-top: .6rem; }
+}
+

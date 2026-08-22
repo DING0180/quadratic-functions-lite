@@ -38,6 +38,13 @@ describe("course configuration", () => {
     });
   });
 
+  it("publishes Lesson 07 as a seven-step local lesson", () => {
+    expect(getLessonById("lesson-07")).toMatchObject({
+      id: "lesson-07",
+      stepCount: 7,
+    });
+  });
+
   it("rejects incomplete or duplicate lesson data", () => {
     expect(() => validateCourse([{ id: "lesson-01", number: "01", title: "A" }])).toThrow("11");
     expect(() => validateCourse(Array.from({ length: 11 }, () => ({
