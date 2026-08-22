@@ -3,6 +3,7 @@ import {
   LESSON02_X_VALUES,
   createPairChallenge,
   createPlotterState,
+  createQuickCheck,
   createSingleChallenge,
   formatCoefficientLatex,
   formatFunctionLatex,
@@ -48,5 +49,17 @@ describe("lesson 02 mathematics", () => {
     challenge.showGraph();
     expect(challenge.answer).toBe("向上");
     expect(challenge.graphVisible).toBe(true);
+  });
+
+  it("creates a fresh numbered Quick Check challenge each time", () => {
+    let coefficient = 0;
+    const quickCheck = createQuickCheck(() => ({ a: ++coefficient }));
+
+    expect(quickCheck.count).toBe(0);
+    expect(quickCheck.current).toBeNull();
+    expect(quickCheck.next()).toEqual({ a: 1 });
+    expect(quickCheck.count).toBe(1);
+    expect(quickCheck.next()).toEqual({ a: 2 });
+    expect(quickCheck.current).toEqual({ a: 2 });
   });
 });
