@@ -15,6 +15,21 @@ describe("parabola SVG", () => {
     expect(container.querySelectorAll(".parabola-curve")).toHaveLength(1);
   });
 
+  it("keeps fixed integer tick marks and marks both positive axis directions", () => {
+    const container = document.createElement("div");
+
+    createParabolaGraph(container, {
+      curves: [{ a: 4 }, { a: -4 }],
+    });
+
+    const ticks = Array.from(container.querySelectorAll(".parabola-tick"), (tick) => tick.textContent);
+    expect(ticks).toEqual(["-4", "-3", "-2", "-1", "1", "2", "3", "4", "-16", "-12", "-8", "-4", "4", "8", "12", "16"]);
+    expect(container.querySelectorAll(".parabola-axis-arrow")).toHaveLength(1);
+    expect(Array.from(container.querySelectorAll(".parabola-axis"), (axis) => axis.getAttribute("marker-end")))
+      .toEqual([expect.stringContaining("axis-arrow"), expect.stringContaining("axis-arrow")]);
+    expect(Array.from(container.querySelectorAll(".parabola-axis-name"), (label) => label.textContent)).toEqual(["x", "y"]);
+  });
+
   it("updates curve progress and shown point markers", () => {
     const container = document.createElement("div");
     const graph = createParabolaGraph(container, {
@@ -31,12 +46,34 @@ describe("parabola SVG", () => {
     expect(container.querySelector(".parabola-curve").getAttribute("stroke-dasharray")).not.toBeNull();
   });
 
+  it("supports one emphasized observation point", () => {
+    const container = document.createElement("div");
+    const graph = createParabolaGraph(container, { curves: [{ a: 1 }] });
+
+    graph.update({ points: [{ x: 1, y: 1, radius: 9, color: "#19735d" }] });
+
+    const point = container.querySelector(".parabola-point");
+    expect(point.getAttribute("r")).toBe("9");
+    expect(point.getAttribute("fill")).toBe("#19735d");
+  });
+
   it("moves a curve vertically when its constant term changes", () => {
     const baseContainer = document.createElement("div");
     const shiftedContainer = document.createElement("div");
 
     createParabolaGraph(baseContainer, { curves: [{ a: 1, k: 0 }] });
     createParabolaGraph(shiftedContainer, { curves: [{ a: 1, k: 2 }] });
+
+    expect(shiftedContainer.querySelector(".parabola-curve").getAttribute("d"))
+      .not.toBe(baseContainer.querySelector(".parabola-curve").getAttribute("d"));
+  });
+
+  it("moves a curve horizontally when its vertex h changes", () => {
+    const baseContainer = document.createElement("div");
+    const shiftedContainer = document.createElement("div");
+
+    createParabolaGraph(baseContainer, { curves: [{ a: 1, h: 0 }] });
+    createParabolaGraph(shiftedContainer, { curves: [{ a: 1, h: 2 }] });
 
     expect(shiftedContainer.querySelector(".parabola-curve").getAttribute("d"))
       .not.toBe(baseContainer.querySelector(".parabola-curve").getAttribute("d"));

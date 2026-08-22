@@ -210,6 +210,7 @@ function renderPlotter(root, onStepChange, cleanup) {
 }
 
 function renderConnect(root, onStepChange, cleanup) {
+  root.classList.add("lesson02-connect-step");
   const graph = addGraph(root, {
     curves: [{ a: 1, color: COLORS.positive }],
     points: LESSON02_X_VALUES.map((x) => [x, x * x]),
@@ -320,24 +321,64 @@ function renderSignCompare(root, onStepChange, cleanup) {
     revealed = Math.min(rows.length, revealed + 1);
     updateTable();
   });
-  const motion = button("演示增减性", "lesson02-action lesson02-action-secondary");
+  const motionStatus = element("p", "lesson02-motion-status", "点击后，用一个加粗观察点分段追踪 x 增大时 y 的变化。");
+  motionStatus.setAttribute("aria-live", "polite");
+  const motion = button("分段演示增减性", "lesson02-action lesson02-action-secondary");
+  let animationActive = true;
+  let frame = null;
+  let pause = null;
+  const request = window.requestAnimationFrame ?? ((callback) => window.setTimeout(callback, 16));
+  const cancel = window.cancelAnimationFrame ?? window.clearTimeout;
+  cleanup.push(() => {
+    animationActive = false;
+    if (frame !== null) cancel(frame);
+    if (pause !== null) window.clearTimeout(pause);
+  });
+
   motion.addEventListener("click", () => {
-    let x = -4;
-    let active = true;
-    let frame = null;
-    const request = window.requestAnimationFrame ?? ((callback) => window.setTimeout(callback, 30));
-    const cancel = window.cancelAnimationFrame ?? window.clearTimeout;
-    cleanup.push(() => {
-      active = false;
-      if (frame !== null) cancel(frame);
-    });
-    function move() {
-      if (!active) return;
-      graph.update({ points: [[x, x * x], [x, -(x * x)]] });
-      x += 0.2;
-      if (x <= 4.001) frame = request(move);
+    if (!animationActive) return;
+    motion.disabled = true;
+    motion.textContent = "演示进行中…";
+    const phases = [
+      { a: 1, from: -4, to: 0, color: COLORS.positive, text: "观察 y=x²：x 从 −4 增大到 0，y 从 16 减小到 0；左侧递减。" },
+      { a: 1, from: 0, to: 4, color: COLORS.positive, text: "观察 y=x²：x 从 0 增大到 4，y 从 0 增大到 16；右侧递增。" },
+      { a: -1, from: -4, to: 0, color: COLORS.negative, text: "观察 y=−x²：x 从 −4 增大到 0，y 从 −16 增大到 0；左侧递增。" },
+      { a: -1, from: 0, to: 4, color: COLORS.negative, text: "观察 y=−x²：x 从 0 增大到 4，y 从 0 减小到 −16；右侧递减。" },
+    ];
+    let phaseIndex = 0;
+
+    function runPhase() {
+      if (!animationActive) return;
+      const phase = phases[phaseIndex];
+      motionStatus.textContent = phase.text;
+      let startedAt = null;
+
+      function advance(timestamp) {
+        if (!animationActive) return;
+        const now = typeof timestamp === "number" ? timestamp : Date.now();
+        if (startedAt === null) startedAt = now;
+        const progress = Math.min(1, (now - startedAt) / 4200);
+        const x = phase.from + (phase.to - phase.from) * progress;
+        graph.update({
+          points: [{ x, y: phase.a * x * x, radius: 9, color: phase.color }],
+        });
+        if (progress < 1) {
+          frame = request(advance);
+          return;
+        }
+        phaseIndex += 1;
+        if (phaseIndex < phases.length) {
+          pause = window.setTimeout(runPhase, 850);
+          return;
+        }
+        motion.disabled = false;
+        motion.textContent = "再演示一次";
+        motionStatus.textContent = "演示完成：同一条曲线在顶点左、右两侧的增减性不同。";
+      }
+
+      frame = request(advance);
     }
-    move();
+    runPhase();
   });
 
   panel.append(
@@ -346,6 +387,7 @@ function renderSignCompare(root, onStepChange, cleanup) {
     table,
     reveal,
     motion,
+    motionStatus,
   );
   layout.append(graphPane, panel);
   root.append(layout);

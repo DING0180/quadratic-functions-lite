@@ -137,11 +137,15 @@ body { min-width: 320px; }
 .lesson02-graph-host { min-height: 17rem; }
 .parabola-svg { display: block; width: 100%; height: auto; min-height: 17rem; overflow: visible; }
 .parabola-axis { stroke: #7b8e87; stroke-width: 1.25; }
+.parabola-axis-name { fill: #40554e; font-size: 14px; font-style: italic; font-weight: 800; }
 .parabola-tick { fill: #60716b; font-size: 12px; text-anchor: middle; }
 .parabola-tick-y { text-anchor: start; }
 .parabola-curve { fill: none; stroke-width: 3.25; stroke-linecap: round; transition: stroke-dashoffset 80ms linear; }
 .parabola-point { fill: #d98935; stroke: #fff; stroke-width: 1.5; }
 .parabola-label { fill: #38524a; font-size: 15px; font-weight: 700; }
+
+.lesson02-connect-step > .lesson02-graph-panel { width: min(100%, 38rem); margin-inline: auto; }
+.lesson02-connect-step .lesson02-graph-host, .lesson02-connect-step .parabola-svg { min-height: 0; }
 
 .lesson02-workbench, .lesson02-observe-panel { padding: clamp(1rem, 1.7vw, 1.45rem); }
 .lesson02-workbench > :first-child, .lesson02-observe-panel > :first-child { margin-top: 0; }
@@ -154,6 +158,7 @@ body { min-width: 320px; }
 .lesson02-data-table th, .lesson02-data-table td, .lesson02-property-table th, .lesson02-property-table td { padding: 0.45rem 0.5rem; border-bottom: 1px solid #dce5e0; text-align: left; }
 .lesson02-data-table th, .lesson02-property-table th { color: #40554e; background: #f1f6f3; }
 .lesson02-parabola-name { color: #6652b8; font-size: 1.2rem; font-weight: 800; letter-spacing: 0.05em; }
+.lesson02-motion-status { min-height: 3.2rem; margin: 0.8rem 0 0; padding: 0.7rem 0.8rem; border-left: 3px solid #d98935; background: #f5f8f6; color: #40554e; line-height: 1.5; }
 .lesson02-slider-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
 .lesson02-observe-panel input[type="range"] { width: 100%; accent-color: #17634e; }
 .lesson02-summary-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; margin: 1rem 0; }
@@ -176,9 +181,78 @@ body { min-width: 320px; }
   .lesson02-prompt, .lesson02-question { margin-block: 0.45rem; font-size: 0.96rem; line-height: 1.4; }
   .lesson02-formula { margin: 0.45rem 0; font-size: 1.04rem; }
   .lesson02-graph-host, .parabola-svg { min-height: 12.75rem; }
+  .lesson02-connect-step .lesson02-graph-host, .lesson02-connect-step .parabola-svg { min-height: 0; }
   .lesson02-workbench, .lesson02-observe-panel { padding: 0.75rem; }
   .lesson02-action, .lesson02-point-choice, .lesson02-choice-button { min-height: 2.15rem; padding: 0.35rem 0.65rem; }
   .lesson02-data-table, .lesson02-property-table { margin: 0.45rem 0; font-size: 0.81rem; }
   .lesson02-data-table th, .lesson02-data-table td, .lesson02-property-table th, .lesson02-property-table td { padding: 0.25rem 0.35rem; }
   .lesson02-step-controls { margin-top: 0.75rem; padding-top: 0.6rem; }
+}
+
+.lesson03-step {
+  width: min(100%, 70rem);
+  margin: auto;
+  color: #223330;
+}
+
+.lesson03-heading { margin-bottom: 1.1rem; }
+.lesson03-kicker { margin: 0; color: #1b765d; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.13em; }
+.lesson03-title { margin: 0.35rem 0 0; font-size: clamp(1.65rem, 3.1vw, 3rem); line-height: 1.18; }
+.lesson03-prompt, .lesson03-question { max-width: 50rem; color: #465a54; font-size: clamp(1rem, 1.2vw, 1.15rem); line-height: 1.65; }
+.lesson03-question { padding-left: 0.9rem; border-left: 3px solid #d98935; }
+.lesson03-formula { margin: 0.85rem 0; color: #164f40; font-size: clamp(1.1rem, 1.65vw, 1.45rem); }
+.lesson03-reveal, .lesson03-rule, .lesson03-warning { margin-top: 1rem; padding: 1rem 1.1rem; border: 1px solid #cbdcd4; border-radius: 0.75rem; background: #f3f8f5; }
+.lesson03-rule { color: #155b48; font-weight: 800; }
+.lesson03-warning { color: #843c2c; border-color: #efb6a9; background: #fff1ed; }
+
+.lesson03-action, .lesson03-point-choice {
+  min-height: 2.65rem; padding: 0.55rem 0.9rem; border: 1px solid #17634e; border-radius: 0.5rem;
+  background: #17634e; color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+}
+.lesson03-action:hover, .lesson03-point-choice:hover { background: #104e3d; }
+.lesson03-action:focus-visible, .lesson03-point-choice:focus-visible { outline: 3px solid #da8c35; outline-offset: 2px; }
+.lesson03-action:disabled, .lesson03-point-choice:disabled { cursor: not-allowed; opacity: 0.55; }
+.lesson03-secondary { border-color: #768883; background: #f8faf9; color: #334640; }
+
+.lesson03-two-column { display: grid; grid-template-columns: minmax(18rem, 1.1fr) minmax(17rem, 0.9fr); gap: clamp(1rem, 2vw, 2rem); align-items: start; }
+.lesson03-graph-panel, .lesson03-workbench, .lesson03-card {
+  border: 1px solid #d5e0da; border-radius: 0.9rem; background: #fff; box-shadow: 0 0.35rem 1.35rem rgb(25 73 58 / 0.06);
+}
+.lesson03-graph-panel { min-width: 0; margin: 0.7rem 0; padding: 0.55rem; }
+.lesson03-two-column > .lesson03-graph-panel { margin: 0; }
+.lesson03-graph-host { min-height: 17rem; }
+.lesson03-workbench { padding: clamp(1rem, 1.7vw, 1.45rem); }
+.lesson03-choice-grid, .lesson03-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.85rem 0; }
+.lesson03-point-choice { min-width: 4.2rem; padding-inline: 0.55rem; background: #fff; color: #17634e; }
+.lesson03-status, .lesson03-lock, .lesson03-vertex-path { color: #1a6853; font-weight: 700; }
+.lesson03-vertex-path { padding-left: 0.9rem; border-left: 3px solid #d98935; }
+.lesson03-data-table, .lesson03-property-table { width: 100%; margin: 0.85rem 0; border-collapse: collapse; font-size: 0.88rem; }
+.lesson03-data-table th, .lesson03-data-table td, .lesson03-property-table th, .lesson03-property-table td { padding: 0.45rem 0.5rem; border-bottom: 1px solid #dce5e0; text-align: left; }
+.lesson03-data-table th, .lesson03-property-table th { color: #40554e; background: #f1f6f3; }
+.lesson03-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.85rem; margin: 1rem 0; }
+.lesson03-card { min-height: 8.25rem; padding: 1rem; }
+.lesson03-card h3 { margin: 0; color: #17634e; }
+.lesson03-card p { color: #4d6059; line-height: 1.55; }
+.lesson03-controls { align-items: center; }
+.lesson03-controls label { color: #40554e; font-weight: 700; }
+.lesson03-controls input[type="range"] { min-width: 10rem; accent-color: #17634e; }
+.lesson03-step > input[type="range"] { display: block; width: min(100%, 35rem); accent-color: #17634e; }
+.lesson03-step-controls { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid #d5e0da; }
+.lesson03-step-count { color: #64746f; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+  .lesson03-two-column, .lesson03-card-grid { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 761px) and (max-height: 760px) {
+  .lesson03-heading { margin-bottom: 0.65rem; }
+  .lesson03-title { font-size: 1.7rem; }
+  .lesson03-prompt, .lesson03-question { margin-block: 0.45rem; font-size: 0.96rem; line-height: 1.4; }
+  .lesson03-formula { margin: 0.45rem 0; font-size: 1.04rem; }
+  .lesson03-graph-host { min-height: 12.75rem; }
+  .lesson03-workbench { padding: 0.75rem; }
+  .lesson03-action, .lesson03-point-choice { min-height: 2.15rem; padding: 0.35rem 0.65rem; }
+  .lesson03-data-table, .lesson03-property-table { margin: 0.45rem 0; font-size: 0.78rem; }
+  .lesson03-data-table th, .lesson03-data-table td, .lesson03-property-table th, .lesson03-property-table td { padding: 0.25rem 0.35rem; }
+  .lesson03-step-controls { margin-top: 0.75rem; padding-top: 0.6rem; }
 }
