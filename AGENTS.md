@@ -110,6 +110,8 @@ git push --force
 git push --force-with-lease
 ```
 
+如果正常 `git push origin main` 因 Codex shell 无法连接 `github.com:443` 失败，但 GitHub Plugin / Connector 可用，则不要要求用户手动 push。自动切换到 GitHub Plugin / Connector，将当前 Lesson 的已验证净文件变化同步到远端 `main`，然后继续 Pages 和线上验收。
+
 ## GitHub Pages 与在线验收
 
 推送 `main` 成功后不得立即停止。检查现有 GitHub Pages workflow，等待其从 queued 到 in progress 再到 success；然后实际打开：
