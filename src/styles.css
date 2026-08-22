@@ -146,6 +146,8 @@ body { min-width: 320px; }
 
 .lesson02-connect-step > .lesson02-graph-panel { width: min(100%, 38rem); margin-inline: auto; }
 .lesson02-connect-step .lesson02-graph-host, .lesson02-connect-step .parabola-svg { min-height: 0; }
+.lesson02-misconception-step > .lesson02-graph-panel { width: min(100%, 44rem); margin-inline: auto; }
+.lesson02-misconception-step .lesson02-graph-host, .lesson02-misconception-step .parabola-svg { min-height: 0; }
 
 .lesson02-workbench, .lesson02-observe-panel { padding: clamp(1rem, 1.7vw, 1.45rem); }
 .lesson02-workbench > :first-child, .lesson02-observe-panel > :first-child { margin-top: 0; }
@@ -159,7 +161,11 @@ body { min-width: 320px; }
 .lesson02-data-table th, .lesson02-property-table th { color: #40554e; background: #f1f6f3; }
 .lesson02-parabola-name { color: #6652b8; font-size: 1.2rem; font-weight: 800; letter-spacing: 0.05em; }
 .lesson02-motion-status { min-height: 3.2rem; margin: 0.8rem 0 0; padding: 0.7rem 0.8rem; border-left: 3px solid #d98935; background: #f5f8f6; color: #40554e; line-height: 1.5; }
-.lesson02-slider-label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+.lesson02-slider-readout { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem 1rem; align-items: center; margin-top: 0.85rem; padding: 0.75rem 0.85rem; border-left: 3px solid #d98935; background: #f5f8f6; }
+.lesson02-slider-value { margin: 0; color: #17634e; font-weight: 800; font-variant-numeric: tabular-nums; }
+.lesson02-slider-formula { margin: 0; color: #164f40; font-size: 1.08rem; }
+.lesson02-quick-check-number { margin: 0.8rem 0 0; color: #1b765d; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.08em; }
+.lesson02-quick-check-question .lesson02-formula { margin: 0.35rem 0 0.75rem; }
 .lesson02-observe-panel input[type="range"] { width: 100%; accent-color: #17634e; }
 .lesson02-summary-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; margin: 1rem 0; }
 .lesson02-summary-card { min-height: 9.5rem; padding: 1rem; }
@@ -182,6 +188,7 @@ body { min-width: 320px; }
   .lesson02-formula { margin: 0.45rem 0; font-size: 1.04rem; }
   .lesson02-graph-host, .parabola-svg { min-height: 12.75rem; }
   .lesson02-connect-step .lesson02-graph-host, .lesson02-connect-step .parabola-svg { min-height: 0; }
+  .lesson02-misconception-step .lesson02-graph-host, .lesson02-misconception-step .parabola-svg { min-height: 0; }
   .lesson02-workbench, .lesson02-observe-panel { padding: 0.75rem; }
   .lesson02-action, .lesson02-point-choice, .lesson02-choice-button { min-height: 2.15rem; padding: 0.35rem 0.65rem; }
   .lesson02-data-table, .lesson02-property-table { margin: 0.45rem 0; font-size: 0.81rem; }
