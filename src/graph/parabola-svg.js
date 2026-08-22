@@ -15,16 +15,32 @@ function createSvgElement(tag, className) {
   return element;
 }
 
-function createScale() {
+function getViewport(options) {
+  const viewport = {
+    xMin: X_MIN,
+    xMax: X_MAX,
+    yMin: Y_MIN,
+    yMax: Y_MAX,
+    yTickStep: 4,
+    ...(options.viewport ?? {}),
+  };
+  if (![viewport.xMin, viewport.xMax, viewport.yMin, viewport.yMax, viewport.yTickStep].every(Number.isFinite)
+    || viewport.xMin >= viewport.xMax || viewport.yMin >= viewport.yMax || viewport.yTickStep <= 0) {
+    throw new TypeError("viewport needs finite increasing bounds");
+  }
+  return viewport;
+}
+
+function createScale(viewport) {
   const innerWidth = WIDTH - PADDING * 2;
   const innerHeight = HEIGHT - PADDING * 2;
 
   return {
     x(value) {
-      return PADDING + ((value - X_MIN) / (X_MAX - X_MIN)) * innerWidth;
+      return PADDING + ((value - viewport.xMin) / (viewport.xMax - viewport.xMin)) * innerWidth;
     },
     y(value) {
-      return HEIGHT - PADDING - ((value - Y_MIN) / (Y_MAX - Y_MIN)) * innerHeight;
+      return HEIGHT - PADDING - ((value - viewport.yMin) / (viewport.yMax - viewport.yMin)) * innerHeight;
     },
   };
 }
@@ -56,7 +72,7 @@ function appendDefinitions(svg, id) {
   svg.append(defs);
 }
 
-function appendAxes(svg, scale, id) {
+function appendAxes(svg, scale, id, viewport, customViewport) {
   const xAxis = createSvgElement("line", "parabola-axis");
   xAxis.setAttribute("x1", String(PADDING));
   xAxis.setAttribute("x2", String(WIDTH - PADDING));
@@ -73,7 +89,9 @@ function appendAxes(svg, scale, id) {
   yAxis.setAttribute("marker-end", "url(#" + id + "-axis-arrow)");
   svg.append(yAxis);
 
-  for (let value = X_MIN; value <= X_MAX; value += 1) {
+  const xTickStart = customViewport ? Math.ceil(viewport.xMin) : X_MIN;
+  const xTickEnd = customViewport ? Math.floor(viewport.xMax) : X_MAX;
+  for (let value = xTickStart; value <= xTickEnd; value += 1) {
     if (value === 0) continue;
     const tick = createSvgElement("text", "parabola-tick");
     tick.setAttribute("x", String(scale.x(value)));
@@ -82,7 +100,11 @@ function appendAxes(svg, scale, id) {
     svg.append(tick);
   }
 
-  Y_TICKS.forEach((value) => {
+  const yTickValues = customViewport
+    ? Array.from({ length: Math.floor((viewport.yMax - viewport.yMin) / viewport.yTickStep) + 1 }, (_, index) => Math.ceil(viewport.yMin / viewport.yTickStep) * viewport.yTickStep + index * viewport.yTickStep)
+      .filter((value) => value <= viewport.yMax && value !== 0)
+    : Y_TICKS;
+  yTickValues.forEach((value) => {
     const tick = createSvgElement("text", "parabola-tick parabola-tick-y");
     tick.setAttribute("x", String(scale.x(0) + 8));
     tick.setAttribute("y", String(scale.y(value) + 4));
@@ -104,18 +126,18 @@ function appendAxes(svg, scale, id) {
   svg.append(yName);
 }
 
-function curvePath(a, k, h, scale) {
+function curvePath(a, k, h, scale, viewport) {
   const points = [];
-  for (let x = X_MIN; x <= X_MAX + 0.001; x += 0.1) {
+  for (let x = viewport.xMin; x <= viewport.xMax + 0.001; x += 0.1) {
     const command = points.length === 0 ? "M" : "L";
     points.push(command + scale.x(x).toFixed(2) + " " + scale.y(a * (x - h) * (x - h) + k).toFixed(2));
   }
   return points.join(" ");
 }
 
-function appendCurve(svg, curve, scale, progress) {
+function appendCurve(svg, curve, scale, progress, viewport) {
   const path = createSvgElement("path", "parabola-curve");
-  path.setAttribute("d", curvePath(curve.a, curve.k ?? 0, curve.h ?? 0, scale));
+  path.setAttribute("d", curvePath(curve.a, curve.k ?? 0, curve.h ?? 0, scale, viewport));
   path.setAttribute("pathLength", "1");
   path.setAttribute("stroke", curve.color ?? "#2563eb");
   path.setAttribute("stroke-dasharray", "1");
@@ -133,6 +155,47 @@ function appendPoint(svg, point, scale) {
   svg.append(circle);
 }
 
+function appendArrow(svg, arrow, scale) {
+  const from = { x: scale.x(arrow.from.x), y: scale.y(arrow.from.y) };
+  const to = { x: scale.x(arrow.to.x), y: scale.y(arrow.to.y) };
+  const directionX = to.x - from.x;
+  const directionY = to.y - from.y;
+  const length = Math.hypot(directionX, directionY);
+  const color = arrow.color ?? "#b45f06";
+
+  const shaft = createSvgElement("line", "parabola-arrow");
+  shaft.setAttribute("x1", String(from.x));
+  shaft.setAttribute("y1", String(from.y));
+  shaft.setAttribute("x2", String(to.x));
+  shaft.setAttribute("y2", String(to.y));
+  shaft.setAttribute("stroke", color);
+  svg.append(shaft);
+
+  if (length > 0) {
+    const angle = Math.atan2(directionY, directionX);
+    const arrowhead = 8;
+    [-Math.PI / 6, Math.PI / 6].forEach((offset) => {
+      const head = createSvgElement("line", "parabola-arrow");
+      head.setAttribute("x1", String(to.x));
+      head.setAttribute("y1", String(to.y));
+      head.setAttribute("x2", String(to.x - arrowhead * Math.cos(angle + offset)));
+      head.setAttribute("y2", String(to.y - arrowhead * Math.sin(angle + offset)));
+      head.setAttribute("stroke", color);
+      svg.append(head);
+    });
+  }
+
+  if (arrow.label) {
+    const label = createSvgElement("text", "parabola-arrow-label");
+    label.setAttribute("x", String((from.x + to.x) / 2));
+    label.setAttribute("y", String((from.y + to.y) / 2 - 8));
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("fill", color);
+    label.textContent = arrow.label;
+    svg.append(label);
+  }
+}
+
 function appendLabel(svg, label, scale) {
   const text = createSvgElement("text", "parabola-label");
   text.setAttribute("x", String(scale.x(label.x)));
@@ -147,23 +210,26 @@ export function createParabolaGraph(container, initialOptions = {}) {
     curves: [],
     points: [],
     labels: [],
+    arrows: [],
     curveProgress: 1,
     ...initialOptions,
   };
 
   function render() {
-    const scale = createScale();
+    const viewport = getViewport(options);
+    const scale = createScale(viewport);
     const svg = createSvgElement("svg", "parabola-svg");
     svg.setAttribute("viewBox", "0 0 " + WIDTH + " " + HEIGHT);
     svg.setAttribute("role", "img");
     svg.setAttribute("aria-label", options.ariaLabel ?? "二次函数图象");
 
     appendDefinitions(svg, id);
-    appendAxes(svg, scale, id);
+    appendAxes(svg, scale, id, viewport, options.viewport != null);
     const plotContent = createSvgElement("g", "parabola-plot-content");
     plotContent.setAttribute("clip-path", "url(#" + id + "-plot-area)");
-    options.curves.forEach((curve) => appendCurve(plotContent, curve, scale, options.curveProgress));
+    options.curves.forEach((curve) => appendCurve(plotContent, curve, scale, options.curveProgress, viewport));
     options.points.forEach((point) => appendPoint(plotContent, point, scale));
+    options.arrows.forEach((arrow) => appendArrow(plotContent, arrow, scale));
     options.labels.forEach((label) => appendLabel(plotContent, label, scale));
     svg.append(plotContent);
     container.replaceChildren(svg);
