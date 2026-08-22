@@ -24,6 +24,23 @@ describe("Lesson 05 vertex-form integration", () => {
     ]);
   });
 
+  it("puts the two bridge formulas on separate rows and reveals the a, h, k roles only after students answer", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson05(stage, { step: 1, onStepChange() {} });
+
+    expect(stage.querySelectorAll("[data-lesson05-bridge-formula]")).toHaveLength(2);
+    expect(stage.querySelector('[data-lesson05-bridge-answer="a"]')).not.toBeNull();
+    expect(stage.querySelector("[data-lesson05-bridge-reveal]").hidden).toBe(true);
+    stage.querySelector('[data-lesson05-bridge-answer="a"]').value = "shape";
+    stage.querySelector('[data-lesson05-bridge-answer="h"]').value = "horizontal";
+    stage.querySelector('[data-lesson05-bridge-answer="k"]').value = "vertical";
+    stage.querySelector("[data-lesson05-reveal-bridge]").click();
+
+    expect(stage.querySelector("[data-lesson05-bridge-reveal]").hidden).toBe(false);
+    expect(stage.querySelector("[data-lesson05-bridge-reveal]").textContent).toContain("a 控制形状");
+    lesson.destroy();
+  });
+
   it("writes live parameter values, the new vertex form, vertex and axis after a drag", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson05(stage, { step: 2, onStepChange() {} });
@@ -61,8 +78,38 @@ describe("Lesson 05 vertex-form integration", () => {
 
     lesson = renderLesson05(stage, { step: 5, onStepChange() {}, random: () => 0.2 });
     expect(stage.querySelector("[data-lesson05-property-graph]").hidden).toBe(true);
-    stage.querySelector("[data-lesson05-check-property]").click();
+    expect(stage.querySelector('[data-lesson05-property-answer="opening"]')).not.toBeNull();
+    lesson.destroy();
+  });
+
+  it("keeps the random property graph hidden until students submit the y=2x² transformation answers", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson05(stage, { step: 5, onStepChange() {}, random: () => 0 });
+    const graph = stage.querySelector("[data-lesson05-property-graph]");
+    const check = stage.querySelector("[data-lesson05-check-property]");
+
+    check.click();
+    expect(graph.hidden).toBe(true);
+    expect(stage.querySelector("[data-lesson05-property-feedback]").textContent).toContain("请先完成");
+
+    const answer = (key, value) => {
+      const input = stage.querySelector('[data-lesson05-property-answer="' + key + '"]');
+      input.value = value;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    answer("opening", "up");
+    answer("axis", "-3");
+    answer("vertex-x", "-3");
+    answer("vertex-y", "-3");
+    answer("horizontal-direction", "left");
+    answer("horizontal-distance", "3");
+    answer("vertical-direction", "down");
+    answer("vertical-distance", "3");
+    check.click();
+
     expect(stage.querySelector("[data-lesson05-property-graph]").hidden).toBe(false);
+    expect(stage.querySelector("[data-lesson05-property-feedback]").textContent).toContain("y=2x²");
+    expect(stage.querySelector("[data-lesson05-property-feedback]").textContent).toContain("全部正确");
     lesson.destroy();
   });
 });
