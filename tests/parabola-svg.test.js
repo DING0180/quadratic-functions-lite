@@ -57,6 +57,36 @@ describe("parabola SVG", () => {
     expect(point.getAttribute("fill")).toBe("#19735d");
   });
 
+  it("renders optional labelled translation arrows", () => {
+    const container = document.createElement("div");
+
+    createParabolaGraph(container, {
+      arrows: [{
+        from: { x: 0, y: 0 },
+        to: { x: 1, y: 0 },
+        color: "#b45f06",
+        label: "+1",
+      }],
+    });
+
+    expect(container.querySelectorAll(".parabola-arrow")).toHaveLength(3);
+    expect(container.querySelectorAll(".parabola-arrow-label")).toHaveLength(1);
+    expect(container.querySelector(".parabola-arrow-label").textContent).toBe("+1");
+  });
+
+  it("uses an optional viewport so Lesson 4 can show its tenth shifted point", () => {
+    const container = document.createElement("div");
+
+    createParabolaGraph(container, {
+      viewport: { xMin: -4, xMax: 5, yMin: -4, yMax: 28 },
+      points: [{ x: -4, y: 25 }, { x: 5, y: 16 }],
+    });
+
+    const points = container.querySelectorAll(".parabola-point");
+    expect(Number(points[0].getAttribute("cy"))).toBeGreaterThan(38);
+    expect(Number(points[1].getAttribute("cx"))).toBeLessThanOrEqual(482);
+  });
+
   it("moves a curve vertically when its constant term changes", () => {
     const baseContainer = document.createElement("div");
     const shiftedContainer = document.createElement("div");
