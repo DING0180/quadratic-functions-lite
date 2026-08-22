@@ -104,3 +104,21 @@ export function createPairChallenge(firstRandom = Math.random, secondRandom = Ma
   return Object.assign(state, { b, correctAnswer });
 }
 
+export function createQuickCheck(createChallenge) {
+  let count = 0;
+  let current = null;
+
+  return {
+    get count() {
+      return count;
+    },
+    get current() {
+      return current;
+    },
+    next() {
+      current = createChallenge();
+      count += 1;
+      return current;
+    },
+  };
+}
