@@ -1,10 +1,24 @@
 .lesson01-step { width: min(100%, 70rem); margin: auto; color: #223330; }
+.lesson01-step [hidden] { display: none !important; }
 .lesson01-heading { margin-bottom: 1rem; }
 .lesson01-kicker { margin: 0; color: #1b765d; font-size: .78rem; font-weight: 800; letter-spacing: .13em; }
 .lesson01-title { margin: .35rem 0 0; font-size: clamp(1.65rem, 3.1vw, 3rem); line-height: 1.18; }
 .lesson01-prompt, .lesson01-question { max-width: 56rem; color: #465a54; font-size: clamp(1rem, 1.2vw, 1.15rem); line-height: 1.6; }
 .lesson01-question { padding-left: .9rem; border-left: 3px solid #d98935; font-weight: 700; }
-.lesson01-bridge-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: .9rem; align-items: stretch; }
+.lesson01-example-groups { display: grid; gap: .75rem; }
+.lesson01-example-group { padding: clamp(.7rem, 1.4vw, 1rem); border: 1px solid #d5e0da; border-radius: .8rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / .06); }
+.lesson01-group-title { margin: 0 0 .55rem; color: #17634e; font-size: 1.05rem; }
+.lesson01-quadratic-group .lesson01-group-title { color: #5f3e8d; }
+.lesson01-example-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; }
+.lesson01-example-formula { position: relative; min-width: 0; padding: .35rem .5rem; border: 1px solid #e0e9e4; border-radius: .5rem; background: #fbfdfc; }
+.lesson01-example-formula .lesson01-formula { margin: 0; text-align: center; font-size: clamp(.95rem, 1.3vw, 1.2rem); }
+.lesson01-standard-form { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem .85rem; margin-top: .65rem; padding: .5rem .7rem; border-left: 4px solid #1f8a70; border-radius: .45rem; background: #eef7f1; }
+.lesson01-standard-form .lesson01-formula, .lesson01-standard-form p { margin: 0; }
+.lesson01-quadratic-group .lesson01-standard-form { border-left-color: #7b55b7; background: #f6f1fb; }
+.lesson01-form-note { color: #465a54; font-size: .9rem; }
+.lesson01-power-badge { position: absolute; top: .08rem; left: 56%; display: grid; width: 1.35rem; height: 1.35rem; place-items: center; border-radius: 50%; background: #d84242; color: #fff; font-size: .8rem; font-weight: 900; line-height: 1; opacity: 0; transform: translateY(.5rem) scale(.6); box-shadow: 0 .15rem .4rem rgb(132 27 27 / .25); }
+.lesson01-power-badge.is-visible { animation: lesson01-power-pop .42s cubic-bezier(.2, 1.35, .5, 1) forwards; }
+@keyframes lesson01-power-pop { to { opacity: 1; transform: translateY(0) scale(1); } }
 .lesson01-card, .lesson01-worked-example { min-width: 0; padding: clamp(.85rem, 1.8vw, 1.3rem); border: 1px solid #d5e0da; border-radius: .9rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / .06); }
 .lesson01-card-label, .lesson01-coefficient { color: #17634e; font-weight: 800; }
 .lesson01-arrow { display: grid; place-items: center; color: #64746f; font-weight: 800; }
@@ -17,6 +31,20 @@
 .lesson01-action:disabled { cursor: not-allowed; opacity: .55; }
 .lesson01-secondary { border-color: #768883; background: #f8faf9; color: #334640; }
 .lesson01-term-controls, .lesson01-scan-controls, .lesson01-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+.lesson01-decomposition-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.lesson01-decomposition-card { min-width: 0; padding: .8rem; border: 1px solid #d5e0da; border-top: 4px solid #1f8a70; border-radius: .75rem; background: #fff; animation: lesson01-decomposition-in .3s ease both; }
+.lesson01-decomposition-card.is-linear { border-top-color: #5f67b8; }
+.lesson01-decomposition-card.is-constant { border-top-color: #d98935; }
+.lesson01-decomposition-card h3 { margin: .35rem 0; }
+.lesson01-decomposition-card p { margin: 0; color: #465a54; line-height: 1.5; }
+@keyframes lesson01-decomposition-in { from { opacity: 0; transform: translateY(.6rem); } to { opacity: 1; transform: translateY(0); } }
+.lesson01-parameter-gate { display: grid; gap: .6rem; margin-top: .8rem; padding: .85rem 1rem; border: 1px solid #d5e0da; border-radius: .8rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / .06); }
+.lesson01-parameter-gate h3, .lesson01-parameter-legend { margin: 0; }
+.lesson01-parameter-legend { color: #465a54; font-weight: 700; line-height: 1.5; }
+.lesson01-parameter-expression { display: flex; flex-wrap: wrap; align-items: center; gap: .08rem; padding: .55rem .7rem; border-radius: .55rem; background: #f7faf8; }
+.lesson01-parameter-piece { margin: 0; font-size: 1.08rem; }
+.lesson01-parameter-piece.is-coefficient { padding: .18rem .28rem; border-radius: .35rem; background: #fff0ee; color: #c83737; box-shadow: inset 0 0 0 1px #efb3ae; }
+.lesson01-parameter-piece.is-exponent { padding: .18rem .28rem; border-radius: .35rem; background: #edf8f0; color: #19735d; box-shadow: inset 0 0 0 1px #a8d7b8; }
 .lesson01-general-formula { display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; padding: .85rem; border: 1px solid #d5e0da; border-radius: .8rem; background: #fff; }
 .lesson01-formula-part { margin: 0; padding: .35rem .45rem; border-radius: .45rem; transition: background .16s ease, box-shadow .16s ease; }
 .lesson01-formula-part.is-active { background: #e8f5ef; box-shadow: inset 0 0 0 2px #1f8a70; }
@@ -35,5 +63,5 @@
 .lesson01-bridge-out { margin-top: 1.2rem; padding: .85rem 1rem; border-radius: .6rem; background: #eef7f1; }
 .lesson01-step-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; margin-top: 1.3rem; }
 .lesson01-step-count { color: #62736e; font-weight: 800; }
-@media (max-width: 760px) { .lesson01-bridge-grid, .lesson01-term-grid, .lesson01-summary-grid { grid-template-columns: 1fr; } .lesson01-arrow { min-height: 1.5rem; } }
+@media (max-width: 760px) { .lesson01-example-grid, .lesson01-term-grid, .lesson01-summary-grid, .lesson01-decomposition-grid { grid-template-columns: 1fr; } .lesson01-arrow { min-height: 1.5rem; } }
 @media (min-width: 761px) and (max-height: 760px) { .lesson01-heading { margin-bottom: .6rem; } .lesson01-title { font-size: 1.7rem; } .lesson01-prompt, .lesson01-question { margin-block: .45rem; font-size: .96rem; line-height: 1.4; } .lesson01-card, .lesson01-worked-example { padding: .72rem; } .lesson01-action { min-height: 2.15rem; padding: .35rem .65rem; } .lesson01-step-controls { margin-top: .75rem; } .lesson01-model-diagram { height: calc(6rem + var(--lesson01-size) * .7rem); min-height: 6rem; } }

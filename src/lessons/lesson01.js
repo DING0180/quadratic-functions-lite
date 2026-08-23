@@ -3,19 +3,22 @@ import "./lesson01.css";
 
 export const LESSON01_STEP_TITLES = Object.freeze([
   "Bridge In：一次函数 → 二次函数",
-  "二次函数一般式",
-  "二次项、一次项和常数项",
-  "Formula Scanner：项与系数",
-  "Quick Check：它是不是二次函数？",
-  "例题与参数条件",
+  "拆解二次函数一般式",
   "从实际问题建立二次函数",
-  "Summary + Bridge Out",
+  "四种情况与参数 Gate",
+  "随机辨认：a 与二次项",
 ]);
 
 const PRACTICE = Object.freeze([
-  { latex: "y=2x^2-3x+1", label: "y=2x²−3x+1", answer: "是。最高次数是 2，且二次项系数 2≠0。" },
-  { latex: "y=(x+2)^2-x^2", label: "y=(x+2)²−x²", answer: "不是。整理后 y=4x+4，最高次数只有 1。" },
-  { latex: "y=0x^2+5x-1", label: "y=0x²+5x−1", answer: "不是。二次项系数为 0，所以它实际上是一次函数。" },
+  { latex: "y=5x-3x^2+7", label: "y=5x−3x²+7", answer: "二次项是 −3x²；所以 a=−3。二次项不一定写在最前面。" },
+  { latex: "y=4x+2-\\frac{1}{2}x^2", label: "y=4x+2−1/2x²", answer: "二次项是 −1/2x²；所以 a=−1/2。它也可以写在最后。" },
+  { latex: "y=6+5x^2-2x", label: "y=6+5x²−2x", answer: "二次项是 5x²；所以 a=5。先找带 x² 的那一项。" },
+]);
+
+const PARAMETER_CHALLENGES = Object.freeze([
+  { coefficient: "m+3", coefficientLabel: "m+3", exponent: "m^2-2m+1", exponentLabel: "m²−2m+1", tail: "+6x-1", answer: "绿色 Gate：m²−2m+1=2；红色 Gate：m+3≠0。两条条件必须同时成立。" },
+  { coefficient: "2p-1", coefficientLabel: "2p−1", exponent: "p+1", exponentLabel: "p+1", tail: "-3x+5", answer: "绿色 Gate：p+1=2；红色 Gate：2p−1≠0。先让指数等于 2，再排除系数为 0 的值。" },
+  { coefficient: "t^2+1", coefficientLabel: "t²+1", exponent: "2t", exponentLabel: "2t", tail: "+t", answer: "绿色 Gate：2t=2；红色 Gate：t²+1≠0。两个 Gate 都通过，才是二次函数。" },
 ]);
 
 function element(tag, className = "", text = "") {
@@ -41,7 +44,7 @@ function createRoot(step) {
   const root = element("section", "lesson01-step");
   const heading = element("header", "lesson01-heading");
   heading.append(
-    element("p", "lesson01-kicker", "LESSON 01 · " + String(step).padStart(2, "0") + " / 08"),
+    element("p", "lesson01-kicker", "LESSON 01 · " + String(step).padStart(2, "0") + " / 05"),
     element("h2", "lesson01-title", LESSON01_STEP_TITLES[step - 1]),
   );
   root.append(heading);
@@ -54,54 +57,96 @@ function appendNavigation(root, step, onStepChange) {
   const previous = button("上一步", "lesson01-action lesson01-secondary");
   previous.disabled = step === 1;
   previous.addEventListener("click", () => onStepChange(Math.max(1, step - 1)));
-  const next = button(step === 8 ? "回到本课开始" : "下一步");
-  next.addEventListener("click", () => onStepChange(step === 8 ? 1 : step + 1));
-  navigation.append(previous, element("span", "lesson01-step-count", step + " / 08"), next);
+  const next = button(step === 5 ? "回到本课开始" : "下一步");
+  next.addEventListener("click", () => onStepChange(step === 5 ? 1 : step + 1));
+  navigation.append(previous, element("span", "lesson01-step-count", step + " / 05"), next);
   root.append(navigation);
 }
 
+function exampleFormula(latex, label, kind) {
+  const host = element("div", "lesson01-example-formula");
+  host.dataset["lesson01" + kind + "Example"] = "";
+  host.append(formula(latex, label));
+  return host;
+}
+
 function renderBridge(root) {
-  const cards = element("div", "lesson01-bridge-grid");
-  const linear = element("article", "lesson01-card lesson01-linear-card");
-  linear.append(element("p", "lesson01-card-label", "已学过 / Linear"), formula("y=kx+b", "一次函数 y=kx+b"), element("p", "", "看自变量 x 的最高次数：1"));
-  const quadratic = element("article", "lesson01-card lesson01-quadratic-card");
-  quadratic.append(element("p", "lesson01-card-label", "今天 / Quadratic"), formula("y=ax^2+bx+c", "二次函数 y=ax²+bx+c"), element("p", "", "看自变量 x 的最高次数：2"));
-  cards.append(linear, element("div", "lesson01-arrow", "一次 → 二次"), quadratic);
+  const linearGroup = element("section", "lesson01-example-group lesson01-linear-group");
+  const linearExamples = element("div", "lesson01-example-grid");
+  [
+    ["y=x+1", "y=x+1"],
+    ["y=-\\frac{1}{2}x+3", "y=−1/2x+3"],
+    ["y=3x-2", "y=3x−2"],
+  ].forEach(([latex, label]) => linearExamples.append(exampleFormula(latex, label, "Linear")));
+  const linearForm = element("div", "lesson01-standard-form"); linearForm.dataset.lesson01LinearForm = ""; linearForm.hidden = true;
+  linearForm.append(element("p", "lesson01-card-label", "归纳：一次函数的一般式"), formula("y=kx+b", "一次函数的一般式 y=kx+b"));
+  linearGroup.append(element("h3", "lesson01-group-title", "先看几个一次函数"), linearExamples, linearForm);
+
+  const quadraticGroup = element("section", "lesson01-example-group lesson01-quadratic-group"); quadraticGroup.hidden = true;
+  const quadraticExamples = element("div", "lesson01-example-grid");
+  [
+    ["y=x^2", "y=x²"],
+    ["y=-2x^2+3x+1", "y=−2x²+3x+1"],
+    ["y=\\frac{1}{2}x^2-4", "y=1/2x²−4"],
+  ].forEach(([latex, label]) => quadraticExamples.append(exampleFormula(latex, label, "Quadratic")));
+  const quadraticForm = element("div", "lesson01-standard-form"); quadraticForm.dataset.lesson01QuadraticForm = ""; quadraticForm.hidden = true;
+  quadraticForm.append(element("p", "lesson01-card-label", "归纳：二次函数的一般式"), formula("y=ax^2+bx+c", "二次函数的一般式 y=ax²+bx+c"), element("p", "lesson01-form-note", "其中 a、b、c 为常数，且 a≠0。"));
+  quadraticGroup.append(element("h3", "lesson01-group-title", "再看几个二次函数"), quadraticExamples, quadraticForm);
+
+  const groups = element("div", "lesson01-example-groups"); groups.append(linearGroup, quadraticGroup);
+  const question = element("p", "lesson01-question", "现在请你告诉老师：为什么这些函数一个叫“一次”，另一个叫“二次”？"); question.hidden = true;
   const answer = element("p", "lesson01-reveal"); answer.dataset.lesson01BridgeAnswer = ""; answer.hidden = true;
-  const reveal = button("Reveal：为什么叫二次函数？"); reveal.dataset.lesson01BridgeReveal = "";
-  reveal.addEventListener("click", () => {
-    answer.textContent = "函数名称来自自变量 x 的最高次数：最高次数是 2，所以称为二次函数。";
-    answer.hidden = false;
+  const advance = button("继续：归纳一次函数"); advance.dataset.lesson01BridgeAdvance = "";
+  let phase = 0;
+  function markPowers() {
+    const examples = [...linearExamples.children, ...quadraticExamples.children];
+    examples.forEach((example, index) => {
+      const power = index < 3 ? "1" : "2";
+      const badge = element("span", "lesson01-power-badge", power);
+      badge.dataset.lesson01PowerBadge = power;
+      example.append(badge);
+      requestAnimationFrame(() => badge.classList.add("is-visible"));
+    });
+  }
+  advance.addEventListener("click", () => {
+    phase += 1;
+    if (phase === 1) { linearForm.hidden = false; advance.textContent = "继续：观察二次函数"; }
+    if (phase === 2) { quadraticGroup.hidden = false; advance.textContent = "继续：归纳二次函数"; }
+    if (phase === 3) { quadraticForm.hidden = false; question.hidden = false; advance.textContent = "Reveal：为什么叫一次、二次？"; }
+    if (phase === 4) {
+      markPowers();
+      answer.textContent = "函数名称来自自变量 x 的最高次数：一次函数的 x 标为 1，二次函数的 x 标为 2。";
+      answer.hidden = false;
+      advance.disabled = true;
+      advance.textContent = "已标出最高次数";
+    }
   });
-  root.append(element("p", "lesson01-prompt", "从一次函数走向二次函数，变化的关键不是系数，而是 x 的最高次数。"), cards, reveal, answer);
+  root.append(element("p", "lesson01-prompt", "先不急着给一般式。观察下面这些熟悉的函数，看看它们有什么共同点。"), groups, question, advance, answer);
 }
 
 function renderGeneral(root) {
-  const terms = [
-    { id: "quadratic", text: "ax²", latex: "ax^2", explanation: "ax² 是二次项；a 是二次项系数，并且 a≠0。" },
-    { id: "linear", text: "+bx", latex: "+bx", explanation: "bx 是一次项；b 是一次项系数。" },
-    { id: "constant", text: "+c", latex: "+c", explanation: "c 是常数项；它可以等于 0。" },
+  const cards = element("div", "lesson01-decomposition-grid");
+  const items = [
+    ["quadratic", "ax^2", "二次项", "ax² 是二次项；其中 a 表示二次项系数，而且 a≠0。"],
+    ["linear", "bx", "一次项", "bx 是一次项；其中 b 表示一次项系数。"],
+    ["constant", "c", "常数项", "c 是常数项；它不含 x，可以等于 0。"],
   ];
-  const formulaLine = element("div", "lesson01-general-formula");
-  const controls = element("div", "lesson01-term-controls");
-  const explanation = element("p", "lesson01-reveal"); explanation.dataset.lesson01TermExplanation = "";
-  let selected = "quadratic";
-  function render() {
-    formulaLine.replaceChildren(...terms.map((term) => {
-      const part = formula(term.latex, term.text, "lesson01-formula-part is-" + term.id + (selected === term.id ? " is-active" : ""));
-      return part;
-    }));
-    controls.replaceChildren(...terms.map((term) => {
-      const control = button(term.text, "lesson01-action lesson01-secondary");
-      control.dataset.lesson01Term = term.id;
-      control.setAttribute("aria-pressed", String(selected === term.id));
-      control.addEventListener("click", () => { selected = term.id; render(); });
-      return control;
-    }));
-    explanation.textContent = terms.find((term) => term.id === selected).explanation;
-  }
-  render();
-  root.append(element("p", "lesson01-prompt", "一般地，形如下面的式子（其中 a、b、c 为常数，a≠0）的函数叫做二次函数。点击一项，让它和对应系数一起亮起来。"), formulaLine, controls, explanation);
+  items.forEach(([id, latex, title, copy]) => {
+    const card = element("article", "lesson01-decomposition-card is-" + id); card.dataset.lesson01DecompositionCard = id; card.hidden = true;
+    card.append(formula(latex, latex), element("h3", "", title), element("p", "", copy));
+    cards.append(card);
+  });
+  const conclusion = element("p", "lesson01-reveal"); conclusion.hidden = true;
+  const advance = button("开始拆分：先看 ax²"); advance.dataset.lesson01DecomposeAdvance = "";
+  let phase = 0;
+  advance.addEventListener("click", () => {
+    phase += 1;
+    cards.children[phase - 1].hidden = false;
+    if (phase === 1) advance.textContent = "继续：再看 bx";
+    if (phase === 2) advance.textContent = "继续：最后看 c";
+    if (phase === 3) { conclusion.textContent = "把三块合起来，就是二次函数的一般式 y=ax²+bx+c，其中 a≠0。"; conclusion.hidden = false; advance.disabled = true; advance.textContent = "拆分完成"; }
+  });
+  root.append(element("p", "lesson01-prompt", "一般地，y=ax²+bx+c（a、b、c 为常数，a≠0）叫做二次函数。现在把这个式子一块一块拆开。"), formula("y=ax^2+bx+c", "二次函数的一般式", "lesson01-formula lesson01-current"), cards, advance, conclusion);
 }
 
 function renderTerms(root) {
@@ -144,8 +189,9 @@ function renderPractice(root, random) {
   let index = Math.min(PRACTICE.length - 1, Math.max(0, Math.floor((Number(random()) || 0) * PRACTICE.length)));
   function render() {
     const item = PRACTICE[index];
-    prompt.textContent = "先整理，再看最高次数，最后检查二次项系数：下面是不是二次函数？";
+    prompt.textContent = "请先口答：二次项是哪一项？二次项系数 a 等于多少？注意：二次项不一定写在最前面。";
     renderFormula(formulaHost, item.latex, { ariaLabel: item.label, displayMode: true });
+    formulaHost.dataset.lesson01PracticeFunction = "";
     answer.hidden = true;
   }
   check.addEventListener("click", () => { answer.textContent = PRACTICE[index].answer; answer.hidden = false; });
@@ -155,7 +201,7 @@ function renderPractice(root, random) {
   root.querySelector(".lesson01-actions").append(check, reset);
 }
 
-function renderExamples(root) {
+function renderExamples(root, random) {
   const examples = [
     ["标准式", "y=3x^2-5x+2", "二次项是 3x²，一次项是 −5x，常数项是 2。"],
     ["先整理", "y=(x+1)(x-2)=x^2-x-2", "展开整理后最高次数是 2，所以它是二次函数。"],
@@ -167,7 +213,28 @@ function renderExamples(root) {
   const work = element("div", "lesson01-worked-example");
   function render() { const [title, latex, copy] = examples[Number(select.value)]; work.replaceChildren(element("h3", "", title), formula(latex, latex), element("p", "", copy)); }
   select.addEventListener("change", render); render();
-  root.append(element("p", "lesson01-prompt", "判断时务必先整理。参数题还要同时满足“次数为 2”和“二次项系数不为 0”两个条件。"), select, work);
+  const parameter = element("section", "lesson01-parameter-gate");
+  const expression = element("div", "lesson01-parameter-expression");
+  const coefficient = formula("", "", "lesson01-parameter-piece is-coefficient"); coefficient.dataset.lesson01ParameterCoefficient = "";
+  const exponent = formula("", "", "lesson01-parameter-piece is-exponent"); exponent.dataset.lesson01ParameterExponent = "";
+  const tail = formula("", "", "lesson01-parameter-piece");
+  const answer = element("p", "lesson01-reveal"); answer.dataset.lesson01ParameterAnswer = ""; answer.hidden = true;
+  const reveal = button("Reveal：检查两个 Gate"); reveal.dataset.lesson01ParameterReveal = "";
+  const next = button("New Parameter Challenge", "lesson01-action lesson01-secondary"); next.dataset.lesson01ParameterNext = "";
+  let index = Math.min(PARAMETER_CHALLENGES.length - 1, Math.max(0, Math.floor((Number(random()) || 0) * PARAMETER_CHALLENGES.length)));
+  function renderParameter() {
+    const challenge = PARAMETER_CHALLENGES[index];
+    renderFormula(coefficient, challenge.coefficient, { ariaLabel: challenge.coefficientLabel, displayMode: true });
+    renderFormula(exponent, "x^{" + challenge.exponent + "}", { ariaLabel: "x 的指数 " + challenge.exponentLabel, displayMode: true });
+    renderFormula(tail, challenge.tail, { ariaLabel: challenge.tail, displayMode: true });
+    answer.hidden = true;
+  }
+  reveal.addEventListener("click", () => { answer.textContent = PARAMETER_CHALLENGES[index].answer; answer.hidden = false; });
+  next.addEventListener("click", () => { index = (index + 1) % PARAMETER_CHALLENGES.length; renderParameter(); });
+  expression.append(formula("y=", "y 等于", "lesson01-parameter-piece"), coefficient, exponent, tail);
+  parameter.append(element("h3", "", "参数 Gate：两条条件同时过关"), element("p", "lesson01-parameter-legend", "绿色：x 的最高次数必须等于 2　｜　红色：二次项系数必须不等于 0"), expression, reveal, next, answer);
+  renderParameter();
+  root.append(element("p", "lesson01-prompt", "判断时务必先整理。下面保留四种常见情况；参数题则要同时检查两条条件。"), select, work, parameter);
   return () => select.removeEventListener("change", render);
 }
 
@@ -185,16 +252,10 @@ function renderModel(root) {
   return () => slider.removeEventListener("input", render);
 }
 
-function renderSummary(root) {
-  const grid = element("div", "lesson01-summary-grid");
-  [["最高次数", "先整理，再看 x 的最高次数是否为 2。"], ["一般式", "y=ax²+bx+c，其中 a≠0。"], ["判断顺序", "整理 → 看次数 → 查二次项系数。"]].forEach(([title, copy]) => { const card = element("article", "lesson01-card"); card.append(element("h3", "", title), element("p", "", copy)); grid.append(card); });
-  root.append(element("p", "lesson01-prompt", "今天我们认识了二次函数。下一课将从最简单的 y=ax² 开始研究它的图象。"), formula("y=ax^2+bx+c\longrightarrow y=ax^2", "从一般式到 y=ax²", "lesson01-formula lesson01-current"), grid, element("p", "lesson01-bridge-out", "Bridge Out：图象会是什么样子？进入 Lesson 02。"));
-}
-
-const RENDERERS = Object.freeze([renderBridge, renderGeneral, renderTerms, renderScanner, renderPractice, renderExamples, renderModel, renderSummary]);
+const RENDERERS = Object.freeze([renderBridge, renderGeneral, renderModel, renderExamples, renderPractice]);
 
 export function renderLesson01(stage, { step = 1, onStepChange = () => {}, random = Math.random } = {}) {
-  const safeStep = Math.min(8, Math.max(1, Number(step) || 1));
+  const safeStep = Math.min(5, Math.max(1, Number(step) || 1));
   const cleanup = [];
   const root = createRoot(safeStep);
   const dispose = RENDERERS[safeStep - 1](root, random);

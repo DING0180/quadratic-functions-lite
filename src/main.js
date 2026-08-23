@@ -102,7 +102,7 @@ function render() {
   const isLesson07 = lesson.id === "lesson-07";
   const isLesson08 = lesson.id === "lesson-08";
   const isLesson09 = lesson.id === "lesson-09";
-  const stepCount = isLesson01 ? 8 : isLesson02 ? 12 : isLesson03 ? 10 : isLesson04 ? 5 : isLesson05 ? 6 : isLesson06 ? 8 : isLesson07 ? 7 : isLesson08 ? 12 : isLesson09 ? 10 : 0;
+  const stepCount = isLesson01 ? 5 : isLesson02 ? 12 : isLesson03 ? 10 : isLesson04 ? 5 : isLesson05 ? 6 : isLesson06 ? 8 : isLesson07 ? 7 : isLesson08 ? 12 : isLesson09 ? 10 : 0;
   const step = stepCount ? lessonStepFromHash(window.location.hash, lesson.id, stepCount) : null;
   const canonicalHash = stepCount ? lessonStepHash(lesson.id, step) : "#" + lesson.id;
   if (window.location.hash !== canonicalHash) {
