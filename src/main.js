@@ -1,6 +1,7 @@
 import "./styles.css";
 import { COURSE, getLessonFromHash } from "./course.js";
 import { renderFormula } from "./formula.js";
+import { renderLesson01 } from "./lessons/lesson01.js";
 import { renderLesson02 } from "./lessons/lesson02.js";
 import { renderLesson03 } from "./lessons/lesson03.js";
 import { renderLesson04 } from "./lessons/lesson04.js";
@@ -91,6 +92,7 @@ function render() {
   activeLesson = null;
 
   const lesson = getLessonFromHash(window.location.hash);
+  const isLesson01 = lesson.id === "lesson-01";
   const isLesson02 = lesson.id === "lesson-02";
   const isLesson03 = lesson.id === "lesson-03";
   const isLesson04 = lesson.id === "lesson-04";
@@ -99,7 +101,7 @@ function render() {
   const isLesson07 = lesson.id === "lesson-07";
   const isLesson08 = lesson.id === "lesson-08";
   const isLesson09 = lesson.id === "lesson-09";
-  const stepCount = isLesson02 ? 12 : isLesson03 ? 10 : isLesson04 ? 5 : isLesson05 ? 6 : isLesson06 ? 8 : isLesson07 ? 7 : isLesson08 ? 12 : isLesson09 ? 10 : 0;
+  const stepCount = isLesson01 ? 8 : isLesson02 ? 12 : isLesson03 ? 10 : isLesson04 ? 5 : isLesson05 ? 6 : isLesson06 ? 8 : isLesson07 ? 7 : isLesson08 ? 12 : isLesson09 ? 10 : 0;
   const step = stepCount ? lessonStepFromHash(window.location.hash, lesson.id, stepCount) : null;
   const canonicalHash = stepCount ? lessonStepHash(lesson.id, step) : "#" + lesson.id;
   if (window.location.hash !== canonicalHash) {
@@ -109,9 +111,9 @@ function render() {
   document.title = lesson.number + " · " + lesson.title + "｜二次函数互动课堂";
   renderSidebar(lesson.id);
 
-  if (isLesson02 || isLesson03 || isLesson04 || isLesson05 || isLesson06 || isLesson07 || isLesson08 || isLesson09) {
+  if (isLesson01 || isLesson02 || isLesson03 || isLesson04 || isLesson05 || isLesson06 || isLesson07 || isLesson08 || isLesson09) {
     stage.classList.add("lesson-stage-active");
-    const renderer = isLesson02 ? renderLesson02 : isLesson03 ? renderLesson03 : isLesson04 ? renderLesson04 : isLesson05 ? renderLesson05 : isLesson06 ? renderLesson06 : isLesson07 ? renderLesson07 : isLesson08 ? renderLesson08 : renderLesson09;
+    const renderer = isLesson01 ? renderLesson01 : isLesson02 ? renderLesson02 : isLesson03 ? renderLesson03 : isLesson04 ? renderLesson04 : isLesson05 ? renderLesson05 : isLesson06 ? renderLesson06 : isLesson07 ? renderLesson07 : isLesson08 ? renderLesson08 : renderLesson09;
     activeLesson = renderer(stage, {
       step,
       onStepChange(nextStep) {

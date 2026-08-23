@@ -1,5 +1,5 @@
 export const COURSE = Object.freeze([
-  { id: "lesson-01", number: "01", title: "二次函数的概念" },
+  { id: "lesson-01", number: "01", title: "二次函数的概念", stepCount: 8 },
   { id: "lesson-02", number: "02", title: "y=ax²" },
   { id: "lesson-03", number: "03", title: "y=ax²+k" },
   { id: "lesson-04", number: "04", title: "y=a(x-h)²" },
