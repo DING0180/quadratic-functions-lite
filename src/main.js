@@ -10,6 +10,7 @@ import { renderLesson06 } from "./lessons/lesson06.js";
 import { renderLesson07 } from "./lessons/lesson07.js";
 import { renderLesson08 } from "./lessons/lesson08.js";
 import { renderLesson09 } from "./lessons/lesson09.js";
+import "./classroom-polish.css";
 
 const root = document.querySelector("#app");
 

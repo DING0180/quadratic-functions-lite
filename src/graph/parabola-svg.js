@@ -73,6 +73,39 @@ function appendDefinitions(svg, id) {
   svg.append(defs);
 }
 
+function appendGrid(svg, scale, id, viewport, customViewport) {
+  const grid = createSvgElement("g", "parabola-grid");
+  grid.setAttribute("clip-path", "url(#" + id + "-plot-area)");
+  const xTickStep = customViewport ? viewport.xTickStep : 1;
+  const xTickStart = customViewport ? Math.ceil((viewport.xMin - 1e-9) / xTickStep) : X_MIN;
+  const xTickEnd = customViewport ? Math.floor((viewport.xMax + 1e-9) / xTickStep) : X_MAX;
+  const yTickValues = customViewport
+    ? Array.from({ length: Math.floor((viewport.yMax - viewport.yMin) / viewport.yTickStep) + 1 }, (_, index) => Math.ceil(viewport.yMin / viewport.yTickStep) * viewport.yTickStep + index * viewport.yTickStep)
+      .filter((value) => value <= viewport.yMax)
+    : [Y_MIN, ...Y_TICKS, Y_MAX];
+
+  for (let index = xTickStart; index <= xTickEnd; index += 1) {
+    const value = Number((index * xTickStep).toFixed(8));
+    const line = createSvgElement("line", "parabola-grid-line");
+    line.setAttribute("x1", String(scale.x(value)));
+    line.setAttribute("x2", String(scale.x(value)));
+    line.setAttribute("y1", String(scale.y(viewport.yMin)));
+    line.setAttribute("y2", String(scale.y(viewport.yMax)));
+    grid.append(line);
+  }
+
+  yTickValues.forEach((value) => {
+    const line = createSvgElement("line", "parabola-grid-line");
+    line.setAttribute("x1", String(scale.x(viewport.xMin)));
+    line.setAttribute("x2", String(scale.x(viewport.xMax)));
+    line.setAttribute("y1", String(scale.y(value)));
+    line.setAttribute("y2", String(scale.y(value)));
+    grid.append(line);
+  });
+
+  svg.append(grid);
+}
+
 function appendAxes(svg, scale, id, viewport, customViewport) {
   const xAxis = createSvgElement("line", "parabola-axis");
   xAxis.setAttribute("x1", String(PADDING));
@@ -269,8 +302,9 @@ export function createParabolaGraph(container, initialOptions = {}) {
     svg.setAttribute("aria-label", options.ariaLabel ?? "二次函数图象");
 
     appendDefinitions(svg, id);
+    appendGrid(svg, scale, id, viewport, options.viewport != null);
     appendAxes(svg, scale, id, viewport, options.viewport != null);
-    const plotContent = createSvgElement("g", "parabola-plot-content");
+    const plotContent = createSvgElement("g", "parabola-plot-content parabola-plot-area");
     plotContent.setAttribute("clip-path", "url(#" + id + "-plot-area)");
     options.guides.forEach((guide) => appendGuide(plotContent, guide, scale, viewport));
     options.horizontalGuides.forEach((guide) => appendHorizontalGuide(plotContent, guide, scale, viewport));

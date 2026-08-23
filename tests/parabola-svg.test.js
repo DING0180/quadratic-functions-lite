@@ -15,6 +15,16 @@ describe("parabola SVG", () => {
     expect(container.querySelectorAll(".parabola-curve")).toHaveLength(1);
   });
 
+  it("renders a clipped semantic grid behind graph content", () => {
+    const container = document.createElement("div");
+
+    createParabolaGraph(container, { curves: [{ a: 1 }] });
+
+    expect(container.querySelector(".parabola-grid")).not.toBeNull();
+    expect(container.querySelectorAll(".parabola-grid-line").length).toBeGreaterThan(0);
+    expect(container.querySelector(".parabola-plot-area")).not.toBeNull();
+  });
+
   it("keeps fixed integer tick marks and marks both positive axis directions", () => {
     const container = document.createElement("div");
 

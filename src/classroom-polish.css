@@ -1,0 +1,153 @@
+:root {
+  --classroom-paper: #fbfcfa;
+  --classroom-rail: #f1f6f2;
+  --classroom-surface: #ffffff;
+  --classroom-ink: #172523;
+  --classroom-muted: #52635e;
+  --classroom-line: #d5e0da;
+  --classroom-green: #17634e;
+  --classroom-green-strong: #104e3d;
+  --classroom-orange: #d98935;
+  --classroom-radius: 0.75rem;
+  --classroom-shadow: 0 0.35rem 1.35rem rgb(25 73 58 / 0.06);
+  --classroom-motion: 180ms;
+  --classroom-motion-slow: 240ms;
+}
+
+.classroom { background: var(--classroom-paper); }
+
+.sidebar {
+  background: var(--classroom-rail);
+  border-right-color: var(--classroom-line);
+}
+
+.brand { border-bottom-color: var(--classroom-line); }
+.brand-title, .lesson-title { color: var(--classroom-ink); }
+.brand-subtitle, .navigation-label, .lesson-link-number { color: var(--classroom-muted); }
+.brand-formula { color: var(--classroom-green); }
+
+.lesson-link {
+  border-radius: 0 0.45rem 0.45rem 0;
+  transition: background-color var(--classroom-motion) ease, color var(--classroom-motion) ease;
+}
+
+.lesson-link:hover { background: #e7f0eb; }
+.lesson-link[aria-current="page"] {
+  background: #dcece3;
+  border-left-color: var(--classroom-green);
+  color: var(--classroom-ink);
+}
+
+.lesson-stage-active { scrollbar-color: #b6c9c0 transparent; }
+
+:is(
+  .lesson01-action, .lesson02-action, .lesson03-action, .lesson04-action, .lesson05-action,
+  .lesson06-action, .lesson07-action, .lesson08-action, .lesson09-action
+) {
+  min-height: 2.55rem;
+  border-color: var(--classroom-green);
+  border-radius: 0.55rem;
+  background: var(--classroom-green);
+  box-shadow: none;
+  transition: transform var(--classroom-motion) ease, background-color var(--classroom-motion) ease, border-color var(--classroom-motion) ease;
+}
+
+:is(
+  .lesson01-action, .lesson02-action, .lesson03-action, .lesson04-action, .lesson05-action,
+  .lesson06-action, .lesson07-action, .lesson08-action, .lesson09-action
+):hover:not(:disabled) {
+  background: var(--classroom-green-strong);
+  transform: translateY(-1px);
+}
+
+:is(
+  .lesson01-secondary, .lesson02-action-secondary, .lesson03-secondary, .lesson04-secondary,
+  .lesson05-secondary, .lesson06-secondary, .lesson07-secondary, .lesson08-secondary, .lesson09-secondary
+) {
+  background: var(--classroom-surface);
+  border-color: #9caea6;
+  color: #334640;
+}
+
+:is(
+  .lesson01-action, .lesson02-action, .lesson03-action, .lesson04-action, .lesson05-action,
+  .lesson06-action, .lesson07-action, .lesson08-action, .lesson09-action
+):focus-visible,
+.lesson-link:focus-visible {
+  outline: 3px solid var(--classroom-orange);
+  outline-offset: 3px;
+}
+
+:is(
+  .lesson01-card, .lesson02-graph-panel, .lesson02-workbench, .lesson02-observe-panel, .lesson02-summary-card,
+  .lesson02-practice-graph, .lesson03-graph-panel, .lesson03-workbench, .lesson03-card,
+  .lesson04-graph-panel, .lesson04-workbench, .lesson05-role, .lesson05-workbench, .lesson05-graph-panel,
+  .lesson05-property, .lesson05-challenge-graph, .lesson06-graph-panel, .lesson06-workbench,
+  .lesson07-graph-panel, .lesson07-workbench, .lesson08-graph-panel, .lesson08-workbench,
+  .lesson09-graph-panel, .lesson09-workbench, .lesson09-method-card, .lesson09-summary-card, .lesson09-format-card
+) {
+  border-color: var(--classroom-line);
+  border-radius: var(--classroom-radius);
+  box-shadow: var(--classroom-shadow);
+}
+
+:is(.lesson02-graph-panel, .lesson03-graph-panel, .lesson04-graph-panel, .lesson05-graph-panel, .lesson06-graph-panel, .lesson07-graph-panel, .lesson08-graph-panel, .lesson09-graph-panel) {
+  background: #fcfefd;
+}
+
+:is(
+  .lesson01-formula, .lesson02-formula, .lesson03-formula, .lesson04-formula, .lesson05-formula,
+  .lesson06-formula, .lesson07-formula, .lesson08-formula, .lesson09-formula
+) {
+  color: #164f40;
+}
+
+:is(
+  .lesson01-reveal, .lesson02-reveal, .lesson02-rule, .lesson03-reveal, .lesson03-rule, .lesson03-warning,
+  .lesson04-conclusion, .lesson05-bridge-reveal, .lesson05-property, .lesson05-answer, .lesson05-bridge-out,
+  .lesson06-reveal, .lesson06-rule, .lesson06-bridge-out, .lesson07-reveal, .lesson07-rule, .lesson07-bridge-out,
+  .lesson08-reveal, .lesson08-rule, .lesson08-bridge-out, .lesson09-reveal, .lesson09-rule, .lesson09-bridge-out
+) {
+  animation: classroom-reveal var(--classroom-motion-slow) ease both;
+}
+
+.lesson-stage-active input[type="range"] {
+  accent-color: var(--classroom-green);
+  cursor: ew-resize;
+}
+
+.parabola-svg {
+  overflow: hidden;
+  border-radius: calc(var(--classroom-radius) - 0.15rem);
+  background: linear-gradient(#ffffff, #fbfdfc);
+}
+
+.parabola-grid-line { stroke: #dfe8e3; stroke-width: 0.75; vector-effect: non-scaling-stroke; }
+.parabola-axis { stroke: #62756d; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.parabola-axis-name, .parabola-label { fill: #29453c; }
+.parabola-label { paint-order: stroke; stroke: #ffffff; stroke-linejoin: round; stroke-width: 4px; }
+.parabola-tick { fill: #64756f; }
+.parabola-curve { stroke-width: 3.5; transition: stroke-dashoffset var(--classroom-motion-slow) ease; }
+.parabola-highlight-curve { stroke-width: 4.5; }
+.parabola-point { stroke-width: 2; }
+.parabola-symmetry-axis, .parabola-horizontal-guide { stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+
+@keyframes classroom-reveal {
+  from { opacity: 0; transform: translateY(0.35rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 761px) and (max-height: 800px) {
+  .lesson-stage-active { padding-block: 0.8rem; }
+  :is(.lesson01-action, .lesson02-action, .lesson03-action, .lesson04-action, .lesson05-action, .lesson06-action, .lesson07-action, .lesson08-action, .lesson09-action) { min-height: 2.15rem; }
+  .lesson04-point-table { font-size: 0.72rem; }
+  .lesson04-point-table th, .lesson04-point-table td { padding-block: 0.18rem; }
+  .lesson04-heading { margin-bottom: 0.55rem; }
+  .lesson04-title { font-size: 1.7rem; }
+  .lesson04-workbench { gap: 0.55rem; padding: 0.7rem; }
+  .lesson06-graph-panel .parabola-svg { min-height: 10.5rem; height: 23vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 1ms !important; }
+}
