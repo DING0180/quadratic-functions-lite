@@ -52,8 +52,18 @@
 .lesson05-property-layout { display: grid; grid-template-columns: minmax(15rem, 30fr) minmax(25rem, 70fr); gap: clamp(1rem, 2vw, 1.75rem); align-items: start; }
 .lesson05-property-study-layout { grid-template-columns: minmax(16rem, 32fr) minmax(25rem, 68fr); }
 .lesson05-property-workbench { gap: .85rem; }
-.lesson05-property-graph-host, .lesson05-challenge-graph-host { min-height: clamp(22rem, 52vh, 34rem); }
-.lesson05-property-form { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 1rem; border: 1px solid #d5e0da; border-radius: .9rem; background: #fbfdfc; }
+.lesson05-property-formula { margin: 0; font-size: clamp(1.05rem, 1.55vw, 1.35rem); }
+.lesson05-property-table { width: 100%; border-collapse: collapse; color: #40524d; font-size: .92rem; }
+.lesson05-property-table th, .lesson05-property-table td { padding: .45rem .5rem; border-bottom: 1px solid #dce7e1; text-align: left; }
+.lesson05-property-table th { color: #1b5d4c; background: #f1f6f3; font-weight: 800; }
+.lesson05-property-table thead th { background: #eaf6f1; }
+.lesson05-property-legend { display: flex; flex-wrap: wrap; gap: .6rem 1rem; color: #465a54; font-size: .9rem; font-weight: 700; }
+.lesson05-legend-item { display: inline-flex; align-items: center; gap: .35rem; }
+.lesson05-swatch { width: .85rem; height: .85rem; border-radius: 50%; box-shadow: 0 0 0 2px rgb(255 255 255 / .8), 0 0 0 3px #cbd8d2; }
+.lesson05-property-graph-host, .lesson05-challenge-graph-host { min-height: clamp(28rem, 62vh, 42rem); }
+.lesson05-property-form { grid-template-columns: minmax(0, 1fr); margin: 0; padding: 1rem; border: 1px solid #d5e0da; border-radius: .9rem; background: #fbfdfc; }
+.lesson05-property-form .lesson05-answer-field { min-width: 0; }
+.lesson05-property-form .lesson05-answer-field select, .lesson05-property-form .lesson05-answer-field input { box-sizing: border-box; min-width: 0; width: 100%; }
 .lesson05-challenge-layout { display: grid; grid-template-columns: minmax(16rem, 32fr) minmax(25rem, 68fr); gap: clamp(1rem, 2vw, 1.75rem); align-items: start; }
 .lesson05-challenge-graph { width: auto; margin: 0; padding: .55rem; }
 .lesson05-challenge-graph[hidden] { display: none; }
@@ -75,5 +85,6 @@
   .lesson05-parameter-controls { gap: .35rem; }
   .lesson05-shift-question { font-size: 1.04rem; line-height: 1.42; }
   .lesson05-property-form { gap: .45rem; padding: .7rem; }
+  .lesson05-property-graph-host, .lesson05-challenge-graph-host { height: clamp(17rem, 46vh, 22rem); min-height: 0; }
 }
 
