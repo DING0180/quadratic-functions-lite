@@ -23,9 +23,18 @@ const PRACTICE_QUESTIONS = Object.freeze([
 ]);
 
 const PARAMETER_CHALLENGES = Object.freeze([
-  { coefficient: "\\left(m+3\\right)", coefficientLabel: "(m+3)", exponent: "m^2-2m+1", exponentLabel: "m²−2m+1", tail: "+6x-1", answer: "绿色：x 的次数 m²−2m+1 必须等于 2；红色：(m+3)≠0。两条条件必须同时成立。" },
-  { coefficient: "\\left|p-2\\right|", coefficientLabel: "|p−2|", exponent: "\\left|p\\right|+1", exponentLabel: "|p|+1", tail: "-3x+5", answer: "绿色：x 的次数 |p|+1 必须等于 2；红色：|p−2|≠0，也就是 p≠2。绝对值为 0 也会让二次项消失。" },
-  { coefficient: "\\left|t-2\\right|+1", coefficientLabel: "|t−2|+1", exponent: "t", exponentLabel: "t", tail: "+t", answer: "绿色：x 的次数 t 必须等于 2；红色：|t−2|+1 始终大于 0。两个 Gate 都通过，才是二次函数。" },
+  {
+    coefficient: "\\left(m+3\\right)", coefficientLabel: "(m+3)", exponent: "m^2-2m+1", exponentLabel: "m²−2m+1", tail: "+6x-1",
+    greenWork: "m²−2m+1 = 2 → m = 1±√2", redWork: "(m+3) ≠ 0 → m ≠ −3", answer: "m = 1±√2 时，两个 Gate 同时通过，是二次函数。",
+  },
+  {
+    coefficient: "\\left(\\left|p-2\\right|\\right)", coefficientLabel: "(|p−2|)", exponent: "\\left|p\\right|+1", exponentLabel: "|p|+1", tail: "-3x+5",
+    greenWork: "|p|+1 = 2 → p = ±1", redWork: "(|p−2|) ≠ 0 → p ≠ 2", answer: "p = ±1 时，两个 Gate 同时通过，是二次函数。",
+  },
+  {
+    coefficient: "\\left(\\left|t-2\\right|+1\\right)", coefficientLabel: "(|t−2|+1)", exponent: "t", exponentLabel: "t", tail: "+t",
+    greenWork: "t = 2", redWork: "(|t−2|+1) > 0，因此始终 ≠ 0", answer: "t = 2 时，两个 Gate 同时通过，是二次函数。",
+  },
 ]);
 
 function element(tag, className = "", text = "") {
@@ -370,11 +379,18 @@ function renderExamples(root, random) {
 
   function createParameterCase() {
     const parameter = element("article", "lesson01-case-card lesson01-parameter-gate"); parameter.dataset.lesson01Case = "parameter";
+    const layout = element("div", "lesson01-parameter-layout");
+    const problem = element("div", "lesson01-parameter-problem");
+    const checks = element("div", "lesson01-parameter-checks");
     const expression = element("div", "lesson01-parameter-expression"); expression.dataset.lesson01CaseFormula = "parameter";
     const coefficient = formula("", "", "lesson01-parameter-piece is-coefficient"); coefficient.dataset.lesson01ParameterCoefficient = "";
     const exponent = formula("", "", "lesson01-parameter-piece is-exponent"); exponent.dataset.lesson01ParameterExponent = "";
     const tail = formula("", "", "lesson01-parameter-piece");
     const answer = element("p", "lesson01-case-answer"); answer.dataset.lesson01ParameterAnswer = ""; answer.hidden = true;
+    const greenGate = element("section", "lesson01-parameter-check is-green"); greenGate.dataset.lesson01ParameterGreenGate = "";
+    const redGate = element("section", "lesson01-parameter-check is-red"); redGate.dataset.lesson01ParameterRedGate = "";
+    const greenWork = element("p", "lesson01-parameter-work"); greenWork.dataset.lesson01ParameterGreenWork = ""; greenWork.hidden = true;
+    const redWork = element("p", "lesson01-parameter-work"); redWork.dataset.lesson01ParameterRedWork = ""; redWork.hidden = true;
     const reveal = button("Reveal：检查两个 Gate", "lesson01-action lesson01-secondary"); reveal.dataset.lesson01CaseReveal = "parameter";
     const next = button("New Problem", "lesson01-action lesson01-secondary"); next.dataset.lesson01CaseNew = "parameter";
     let parameterIndex = Math.min(PARAMETER_CHALLENGES.length - 1, Math.max(0, Math.floor((Number(random()) || 0) * PARAMETER_CHALLENGES.length)));
@@ -384,12 +400,26 @@ function renderExamples(root, random) {
       renderFormula(coefficient, challenge.coefficient, { ariaLabel: challenge.coefficientLabel, displayMode: true });
       renderFormula(exponent, "x^{" + challenge.exponent + "}", { ariaLabel: "x 的指数 " + challenge.exponentLabel, displayMode: true });
       renderFormula(tail, challenge.tail, { ariaLabel: challenge.tail, displayMode: true });
+      greenWork.textContent = challenge.greenWork;
+      redWork.textContent = challenge.redWork;
+      greenWork.hidden = true;
+      redWork.hidden = true;
       answer.hidden = true;
     }
-    reveal.addEventListener("click", () => { answer.textContent = PARAMETER_CHALLENGES[parameterIndex].answer; answer.hidden = false; });
+    reveal.addEventListener("click", () => {
+      answer.textContent = PARAMETER_CHALLENGES[parameterIndex].answer;
+      greenWork.hidden = false;
+      redWork.hidden = false;
+      answer.hidden = false;
+    });
     next.addEventListener("click", () => { parameterIndex = (parameterIndex + 1) % PARAMETER_CHALLENGES.length; renderParameter(); });
     expression.append(formula("y=", "y 等于", "lesson01-parameter-piece"), coefficient, exponent, tail);
-    parameter.append(element("h3", "", "③ 含参 Gate"), element("p", "lesson01-case-prompt", "同时检查：x 的次数是否为 2，以及二次项系数是否不为 0。"), element("p", "lesson01-parameter-legend", "绿色：x 的次数（指数）必须等于 2　｜　红色：二次项系数必须不等于 0"), expression, reveal, next, answer);
+    greenGate.append(element("p", "lesson01-parameter-check-label", "绿色 Gate"), element("p", "lesson01-parameter-check-rule", "x 的最高次数必须等于 2"), greenWork);
+    redGate.append(element("p", "lesson01-parameter-check-label", "红色 Gate"), element("p", "lesson01-parameter-check-rule", "二次项系数必须不等于 0"), redWork);
+    problem.append(expression, reveal, next);
+    checks.append(greenGate, redGate);
+    layout.append(problem, checks);
+    parameter.append(element("h3", "", "③ 含参 Gate"), element("p", "lesson01-case-prompt", "同时检查：x 的最高次数是否为 2，以及二次项系数是否不为 0。"), layout, answer);
     renderParameter();
     return parameter;
   }
