@@ -113,18 +113,21 @@ describe("Lesson 05 vertex-form integration", () => {
     lesson.destroy();
   });
 
-  it("uses an observable moving point before revealing the step-three properties", () => {
+  it("uses a Lesson 4-style base-versus-target comparison before revealing step-three properties", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson05(stage, { step: 3, onStepChange() {} });
-    const firstProperty = stage.querySelector("[data-lesson05-property-row]");
+    const firstProperty = stage.querySelector("[data-lesson05-property-row=\"vertex\"]");
     const motionStatus = stage.querySelector("[data-lesson05-property-motion-status]");
 
     expect(stage.querySelector("[data-lesson05-property-graph]")).not.toBeNull();
-    expect(firstProperty.hidden).toBe(true);
+    expect(stage.querySelector("[data-lesson05-property-table]")).not.toBeNull();
+    expect(stage.querySelector("[data-lesson05-property-base]")).not.toBeNull();
+    expect(stage.querySelector("[data-lesson05-property-target]")).not.toBeNull();
+    expect(firstProperty.textContent).toContain("？");
     stage.querySelector("[data-lesson05-property-motion]").click();
     expect(motionStatus.textContent).toContain("左侧");
     stage.querySelector("[data-lesson05-reveal-properties]").click();
-    expect(firstProperty.hidden).toBe(false);
+    expect(firstProperty.textContent).toContain("(1, 2)");
     lesson.destroy();
   });
 });
