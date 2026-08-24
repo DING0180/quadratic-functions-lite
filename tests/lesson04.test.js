@@ -76,16 +76,20 @@ describe("Lesson 04 horizontal-shift migration", () => {
     lesson.destroy();
   });
 
-  it("expands the k exploration viewport only for the largest horizontal shifts", () => {
+  it("expands the k exploration viewport around the shifted curve", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson04(stage, { step: 2, onStepChange() {} });
     const slider = stage.querySelector('[data-lesson04-slider="k"]');
     const initialTicks = Array.from(stage.querySelectorAll(".parabola-tick-y"), (tick) => tick.textContent);
 
     expect(initialTicks).not.toContain("68");
-    slider.value = "4";
+    slider.value = "3";
     slider.dispatchEvent(new Event("input", { bubbles: true }));
-    expect(Array.from(stage.querySelectorAll(".parabola-tick-y"), (tick) => tick.textContent)).toContain("68");
+    expect(Array.from(stage.querySelectorAll(".parabola-tick:not(.parabola-tick-y)"), (tick) => tick.textContent)).toContain("7");
+    expect(Array.from(stage.querySelectorAll(".parabola-tick-y"), (tick) => tick.textContent)).toContain("56");
+    slider.value = "-3";
+    slider.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(Array.from(stage.querySelectorAll(".parabola-tick:not(.parabola-tick-y)"), (tick) => tick.textContent)).toContain("-7");
     lesson.destroy();
   });
 
@@ -118,3 +122,4 @@ describe("Lesson 04 horizontal-shift migration", () => {
     lesson.destroy();
   });
 });
+
