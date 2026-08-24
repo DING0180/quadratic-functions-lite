@@ -8,7 +8,6 @@ import {
   createCurveToggleState,
   createPlotterState,
   createQuickCheck,
-  createSingleChallenge,
   formatFunctionLatex,
 } from "./lesson02-state.js";
 
@@ -37,7 +36,6 @@ const STEP_TITLES = Object.freeze([
   "Your Turn：画 y=2x² 与 y=½x²",
   "三图比较：研究 |a|",
   "a 到底控制了什么？",
-  "随机单函数判断",
   "随机双函数比较开口",
   "综合图象挑战",
   "小结与下一课桥接",
@@ -322,15 +320,15 @@ function renderSignCompare(root, onStepChange, cleanup) {
 
   const panel = element("aside", "lesson02-observe-panel");
   const rows = [
-    ["开口方向", "向上", "向下"],
-    ["顶点", "(0,0)", "(0,0)"],
-    ["对称轴", "x=0", "x=0"],
-    ["x<0 时", "随 x 增大而减小", "随 x 增大而增大"],
-    ["x>0 时", "随 x 增大而增大", "随 x 增大而减小"],
-    ["最值", "最小值 0", "最大值 0"],
+    { label: "开口方向", values: ["向上", "向下"] },
+    { label: "顶点", values: ["(0,0)", "(0,0)"] },
+    { label: "对称轴", values: ["x=0", "x=0"] },
+    { label: "x<0 时", values: ["随 x 增大而减小", "随 x 增大而增大"], phases: [0, 2] },
+    { label: "x>0 时", values: ["随 x 增大而增大", "随 x 增大而减小"], phases: [1, 3] },
+    { label: "最值", values: ["最小值 0", "最大值 0"] },
   ];
   const table = document.createElement("table");
-  table.className = "lesson02-property-table";
+  table.className = "lesson02-property-table lesson02-property-table-large";
   table.innerHTML = "<thead><tr><th>性质</th><th>y=x²</th><th>y=-x²</th></tr></thead>";
   const body = document.createElement("tbody");
   table.append(body);
@@ -340,7 +338,18 @@ function renderSignCompare(root, onStepChange, cleanup) {
     body.replaceChildren();
     rows.forEach((row, index) => {
       const tr = document.createElement("tr");
-      row.forEach((text, cellIndex) => tr.append(element(cellIndex === 0 ? "th" : "td", "", index < revealed || cellIndex === 0 ? text : "?")));
+      tr.append(element("th", "", row.label));
+      row.values.forEach((text, cellIndex) => {
+        const cell = element("td", "", index < revealed ? text : "?");
+        const phaseIndex = row.phases?.[cellIndex];
+        if (index < revealed && Number.isInteger(phaseIndex)) {
+          const start = button("开始演示", "lesson02-motion-segment");
+          start.dataset.lesson02MotionSegment = String(phaseIndex);
+          start.addEventListener("click", () => playPhases([phases[phaseIndex]], "本段演示完成：" + phases[phaseIndex].relation));
+          cell.append(start);
+        }
+        tr.append(cell);
+      });
       body.append(tr);
     });
   }
@@ -361,14 +370,16 @@ function renderSignCompare(root, onStepChange, cleanup) {
   const motionReadout = element("div", "lesson02-motion-readout");
   motionReadout.setAttribute("aria-live", "polite");
   motionReadout.hidden = true;
-  const motion = button("分段演示增减性", "lesson02-action lesson02-action-secondary");
+  const motion = button("分段演示增减性（依次四段）", "lesson02-action lesson02-action-secondary");
   let animationActive = true;
   let frame = null;
   let pause = null;
+  let animationToken = 0;
   const request = window.requestAnimationFrame ?? ((callback) => window.setTimeout(callback, 16));
   const cancel = window.cancelAnimationFrame ?? window.clearTimeout;
   cleanup.push(() => {
     animationActive = false;
+    animationToken += 1;
     if (frame !== null) cancel(frame);
     if (pause !== null) window.clearTimeout(pause);
   });
@@ -407,21 +418,33 @@ function renderSignCompare(root, onStepChange, cleanup) {
 
   updateMotionEvidence(phases[0], phases[0].from);
 
-  motion.addEventListener("click", () => {
-    if (!animationActive) return;
+  function setMotionControlsDisabled(disabled) {
+    motion.disabled = disabled;
+    panel.querySelectorAll("[data-lesson02-motion-segment]").forEach((control) => {
+      control.disabled = disabled;
+    });
+  }
+
+  function playPhases(selectedPhases, completionText) {
+    if (!animationActive || selectedPhases.length === 0) return;
+    animationToken += 1;
+    const token = animationToken;
+    if (frame !== null) cancel(frame);
+    if (pause !== null) window.clearTimeout(pause);
     motionReadout.hidden = false;
-    motion.disabled = true;
+    setMotionControlsDisabled(true);
     motion.textContent = "演示进行中…";
     let phaseIndex = 0;
 
     function runPhase() {
-      if (!animationActive) return;
-      const phase = phases[phaseIndex];
+      if (!animationActive || token !== animationToken) return;
+      const phase = selectedPhases[phaseIndex];
       motionStatus.textContent = phase.text + " 请同时看坐标轴上的两支箭头和下面的数值。";
+      updateMotionEvidence(phase, phase.from);
       let startedAt = null;
 
       function advance(timestamp) {
-        if (!animationActive) return;
+        if (!animationActive || token !== animationToken) return;
         const now = typeof timestamp === "number" ? timestamp : Date.now();
         if (startedAt === null) startedAt = now;
         const progress = Math.min(1, (now - startedAt) / 4200);
@@ -432,18 +455,22 @@ function renderSignCompare(root, onStepChange, cleanup) {
           return;
         }
         phaseIndex += 1;
-        if (phaseIndex < phases.length) {
+        if (phaseIndex < selectedPhases.length) {
           pause = window.setTimeout(runPhase, 850);
           return;
         }
-        motion.disabled = false;
-        motion.textContent = "再演示一次";
-        motionStatus.textContent = "演示完成：同一条曲线在顶点左、右两侧的增减性不同。";
+        setMotionControlsDisabled(false);
+        motion.textContent = "再按顺序演示四段";
+        motionStatus.textContent = completionText;
       }
 
       frame = request(advance);
     }
     runPhase();
+  }
+
+  motion.addEventListener("click", () => {
+    playPhases(phases, "演示完成：同一条曲线在顶点左、右两侧的增减性不同。");
   });
 
   panel.append(
@@ -525,10 +552,10 @@ function renderMagnitude(root, onStepChange, cleanup) {
 
 function renderSummary(root) {
   const cards = [
-    ["Sign", "a>0：开口向上，有最小值；a<0：开口向下，有最大值。"],
-    ["Magnitude", "|a| 越大，开口越窄；|a| 越小，开口越宽。"],
-    ["Fixed", "无论 a 如何改变，顶点始终为 (0,0)，对称轴始终为 x=0。"],
-    ["Monotonicity", "a>0 左减右增；a<0 左增右减。"],
+    ["Sign · 符号（正负）", "a>0：开口向上，有最小值；a<0：开口向下，有最大值。"],
+    ["Magnitude · 绝对值大小", "|a| 越大，开口越窄；|a| 越小，开口越宽。"],
+    ["Fixed · 不变的性质", "无论 a 如何改变，顶点始终为 (0,0)，对称轴始终为 x=0。"],
+    ["Monotonicity · 增减性", "a>0 左减右增；a<0 左增右减。"],
   ];
   const wrap = element("div", "lesson02-summary-cards");
   const reveal = button("Reveal 下一条");
@@ -553,82 +580,6 @@ function renderSummary(root) {
 
   root.append(element("p", "lesson02-prompt", "把刚才的观察压缩成一张可复习的控制面板。"), formula("\\boxed{y=ax^2}"), wrap, reveal);
   update();
-}
-
-function renderSinglePractice(root, onStepChange, cleanup) {
-  const quickCheck = createQuickCheck(createSingleChallenge);
-  let challenge = null;
-  const number = element("p", "lesson02-quick-check-number");
-  const question = element("div", "lesson02-quick-check-question");
-  const feedback = element("p", "lesson02-status", "先根据解析式判断，再用图象验证。");
-  const options = element("div", "lesson02-practice-options");
-  const graphWrap = element("div", "lesson02-practice-graph");
-  graphWrap.hidden = true;
-  const graphPlaceholder = element("p", "lesson02-practice-graph-placeholder", "点击“Check with Graph”后，在这里验证你的判断。\n图像会保持在右侧，不需要向下滚动。");
-  const graphPane = element("section", "lesson02-practice-graph-pane");
-  graphPane.append(element("h3", "", "图像验证"), graphPlaceholder, graphWrap);
-  let graph = null;
-
-  const direction = button("开口向上", "lesson02-choice-button");
-  const downward = button("开口向下", "lesson02-choice-button");
-  [direction, downward].forEach((choice) => {
-    choice.addEventListener("click", () => {
-      const opensUp = challenge.a > 0;
-      const correct = choice === direction ? opensUp : !opensUp;
-      challenge.answerWith(choice.textContent);
-      feedback.textContent = correct ? "判断正确。接着用图象验证。" : "先保留你的判断，点击图象验证。";
-      direction.disabled = true;
-      downward.disabled = true;
-    });
-  });
-  options.append(direction, downward);
-
-  const show = button("Check with Graph");
-  show.addEventListener("click", () => {
-    challenge.showGraph();
-    graphWrap.hidden = false;
-    graphPlaceholder.hidden = true;
-    if (!graph) {
-      graph = createParabolaGraph(graphWrap, {
-        curves: [{ a: challenge.a, color: challenge.a > 0 ? COLORS.positive : COLORS.negative }],
-        ariaLabel: "随机二次函数图象",
-      });
-      cleanup.push(() => graph.destroy());
-    } else {
-      graph.update({ curves: [{ a: challenge.a, color: challenge.a > 0 ? COLORS.positive : COLORS.negative }] });
-    }
-    feedback.textContent = "验证：a=" + challenge.a + "；方向看符号，宽窄看 |a|=" + Math.abs(challenge.a) + "。";
-  });
-
-  const next = button("下一题（随机）", "lesson02-action lesson02-action-secondary");
-  function loadNextChallenge() {
-    challenge = quickCheck.next();
-    number.textContent = "Quick Check · 第 " + quickCheck.count + " 题";
-    question.replaceChildren(formula(formatFunctionLatex(challenge.a)));
-    direction.disabled = false;
-    downward.disabled = false;
-    graphWrap.hidden = true;
-    graphPlaceholder.hidden = false;
-    feedback.textContent = "先根据解析式判断，再用图象验证。";
-  }
-  next.addEventListener("click", loadNextChallenge);
-
-  const questionPane = element("section", "lesson02-practice-question-pane");
-  questionPane.append(
-    element("h3", "", "Can You Read a Parabola?"),
-    number,
-    question,
-    element("p", "lesson02-question", "只看解析式，图象开口向哪里？"),
-    options,
-    show,
-    feedback,
-    next,
-  );
-  const layout = element("div", "lesson02-practice-layout");
-  layout.append(questionPane, graphPane);
-  applyClassroomSplit(layout, questionPane, graphPane);
-  root.append(layout);
-  loadNextChallenge();
 }
 
 function renderPairPractice(root, onStepChange, cleanup) {
@@ -695,10 +646,13 @@ function renderPairPractice(root, onStepChange, cleanup) {
   function loadNextChallenge() {
     pair = quickCheck.next();
     number.textContent = "Quick Check · 第 " + quickCheck.count + " 题";
-    question.replaceChildren(
-      formula("A:\\ " + formatFunctionLatex(pair.a)),
-      formula("B:\\ " + formatFunctionLatex(pair.b)),
-    );
+    const formulaA = formula("A:\\ " + formatFunctionLatex(pair.a));
+    formulaA.classList.add("lesson02-pair-formula", "lesson02-pair-formula-a");
+    formulaA.dataset.lesson02PairFormula = "a";
+    const formulaB = formula("B:\\ " + formatFunctionLatex(pair.b));
+    formulaB.classList.add("lesson02-pair-formula", "lesson02-pair-formula-b");
+    formulaB.dataset.lesson02PairFormula = "b";
+    question.replaceChildren(formulaA, formulaB);
     graphWrap.hidden = true;
     graphPlaceholder.hidden = false;
     feedback.textContent = "谁的开口更宽？请比较 |a|。";
@@ -822,7 +776,6 @@ const RENDERERS = Object.freeze([
   (root, onStepChange, cleanup) => renderPaper(root, "width", cleanup),
   renderMagnitude,
   renderSummary,
-  renderSinglePractice,
   renderPairPractice,
   renderMisconception,
   renderBridgeOut,

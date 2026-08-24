@@ -81,6 +81,35 @@
 .lesson02-motion-current, .lesson02-motion-conclusion { grid-column: 1 / -1; }
 .lesson02-motion-conclusion { color: #9a4d27; font-weight: 800; }
 
+.lesson02-property-table-large {
+  font-size: clamp(0.98rem, 1.05vw, 1.12rem);
+  line-height: 1.45;
+}
+.lesson02-property-table-large th,
+.lesson02-property-table-large td { padding: 0.62rem 0.68rem; vertical-align: top; }
+.lesson02-property-table-large th { white-space: nowrap; }
+.lesson02-motion-segment {
+  display: block;
+  width: max-content;
+  margin-top: 0.48rem;
+  padding: 0.28rem 0.5rem;
+  border: 1px solid #4f7b6d;
+  border-radius: 0.42rem;
+  background: #fff;
+  color: #17634e;
+  font: inherit;
+  font-size: 0.82em;
+  font-weight: 800;
+  cursor: pointer;
+}
+.lesson02-motion-segment:hover { border-color: #17634e; background: #edf6f1; }
+.lesson02-motion-segment:focus-visible { outline: 3px solid #da8c35; outline-offset: 2px; }
+.lesson02-motion-segment:disabled { cursor: not-allowed; opacity: 0.55; }
+
+.lesson02-pair-formula { margin: 0.35rem 0; padding: 0.22rem 0.5rem; border-left: 0.28rem solid currentColor; border-radius: 0.35rem; font-weight: 800; }
+.lesson02-formula.lesson02-pair-formula-a { color: #19735d; background: #eef7f3; }
+.lesson02-formula.lesson02-pair-formula-b { color: #cf684e; background: #fff1ec; }
+
 .lesson02-practice-layout,
 .lesson02-comparison-layout {
   display: grid;

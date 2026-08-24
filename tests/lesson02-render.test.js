@@ -43,11 +43,11 @@ describe("Lesson 02 parameter explorer", () => {
     view.destroy();
   });
 
-  it("reduces the lesson to eleven steps after merging point plotting and connection", () => {
+  it("reduces the lesson to ten steps after removing the redundant single-function Quick Check", () => {
     const stage = document.createElement("div");
     const view = renderLesson02(stage, { step: 12, onStepChange() {} });
 
-    expect(stage.querySelector(".lesson02-step-count").textContent).toBe("11 / 11");
+    expect(stage.querySelector(".lesson02-step-count").textContent).toBe("10 / 10");
     view.destroy();
   });
 
@@ -64,22 +64,54 @@ describe("Lesson 02 parameter explorer", () => {
     view.destroy();
   });
 
-  it("keeps both Quick Check questions on the left and their graph areas on the right", () => {
-    [8, 9].forEach((step) => {
-      const stage = document.createElement("div");
-      const view = renderLesson02(stage, { step, onStepChange() {} });
-      const layout = stage.querySelector(".lesson02-practice-layout");
+  it("adds four isolated demonstrations to the enlarged monotonicity table", () => {
+    const stage = document.createElement("div");
+    const view = renderLesson02(stage, { step: 4, onStepChange() {} });
 
-      expect(layout).toBeTruthy();
-      expect(layout.querySelector(".lesson02-practice-question-pane")).toBeTruthy();
-      expect(layout.querySelector(".lesson02-practice-graph-pane")).toBeTruthy();
-      view.destroy();
-    });
+    const reveal = Array.from(stage.querySelectorAll("button")).find((node) => node.textContent.includes("逐项揭晓"));
+    for (let index = 0; index < 5; index += 1) reveal.click();
+    const segmentStarts = stage.querySelectorAll("[data-lesson02-motion-segment]");
+
+    expect(stage.querySelector(".lesson02-property-table-large")).toBeTruthy();
+    expect(Array.from(segmentStarts, (node) => node.dataset.lesson02MotionSegment)).toEqual(["0", "2", "1", "3"]);
+    segmentStarts[3].click();
+    expect(stage.querySelector(".lesson02-motion-readout").textContent).toContain("x：0 → 4（增大）");
+    expect(stage.querySelector(".lesson02-motion-status").textContent).toContain("y=−x² 的右侧");
+    view.destroy();
+  });
+
+  it("shows the four summary properties in Chinese and English", () => {
+    const stage = document.createElement("div");
+    const view = renderLesson02(stage, { step: 7, onStepChange() {} });
+
+    expect(Array.from(stage.querySelectorAll(".lesson02-summary-card h3"), (node) => node.textContent)).toEqual([
+      "Sign · 符号（正负）",
+      "Magnitude · 绝对值大小",
+      "Fixed · 不变的性质",
+      "Monotonicity · 增减性",
+    ]);
+    view.destroy();
+  });
+
+  it("keeps the remaining dual-function Quick Check on the left and colours A and B to match its curves", () => {
+    const stage = document.createElement("div");
+    const view = renderLesson02(stage, { step: 8, onStepChange() {} });
+    const layout = stage.querySelector(".lesson02-practice-layout");
+
+    expect(layout).toBeTruthy();
+    expect(layout.querySelector(".lesson02-practice-question-pane")).toBeTruthy();
+    expect(layout.querySelector(".lesson02-practice-graph-pane")).toBeTruthy();
+    expect(stage.querySelector('[data-lesson02-pair-formula="a"]')).toBeTruthy();
+    expect(stage.querySelector('[data-lesson02-pair-formula="b"]')).toBeTruthy();
+
+    Array.from(stage.querySelectorAll("button")).find((node) => node.textContent.includes("Check with Graph")).click();
+    expect(Array.from(stage.querySelectorAll(".parabola-curve"), (curve) => curve.getAttribute("stroke"))).toEqual(["#19735d", "#cf684e"]);
+    view.destroy();
   });
 
   it("places the six requested comparison functions vertically on the left of one graph", () => {
     const stage = document.createElement("div");
-    const view = renderLesson02(stage, { step: 10, onStepChange() {} });
+    const view = renderLesson02(stage, { step: 9, onStepChange() {} });
     const layout = stage.querySelector(".lesson02-comparison-layout");
 
     expect(layout).toBeTruthy();
@@ -103,7 +135,7 @@ describe("Lesson 02 parameter explorer", () => {
 
   it("starts the comparison board with six hidden curve toggles", () => {
     const stage = document.createElement("div");
-    const view = renderLesson02(stage, { step: 10, onStepChange() {} });
+    const view = renderLesson02(stage, { step: 9, onStepChange() {} });
     const toggles = stage.querySelectorAll(".lesson02-curve-toggle");
 
     expect(toggles).toHaveLength(6);
