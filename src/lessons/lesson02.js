@@ -20,18 +20,17 @@ const COLORS = Object.freeze({
 });
 
 const COMPARISON_CURVES = Object.freeze([
-  { id: "four", a: 4, latex: "y=4x^2", color: "#7c3aed" },
   { id: "two", a: 2, latex: "y=2x^2", color: "#2563eb" },
+  { id: "four", a: 4, latex: "y=4x^2", color: "#7c3aed" },
+  { id: "one", a: 1, latex: "y=x^2", color: "#19735d" },
+  { id: "negative-one", a: -1, latex: "y=-x^2", color: "#cf684e" },
   { id: "half", a: 0.5, latex: "y=\\frac{1}{2}x^2", color: "#16718a" },
   { id: "negative-half", a: -0.5, latex: "y=-\\frac{1}{2}x^2", color: "#d97706" },
-  { id: "negative-one", a: -1, latex: "y=-x^2", color: "#cf684e" },
-  { id: "negative-two", a: -2, latex: "y=-2x^2", color: "#9f2d63" },
 ]);
 
 const STEP_TITLES = Object.freeze([
   "从一般式到 y=ax²",
-  "描点法：亲手生成 y=x²",
-  "连接九个点，得到抛物线",
+  "描点并连线：生成 y=x²",
   "Your Turn：画 y=-x²",
   "对比 y=x² 与 y=-x²",
   "Your Turn：画 y=2x² 与 y=½x²",
@@ -62,11 +61,17 @@ function formula(latex, label = latex, className = "lesson02-formula") {
   return node;
 }
 
+function formulaTerm(latex, label = latex, className = "") {
+  const node = element("span", className);
+  renderFormula(node, latex, { ariaLabel: label });
+  return node;
+}
+
 function createRoot(step) {
   const root = element("section", "lesson02-step");
   const heading = element("header", "lesson02-heading");
   heading.append(
-    element("p", "lesson02-kicker", "LESSON 02 · " + String(step).padStart(2, "0") + " / 12"),
+    element("p", "lesson02-kicker", "LESSON 02 · " + String(step).padStart(2, "0") + " / " + String(RENDERERS.length)),
     element("h2", "lesson02-title", STEP_TITLES[step - 1]),
   );
   root.append(heading);
@@ -81,10 +86,10 @@ function appendNavigation(root, step, onStepChange) {
   previous.disabled = step === 1;
   previous.addEventListener("click", () => onStepChange(Math.max(1, step - 1)));
 
-  const next = button(step === 12 ? "回到本课开始" : "下一步");
-  next.addEventListener("click", () => onStepChange(step === 12 ? 1 : step + 1));
+  const next = button(step === RENDERERS.length ? "回到本课开始" : "下一步");
+  next.addEventListener("click", () => onStepChange(step === RENDERERS.length ? 1 : step + 1));
 
-  controls.append(previous, element("span", "lesson02-step-count", String(step) + " / 12"), next);
+  controls.append(previous, element("span", "lesson02-step-count", String(step) + " / " + String(RENDERERS.length)), next);
   root.append(controls);
 }
 
@@ -99,7 +104,7 @@ function addGraph(root, options, cleanup) {
   return graph;
 }
 
-function animateProgress(graph, update, cleanup) {
+function animateProgress(graph, update, cleanup, duration = 1100) {
   let active = true;
   let frame = null;
   const request = window.requestAnimationFrame ?? ((callback) => window.setTimeout(callback, 16));
@@ -109,34 +114,57 @@ function animateProgress(graph, update, cleanup) {
     if (frame !== null) cancel(frame);
   });
 
-  let progress = 0;
-  function advance() {
+  let startedAt = null;
+  function advance(timestamp) {
     if (!active) return;
-    progress = Math.min(1, progress + 0.08);
+    const now = typeof timestamp === "number" ? timestamp : Date.now();
+    if (startedAt === null) startedAt = now;
+    const progress = Math.min(1, (now - startedAt) / duration);
     update(progress);
     if (progress < 1) frame = request(advance);
   }
-  advance();
+  frame = request(advance);
 }
 
-function renderBridge(root) {
+function renderBridge(root, onStepChange, cleanup) {
+  const transformation = element("div", "lesson02-equation-transform");
+  transformation.append(
+    formulaTerm("y=ax^2", "保留的主项 y 等于 a x 平方", "lesson02-equation-base"),
+    formulaTerm("+bx", "消退的 b x 项", "lesson02-vanishing-term"),
+    formulaTerm("+c", "消退的常数项 c", "lesson02-vanishing-term"),
+  );
   const reveal = element("div", "lesson02-reveal");
   reveal.hidden = true;
   reveal.append(
     formula("b\\to0,\\quad c\\to0", "令 b 和 c 等于 0"),
-    formula("\\boxed{y=ax^2}", "二次函数 y 等于 a x 平方"),
+    formula("\\boxed{y=ax^2}", "留下的二次函数 y 等于 a x 平方"),
     element("p", "lesson02-question", "今天的问题：y=ax² 的图象到底长什么样？"),
   );
 
-  const start = button("从最简单的情况开始");
-  start.addEventListener("click", () => {
-    start.hidden = true;
-    reveal.hidden = false;
-  });
+  const start = button("开始化简动画");
+  let timer = null;
+
+  function play() {
+    window.clearTimeout(timer);
+    reveal.hidden = true;
+    transformation.classList.remove("is-complete", "is-transforming");
+    void transformation.offsetWidth;
+    transformation.classList.add("is-transforming");
+    start.disabled = true;
+    timer = window.setTimeout(() => {
+      transformation.classList.add("is-complete");
+      reveal.hidden = false;
+      start.disabled = false;
+      start.textContent = "再看一次化简动画";
+    }, 900);
+  }
+
+  start.addEventListener("click", play);
+  cleanup.push(() => window.clearTimeout(timer));
 
   root.append(
     element("p", "lesson02-prompt", "上一节课，我们认识了二次函数的一般形式。现在开始研究它的图象。"),
-    formula("y=ax^2+bx+c", "二次函数一般式"),
+    transformation,
     element("p", "lesson02-prompt", "一个一般二次函数有三个参数。我们应该从哪里开始？"),
     start,
     reveal,
@@ -169,6 +197,9 @@ function renderPlotter(root, onStepChange, cleanup) {
   table.append(head, body);
   const connect = button("用平滑曲线连接这些点");
   connect.hidden = true;
+  const parabolaName = element("p", "lesson02-parabola-name", "Parabola · 抛物线");
+  parabolaName.hidden = true;
+  const connectionStatus = element("p", "lesson02-status", "先用描点法找到九个坐标。");
 
   function update() {
     graph.update({ points: state.points });
@@ -186,7 +217,8 @@ function renderPlotter(root, onStepChange, cleanup) {
       choice.disabled = used;
       choice.classList.toggle("is-plotted", used);
     });
-    connect.hidden = !state.canConnect;
+    connect.hidden = state.count !== LESSON02_X_VALUES.length;
+    connect.disabled = state.connected;
   }
 
   LESSON02_X_VALUES.forEach((x) => {
@@ -204,7 +236,18 @@ function renderPlotter(root, onStepChange, cleanup) {
   });
 
   connect.addEventListener("click", () => {
-    if (state.connect()) onStepChange(3);
+    if (!state.connect()) return;
+    connect.disabled = true;
+    connect.textContent = "正在平滑连接…";
+    connectionStatus.textContent = "观察：九个点被同一条平滑曲线依次穿过。";
+    animateProgress(graph, (progress) => {
+      graph.update({ points: state.points, curveProgress: progress });
+      if (progress === 1) {
+        connect.textContent = "已连接";
+        parabolaName.hidden = false;
+        connectionStatus.textContent = "这条平滑曲线叫作抛物线。它经过刚才描出的每一个点。";
+      }
+    }, cleanup, 1500);
   });
 
   workbench.append(
@@ -215,41 +258,12 @@ function renderPlotter(root, onStepChange, cleanup) {
     calculation,
     table,
     connect,
+    parabolaName,
+    connectionStatus,
   );
   layout.append(graphPane, workbench);
   root.append(layout);
   update();
-}
-
-function renderConnect(root, onStepChange, cleanup) {
-  root.classList.add("lesson02-connect-step");
-  const graph = addGraph(root, {
-    curves: [{ a: 1, color: COLORS.positive }],
-    points: LESSON02_X_VALUES.map((x) => [x, x * x]),
-    curveProgress: 0,
-    ariaLabel: "经过九个点的 y 等于 x 平方图象",
-  }, cleanup);
-  const panel = element("div", "lesson02-observe-panel");
-  const name = element("p", "lesson02-parabola-name", "Parabola · 抛物线");
-  name.hidden = true;
-  const draw = button("用平滑曲线连接这些点");
-
-  draw.addEventListener("click", () => {
-    draw.disabled = true;
-    animateProgress(graph, (progress) => {
-      graph.update({ curveProgress: progress });
-      if (progress === 1) name.hidden = false;
-    }, cleanup);
-  });
-
-  panel.append(
-    element("h3", "", "从“点”到“曲线”"),
-    element("p", "", "九个点已经出现。点击后，观察标准函数图象如何被平滑地画出。"),
-    draw,
-    name,
-    element("p", "lesson02-question", "观察这条曲线，你第一眼发现了什么？"),
-  );
-  root.append(panel);
 }
 
 function renderPaper(root, variant, cleanup) {
@@ -333,8 +347,16 @@ function renderSignCompare(root, onStepChange, cleanup) {
     revealed = Math.min(rows.length, revealed + 1);
     updateTable();
   });
+  const phases = [
+    { a: 1, from: -4, to: 0, color: COLORS.positive, relation: "y 随 x 的增大而减小", text: "观察 y=x² 的左侧：x 增大，y 减小。" },
+    { a: 1, from: 0, to: 4, color: COLORS.positive, relation: "y 随 x 的增大而增大", text: "观察 y=x² 的右侧：x 增大，y 增大。" },
+    { a: -1, from: -4, to: 0, color: COLORS.negative, relation: "y 随 x 的增大而增大", text: "观察 y=−x² 的左侧：x 增大，y 增大。" },
+    { a: -1, from: 0, to: 4, color: COLORS.negative, relation: "y 随 x 的增大而减小", text: "观察 y=−x² 的右侧：x 增大，y 减小。" },
+  ];
   const motionStatus = element("p", "lesson02-motion-status", "点击后，用一个加粗观察点分段追踪 x 增大时 y 的变化。");
   motionStatus.setAttribute("aria-live", "polite");
+  const motionReadout = element("div", "lesson02-motion-readout");
+  motionReadout.setAttribute("aria-live", "polite");
   const motion = button("分段演示增减性", "lesson02-action lesson02-action-secondary");
   let animationActive = true;
   let frame = null;
@@ -347,22 +369,50 @@ function renderSignCompare(root, onStepChange, cleanup) {
     if (pause !== null) window.clearTimeout(pause);
   });
 
+  function formatValue(value) {
+    return String(Math.round(value * 10) / 10).replace("-", "−");
+  }
+
+  function updateMotionEvidence(phase, x) {
+    const startY = phase.a * phase.from * phase.from;
+    const y = phase.a * x * x;
+    const endY = phase.a * phase.to * phase.to;
+    const xDirection = phase.to > phase.from ? "增大" : "减小";
+    const yDirection = endY > startY ? "增大" : "减小";
+    motionReadout.replaceChildren(
+      element("p", "", "x：" + formatValue(phase.from) + " → " + formatValue(phase.to) + "（" + xDirection + "）"),
+      element("p", "", "y：" + formatValue(startY) + " → " + formatValue(endY) + "（" + yDirection + "）"),
+      element("p", "lesson02-motion-current", "当前观察点：(" + formatValue(x) + "，" + formatValue(y) + ")"),
+      element("p", "lesson02-motion-conclusion", phase.relation),
+    );
+    graph.update({
+      points: [
+        { x: phase.from, y: startY, radius: 6, color: phase.color },
+        { x, y, radius: 9, color: phase.color },
+      ],
+      arrows: [
+        { from: { x: phase.from, y: 0 }, to: { x, y: 0 }, color: phase.color, label: "x " + xDirection },
+        { from: { x: 0, y: startY }, to: { x: 0, y }, color: phase.color, label: "y " + yDirection },
+      ],
+      labels: [
+        { x: phase.from, y: startY, text: "(" + formatValue(phase.from) + "，" + formatValue(startY) + ")" },
+        { x, y, text: "(" + formatValue(x) + "，" + formatValue(y) + ")" },
+      ],
+    });
+  }
+
+  updateMotionEvidence(phases[0], phases[0].from);
+
   motion.addEventListener("click", () => {
     if (!animationActive) return;
     motion.disabled = true;
     motion.textContent = "演示进行中…";
-    const phases = [
-      { a: 1, from: -4, to: 0, color: COLORS.positive, text: "观察 y=x²：x 从 −4 增大到 0，y 从 16 减小到 0；左侧递减。" },
-      { a: 1, from: 0, to: 4, color: COLORS.positive, text: "观察 y=x²：x 从 0 增大到 4，y 从 0 增大到 16；右侧递增。" },
-      { a: -1, from: -4, to: 0, color: COLORS.negative, text: "观察 y=−x²：x 从 −4 增大到 0，y 从 −16 增大到 0；左侧递增。" },
-      { a: -1, from: 0, to: 4, color: COLORS.negative, text: "观察 y=−x²：x 从 0 增大到 4，y 从 0 减小到 −16；右侧递减。" },
-    ];
     let phaseIndex = 0;
 
     function runPhase() {
       if (!animationActive) return;
       const phase = phases[phaseIndex];
-      motionStatus.textContent = phase.text;
+      motionStatus.textContent = phase.text + " 请同时看坐标轴上的两支箭头和下面的数值。";
       let startedAt = null;
 
       function advance(timestamp) {
@@ -371,9 +421,7 @@ function renderSignCompare(root, onStepChange, cleanup) {
         if (startedAt === null) startedAt = now;
         const progress = Math.min(1, (now - startedAt) / 4200);
         const x = phase.from + (phase.to - phase.from) * progress;
-        graph.update({
-          points: [{ x, y: phase.a * x * x, radius: 9, color: phase.color }],
-        });
+        updateMotionEvidence(phase, x);
         if (progress < 1) {
           frame = request(advance);
           return;
@@ -400,6 +448,7 @@ function renderSignCompare(root, onStepChange, cleanup) {
     reveal,
     motion,
     motionStatus,
+    motionReadout,
   );
   layout.append(graphPane, panel);
   root.append(layout);
@@ -508,6 +557,9 @@ function renderSinglePractice(root, onStepChange, cleanup) {
   const options = element("div", "lesson02-practice-options");
   const graphWrap = element("div", "lesson02-practice-graph");
   graphWrap.hidden = true;
+  const graphPlaceholder = element("p", "lesson02-practice-graph-placeholder", "点击“Check with Graph”后，在这里验证你的判断。\n图像会保持在右侧，不需要向下滚动。");
+  const graphPane = element("section", "lesson02-practice-graph-pane");
+  graphPane.append(element("h3", "", "图像验证"), graphPlaceholder, graphWrap);
   let graph = null;
 
   const direction = button("开口向上", "lesson02-choice-button");
@@ -528,6 +580,7 @@ function renderSinglePractice(root, onStepChange, cleanup) {
   show.addEventListener("click", () => {
     challenge.showGraph();
     graphWrap.hidden = false;
+    graphPlaceholder.hidden = true;
     if (!graph) {
       graph = createParabolaGraph(graphWrap, {
         curves: [{ a: challenge.a, color: challenge.a > 0 ? COLORS.positive : COLORS.negative }],
@@ -548,11 +601,13 @@ function renderSinglePractice(root, onStepChange, cleanup) {
     direction.disabled = false;
     downward.disabled = false;
     graphWrap.hidden = true;
+    graphPlaceholder.hidden = false;
     feedback.textContent = "先根据解析式判断，再用图象验证。";
   }
   next.addEventListener("click", loadNextChallenge);
 
-  root.append(
+  const questionPane = element("section", "lesson02-practice-question-pane");
+  questionPane.append(
     element("h3", "", "Can You Read a Parabola?"),
     number,
     question,
@@ -560,9 +615,11 @@ function renderSinglePractice(root, onStepChange, cleanup) {
     options,
     show,
     feedback,
-    graphWrap,
     next,
   );
+  const layout = element("div", "lesson02-practice-layout");
+  layout.append(questionPane, graphPane);
+  root.append(layout);
   loadNextChallenge();
 }
 
@@ -575,6 +632,9 @@ function renderPairPractice(root, onStepChange, cleanup) {
   const choices = element("div", "lesson02-practice-options");
   const graphWrap = element("div", "lesson02-practice-graph");
   graphWrap.hidden = true;
+  const graphPlaceholder = element("p", "lesson02-practice-graph-placeholder", "先比较两个 |a| 的大小，再点击按钮在右侧坐标系验证。\n图像区域始终留在本页右半部分。");
+  const graphPane = element("section", "lesson02-practice-graph-pane");
+  graphPane.append(element("h3", "", "图像验证"), graphPlaceholder, graphWrap);
   let graph = null;
 
   [
@@ -595,6 +655,7 @@ function renderPairPractice(root, onStepChange, cleanup) {
   show.addEventListener("click", () => {
     pair.showGraph();
     graphWrap.hidden = false;
+    graphPlaceholder.hidden = true;
     if (!graph) {
       graph = createParabolaGraph(graphWrap, {
         curves: [
@@ -631,30 +692,38 @@ function renderPairPractice(root, onStepChange, cleanup) {
       formula("B:\\ " + formatFunctionLatex(pair.b)),
     );
     graphWrap.hidden = true;
+    graphPlaceholder.hidden = false;
     feedback.textContent = "谁的开口更宽？请比较 |a|。";
   }
   next.addEventListener("click", loadNextChallenge);
 
-  root.append(
+  const questionPane = element("section", "lesson02-practice-question-pane");
+  questionPane.append(
     element("h3", "", "Which One Is Wider?"),
     number,
     question,
     choices,
     show,
     feedback,
-    graphWrap,
     next,
   );
+  const layout = element("div", "lesson02-practice-layout");
+  layout.append(questionPane, graphPane);
+  root.append(layout);
   loadNextChallenge();
 }
 
 function renderMisconception(root, onStepChange, cleanup) {
-  root.classList.add("lesson02-misconception-step");
-  const graph = addGraph(root, {
+  const layout = element("div", "lesson02-comparison-layout");
+  const graphPane = element("section", "lesson02-comparison-graph lesson02-graph-panel");
+  const graphHost = element("div", "lesson02-graph-host");
+  graphPane.append(graphHost);
+  const graph = createParabolaGraph(graphHost, {
     curves: [],
     ariaLabel: "正负系数与绝对值比较的综合图象",
-  }, cleanup);
-  const panel = element("div", "lesson02-observe-panel");
+  });
+  cleanup.push(() => graph.destroy());
+  const panel = element("section", "lesson02-comparison-controls lesson02-observe-panel");
   const selection = createCurveToggleState(COMPARISON_CURVES.map((curve) => curve.id));
   const toggles = element("div", "lesson02-curve-toggles");
   const status = element("p", "lesson02-curve-status", "点击一个函数，把它画到同一坐标系；再次点击可隐藏它。");
@@ -699,7 +768,8 @@ function renderMisconception(root, onStepChange, cleanup) {
     toggles,
     status,
   );
-  root.append(panel);
+  layout.append(panel, graphPane);
+  root.append(layout);
   updateComparison();
 }
 
@@ -737,7 +807,6 @@ function renderBridgeOut(root, onStepChange, cleanup) {
 const RENDERERS = Object.freeze([
   renderBridge,
   renderPlotter,
-  renderConnect,
   (root, onStepChange, cleanup) => renderPaper(root, "negative", cleanup),
   renderSignCompare,
   (root, onStepChange, cleanup) => renderPaper(root, "width", cleanup),
