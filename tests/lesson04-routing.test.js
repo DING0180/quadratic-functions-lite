@@ -16,6 +16,6 @@ describe("Lesson 04 classroom routing", () => {
 
     expect(window.location.hash).toBe("#lesson-04/step-03");
     expect(document.querySelector(".lesson04-step")).not.toBeNull();
-    expect(document.querySelector(".lesson04-kicker").textContent).toContain("03 / 05");
+    expect(document.querySelector(".lesson04-kicker").textContent).toContain("03 / 04");
   });
 });

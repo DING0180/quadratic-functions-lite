@@ -51,6 +51,17 @@
 .lesson01-decomposition-card.is-linear { border-top-color: #5f67b8; }
 .lesson01-decomposition-card.is-constant { border-top-color: #d98935; }
 .lesson01-token-slot { display: grid; min-height: 2.2rem; place-items: center; }
+.lesson01-decomposed-token { display: inline-flex; align-items: center; }
+.lesson01-decomposed-token .lesson01-formula { margin: 0; }
+.lesson01-coefficient-token { display: inline-block; position: relative; z-index: 1; transform-origin: center; transition: transform .32s cubic-bezier(.2, .9, .2, 1), color .24s ease, text-shadow .24s ease; }
+.lesson01-coefficient-token.is-coefficient-emphasized { transform: scale(1.52); font-weight: 800; animation: lesson01-coefficient-pulse .62s cubic-bezier(.2, 1.25, .3, 1) both; }
+.lesson01-coefficient-token.is-quadratic.is-coefficient-emphasized { color: #d84242; text-shadow: 0 .08em .18em rgb(216 66 66 / .23); }
+.lesson01-coefficient-token.is-linear.is-coefficient-emphasized { color: #5f46a7; text-shadow: 0 .08em .18em rgb(95 70 167 / .23); }
+.lesson01-decomposition-card.is-coefficient-focused.is-quadratic { border-top-color: #d84242; }
+.lesson01-decomposition-card.is-coefficient-focused.is-linear { border-top-color: #5f46a7; }
+.lesson01-coefficient-callout { margin-top: .55rem !important; color: #d84242 !important; font-weight: 800; }
+.lesson01-decomposition-card.is-linear .lesson01-coefficient-callout { color: #5f46a7 !important; }
+@keyframes lesson01-coefficient-pulse { 0% { transform: scale(1); } 55% { transform: scale(1.72); } 100% { transform: scale(1.52); } }
 .lesson01-token-label:not([hidden]) { animation: lesson01-decomposition-in .26s ease both; }
 .lesson01-decomposition-card h3 { margin: .35rem 0; }
 .lesson01-decomposition-card p { margin: 0; color: #465a54; line-height: 1.5; }

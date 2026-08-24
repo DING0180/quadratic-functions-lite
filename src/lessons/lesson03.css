@@ -19,9 +19,122 @@
   line-height: 1.55;
 }
 
+.lesson03-point-lab-layout {
+  grid-template-columns: minmax(31rem, 1.4fr) minmax(24rem, 0.86fr);
+}
+
+.lesson03-point-lab-layout .lesson03-graph-host,
+.lesson03-point-lab-layout .parabola-svg {
+  min-height: clamp(25rem, 57vh, 37rem);
+}
+
+.lesson03-k-lab-layout,
+.lesson03-example-layout,
+.lesson03-properties-layout,
+.lesson03-parameter-layout {
+  display: grid;
+  gap: clamp(1rem, 2vw, 2rem);
+  align-items: stretch;
+}
+
+.lesson03-k-lab-layout { grid-template-columns: minmax(15rem, 0.62fr) minmax(32rem, 1.55fr); }
+.lesson03-example-layout { grid-template-columns: minmax(17rem, 0.7fr) minmax(34rem, 1.55fr); }
+.lesson03-properties-layout { grid-template-columns: minmax(32rem, 1.4fr) minmax(23rem, 0.86fr); }
+.lesson03-parameter-layout { grid-template-columns: minmax(23rem, 0.92fr) minmax(27rem, 1.08fr); }
+
+.lesson03-k-lab-layout .lesson03-graph-panel,
+.lesson03-example-layout .lesson03-graph-panel,
+.lesson03-properties-layout .lesson03-graph-panel,
+.lesson03-parameter-layout .lesson03-graph-panel {
+  min-width: 0;
+  margin: 0;
+}
+
+.lesson03-k-lab-layout .lesson03-graph-host,
+.lesson03-k-lab-layout .parabola-svg,
+.lesson03-example-layout .lesson03-graph-host,
+.lesson03-example-layout .parabola-svg,
+.lesson03-properties-layout .lesson03-graph-host,
+.lesson03-properties-layout .parabola-svg,
+.lesson03-parameter-layout .lesson03-graph-host,
+.lesson03-parameter-layout .parabola-svg {
+  height: clamp(24rem, 52vh, 35rem);
+  min-height: clamp(24rem, 52vh, 35rem);
+}
+
+.lesson03-answer-field {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.7rem;
+  color: #365048;
+  font-weight: 800;
+}
+
+.lesson03-answer-input {
+  width: 100%;
+  min-height: 2.45rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #a9c2b8;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: #223330;
+  font: inherit;
+}
+
+.lesson03-answer-input:focus-visible {
+  outline: 3px solid #da8c35;
+  outline-offset: 2px;
+}
+
+.lesson03-property-motion {
+  min-height: 4.8rem;
+  margin: 0.85rem 0 0;
+  padding: 0.8rem;
+  border-left: 3px solid #d98935;
+  background: #f5f8f6;
+  color: #40554e;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .lesson03-point-lab-layout,
+  .lesson03-k-lab-layout,
+  .lesson03-example-layout,
+  .lesson03-properties-layout,
+  .lesson03-parameter-layout { grid-template-columns: 1fr; }
+
+  .lesson03-point-lab-layout .lesson03-graph-host,
+  .lesson03-point-lab-layout .parabola-svg,
+  .lesson03-k-lab-layout .lesson03-graph-host,
+  .lesson03-k-lab-layout .parabola-svg,
+  .lesson03-example-layout .lesson03-graph-host,
+  .lesson03-example-layout .parabola-svg,
+  .lesson03-properties-layout .lesson03-graph-host,
+  .lesson03-properties-layout .parabola-svg,
+  .lesson03-parameter-layout .lesson03-graph-host,
+  .lesson03-parameter-layout .parabola-svg {
+    height: auto;
+    min-height: 21rem;
+  }
+}
+
 @media (min-width: 761px) and (max-height: 760px) {
   .lesson03-compact-graph .lesson03-graph-host,
   .lesson03-compact-graph .parabola-svg {
     height: 10.25rem;
+  }
+
+  .lesson03-point-lab-layout .lesson03-graph-host,
+  .lesson03-point-lab-layout .parabola-svg,
+  .lesson03-k-lab-layout .lesson03-graph-host,
+  .lesson03-k-lab-layout .parabola-svg,
+  .lesson03-example-layout .lesson03-graph-host,
+  .lesson03-example-layout .parabola-svg,
+  .lesson03-properties-layout .lesson03-graph-host,
+  .lesson03-properties-layout .parabola-svg,
+  .lesson03-parameter-layout .lesson03-graph-host,
+  .lesson03-parameter-layout .parabola-svg {
+    height: 20rem;
+    min-height: 20rem;
   }
 }

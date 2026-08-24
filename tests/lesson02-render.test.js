@@ -51,12 +51,16 @@ describe("Lesson 02 parameter explorer", () => {
     view.destroy();
   });
 
-  it("shows numerical x and y change readouts during the monotonicity demonstration", () => {
+  it("reveals numerical x and y change readouts when the monotonicity demonstration starts", () => {
     const stage = document.createElement("div");
     const view = renderLesson02(stage, { step: 4, onStepChange() {} });
 
-    expect(stage.querySelector(".lesson02-motion-readout").textContent).toContain("x：−4 → 0（增大）");
-    expect(stage.querySelector(".lesson02-motion-readout").textContent).toContain("y：16 → 0（减小）");
+    const readout = stage.querySelector(".lesson02-motion-readout");
+    expect(readout.hidden).toBe(true);
+    Array.from(stage.querySelectorAll("button")).find((node) => node.textContent.includes("分段演示增减性")).click();
+    expect(readout.hidden).toBe(false);
+    expect(readout.textContent).toContain("x：−4 → 0（增大）");
+    expect(readout.textContent).toContain("y：16 → 0（减小）");
     view.destroy();
   });
 

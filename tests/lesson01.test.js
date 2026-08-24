@@ -35,7 +35,6 @@ describe("Lesson 01 quadratic-function concepts", () => {
     expect(stage.querySelector("[data-lesson01-bridge-answer]").hidden).toBe(false);
     lesson.destroy();
   });
-
   it("keeps the original formula while colored copies move into term cards", async () => {
     const stage = document.createElement("main");
     const lesson = lesson01.renderLesson01(stage, { step: 2, onStepChange() {} });
@@ -65,6 +64,16 @@ describe("Lesson 01 quadratic-function concepts", () => {
     advance.click();
     await new Promise((resolve) => window.setTimeout(resolve));
     expect(stage.querySelector("[data-lesson01-token-slot='constant'] [data-lesson01-decomposed-token='constant']")).not.toBeNull();
+    expect(advance.disabled).toBe(false);
+    expect(advance.textContent).toContain("二次项系数 a");
+    advance.click();
+    expect(stage.querySelector("[data-lesson01-coefficient-token='quadratic']").classList).toContain("is-coefficient-emphasized");
+    expect(stage.querySelector("[data-lesson01-coefficient-callout='quadratic']").hidden).toBe(false);
+    expect(advance.textContent).toContain("一次项系数 b");
+    advance.click();
+    expect(stage.querySelector("[data-lesson01-coefficient-token='linear']").classList).toContain("is-coefficient-emphasized");
+    expect(stage.querySelector("[data-lesson01-coefficient-callout='linear']").hidden).toBe(false);
+    expect(advance.disabled).toBe(true);
     lesson.destroy();
   });
 

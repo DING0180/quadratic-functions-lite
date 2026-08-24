@@ -141,8 +141,8 @@ function renderGeneral(root) {
   const source = element("div", "lesson01-token-formula lesson01-current");
   source.dataset.lesson01TokenSource = "";
   const parts = [
-    { id: "quadratic", latex: "ax^2", label: "ax²", title: "二次项", copy: "ax² 是二次项；其中 a 表示二次项系数，而且 a≠0。" },
-    { id: "linear", latex: "bx", label: "bx", title: "一次项", copy: "bx 是一次项；其中 b 表示一次项系数。" },
+    { id: "quadratic", latex: "ax^2", label: "ax²", title: "二次项", copy: "ax² 是二次项；其中 a 表示二次项系数，而且 a≠0。", coefficient: "a", remainder: "x^2", coefficientTitle: "a 是二次项系数" },
+    { id: "linear", latex: "bx", label: "bx", title: "一次项", copy: "bx 是一次项；其中 b 表示一次项系数。", coefficient: "b", remainder: "x", coefficientTitle: "b 是一次项系数" },
     { id: "constant", latex: "c", label: "c", title: "常数项", copy: "c 是常数项；它不含 x，可以等于 0。" },
   ].map((part) => {
     const token = formula(part.latex, part.label, "lesson01-formula lesson01-general-token is-" + part.id);
@@ -153,10 +153,11 @@ function renderGeneral(root) {
     card.dataset.lesson01DecompositionCard = part.id;
     const slot = element("div", "lesson01-token-slot"); slot.dataset.lesson01TokenSlot = part.id;
     const details = element("div", "lesson01-token-label"); details.dataset.lesson01TokenLabel = part.id; details.hidden = true;
-    details.append(element("h3", "", part.title), element("p", "", part.copy));
+    const callout = element("p", "lesson01-coefficient-callout"); callout.dataset.lesson01CoefficientCallout = part.id; callout.hidden = true;
+    details.append(element("h3", "", part.title), element("p", "", part.copy), callout);
     card.append(slot, details);
     cards.append(card);
-    return { ...part, token, separator, card, slot, details };
+    return { ...part, token, separator, card, slot, details, callout };
   });
   const prefix = formula("y=", "y 等于", "lesson01-formula lesson01-token-prefix");
   prefix.dataset.lesson01TokenPrefix = "";
@@ -169,6 +170,19 @@ function renderGeneral(root) {
   const advance = button("开始拆分：移动 ax²"); advance.dataset.lesson01DecomposeAdvance = "";
   let phase = 0;
   const activeFlights = new Set();
+  function createDecomposedToken(part) {
+    if (!part.coefficient) {
+      const token = formula(part.latex, part.label, "lesson01-formula lesson01-decomposed-token is-" + part.id);
+      token.dataset.lesson01DecomposedToken = part.id;
+      return token;
+    }
+    const token = element("div", "lesson01-formula lesson01-decomposed-token is-" + part.id);
+    token.dataset.lesson01DecomposedToken = part.id;
+    const coefficient = formula(part.coefficient, part.coefficient, "lesson01-formula lesson01-coefficient-token is-" + part.id);
+    coefficient.dataset.lesson01CoefficientToken = part.id;
+    token.append(coefficient, formula(part.remainder, part.remainder, "lesson01-formula lesson01-term-remainder"));
+    return token;
+  }
   function moveToken(part) {
     const before = part.token.getBoundingClientRect();
     part.card.classList.add("is-revealed");
@@ -185,9 +199,7 @@ function renderGeneral(root) {
     const finish = () => {
       flight.remove();
       activeFlights.delete(flight);
-      const copy = formula(part.latex, part.label, "lesson01-formula lesson01-decomposed-token is-" + part.id);
-      copy.dataset.lesson01DecomposedToken = part.id;
-      part.slot.replaceChildren(copy);
+      part.slot.replaceChildren(createDecomposedToken(part));
     };
     if (typeof flight.animate === "function") {
       const animation = flight.animate([
@@ -220,16 +232,38 @@ function renderGeneral(root) {
       window.setTimeout(complete, 640);
     });
   }
+  function focusCoefficient(part) {
+    const coefficient = part.slot.querySelector("[data-lesson01-coefficient-token='" + part.id + "']");
+    coefficient.classList.add("is-coefficient-emphasized");
+    part.card.classList.add("is-coefficient-focused");
+    part.callout.textContent = part.coefficientTitle;
+    part.callout.hidden = false;
+  }
   advance.addEventListener("click", async () => {
     if (advance.disabled) return;
     advance.disabled = true;
+    if (phase === 3) {
+      focusCoefficient(parts[0]);
+      phase = 4;
+      advance.disabled = false;
+      advance.textContent = "继续：聚焦一次项系数 b";
+      return;
+    }
+    if (phase === 4) {
+      focusCoefficient(parts[1]);
+      phase = 5;
+      conclusion.textContent = "项是完整的一块：ax²、bx；系数是项中的一部分：a 是二次项系数，b 是一次项系数。";
+      conclusion.hidden = false;
+      advance.textContent = "系数已聚焦";
+      return;
+    }
     const part = parts[phase];
     await moveToken(part);
     part.details.hidden = false;
     phase += 1;
     if (phase === 1) { advance.disabled = false; advance.textContent = "继续：移动 bx"; }
     if (phase === 2) { advance.disabled = false; advance.textContent = "继续：最后移动 c"; }
-    if (phase === 3) { conclusion.textContent = "一个完整的二次函数被拆成了二次项、一次项和常数项；再合起来就是 y=ax²+bx+c，其中 a≠0。"; conclusion.hidden = false; advance.textContent = "拆分完成"; }
+    if (phase === 3) { conclusion.textContent = "三项已经拆分完成。继续观察：每个完整的项中，哪一部分才是系数？"; conclusion.hidden = false; advance.disabled = false; advance.textContent = "继续：聚焦二次项系数 a"; }
   });
   root.append(element("p", "lesson01-prompt", "一般地，y=ax²+bx+c（a、b、c 为常数，a≠0）叫做二次函数。原式会保留；每次点击会复制一块同色数学 token，并平滑移动到对应位置。"), source, cards, advance, conclusion);
   return () => activeFlights.forEach((flight) => flight.remove());

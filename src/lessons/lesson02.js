@@ -1,4 +1,5 @@
 import { createParabolaGraph } from "../graph/parabola-svg.js";
+import { applyClassroomSplit } from "../classroom-layout.js";
 import { renderFormula } from "../formula.js";
 import "./lesson02.css";
 import {
@@ -263,6 +264,7 @@ function renderPlotter(root, onStepChange, cleanup) {
     connectionStatus,
   );
   layout.append(graphPane, workbench);
+  applyClassroomSplit(layout, workbench, graphPane);
   root.append(layout);
   update();
 }
@@ -358,6 +360,7 @@ function renderSignCompare(root, onStepChange, cleanup) {
   motionStatus.setAttribute("aria-live", "polite");
   const motionReadout = element("div", "lesson02-motion-readout");
   motionReadout.setAttribute("aria-live", "polite");
+  motionReadout.hidden = true;
   const motion = button("分段演示增减性", "lesson02-action lesson02-action-secondary");
   let animationActive = true;
   let frame = null;
@@ -406,6 +409,7 @@ function renderSignCompare(root, onStepChange, cleanup) {
 
   motion.addEventListener("click", () => {
     if (!animationActive) return;
+    motionReadout.hidden = false;
     motion.disabled = true;
     motion.textContent = "演示进行中…";
     let phaseIndex = 0;
@@ -452,6 +456,7 @@ function renderSignCompare(root, onStepChange, cleanup) {
     motionReadout,
   );
   layout.append(graphPane, panel);
+  applyClassroomSplit(layout, panel, graphPane);
   root.append(layout);
   updateTable();
 }
@@ -513,6 +518,7 @@ function renderMagnitude(root, onStepChange, cleanup) {
     sliderReadout,
   );
   layout.append(graphPane, panel);
+  applyClassroomSplit(layout, panel, graphPane);
   root.append(layout);
   updateSlider();
 }
@@ -620,6 +626,7 @@ function renderSinglePractice(root, onStepChange, cleanup) {
   );
   const layout = element("div", "lesson02-practice-layout");
   layout.append(questionPane, graphPane);
+  applyClassroomSplit(layout, questionPane, graphPane);
   root.append(layout);
   loadNextChallenge();
 }
@@ -710,6 +717,7 @@ function renderPairPractice(root, onStepChange, cleanup) {
   );
   const layout = element("div", "lesson02-practice-layout");
   layout.append(questionPane, graphPane);
+  applyClassroomSplit(layout, questionPane, graphPane);
   root.append(layout);
   loadNextChallenge();
 }
@@ -770,6 +778,7 @@ function renderMisconception(root, onStepChange, cleanup) {
     status,
   );
   layout.append(panel, graphPane);
+  applyClassroomSplit(layout, panel, graphPane);
   root.append(layout);
   updateComparison();
 }

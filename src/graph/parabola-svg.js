@@ -213,7 +213,10 @@ function appendPoint(svg, point, scale) {
   circle.setAttribute("cx", String(scale.x(x)));
   circle.setAttribute("cy", String(scale.y(y)));
   circle.setAttribute("r", String(Array.isArray(point) ? 4 : point.radius ?? 4));
-  if (!Array.isArray(point) && point.color) circle.setAttribute("fill", point.color);
+  if (!Array.isArray(point) && point.color) {
+    circle.setAttribute("fill", point.color);
+    circle.style.fill = point.color;
+  }
   svg.append(circle);
 }
 
