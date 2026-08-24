@@ -1,5 +1,6 @@
 import { renderFormula } from "../formula.js";
 import { createParabolaGraph } from "../graph/parabola-svg.js";
+import { applyClassroomSplit } from "../classroom-layout.js";
 import "./lesson08.css";
 
 const COLORS = Object.freeze({ curve: "#19735d", muted: "#a8bbb4", root: "#d98935", guide: "#7b55b7", compare: "#197b9b", signBase: "#c84f42", signHighlight: "#16815f" });
@@ -110,7 +111,7 @@ function layoutWithGraph(root, cleanup, options, workbench) {
   const graphPanel = element("div", "lesson08-graph-panel");
   const host = element("div", "lesson08-graph-host"); graphPanel.append(host);
   const graph = createGraph(host, cleanup, options);
-  layout.append(graphPanel, workbench); root.append(layout);
+  layout.append(graphPanel, workbench); applyClassroomSplit(layout, workbench, graphPanel); root.append(layout);
   return graph;
 }
 

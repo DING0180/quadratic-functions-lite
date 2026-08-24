@@ -182,7 +182,7 @@ body { min-width: 320px; }
   .lesson02-summary-cards { grid-template-columns: 1fr; }
 }
 
-@media (min-width: 761px) and (max-height: 760px) {
+@media (min-width: 761px) and (max-height: 800px) {
   .lesson-stage-active { padding: 0.8rem 1.4rem; }
   .lesson02-heading { margin-bottom: 0.65rem; }
   .lesson02-title { font-size: 1.7rem; }

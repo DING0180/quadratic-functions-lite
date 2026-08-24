@@ -1,5 +1,6 @@
 import { renderFormula } from "../formula.js";
 import { createParabolaGraph } from "../graph/parabola-svg.js";
+import { applyClassroomSplit } from "../classroom-layout.js";
 import "./lesson09.css";
 
 const COLORS = Object.freeze({ curve: "#1d765e", segment: "#d98935", vertex: "#7653af", outside: "#bd4a40", muted: "#b4c7c0" });
@@ -79,7 +80,7 @@ function graphOptions(parameters, analysis, { viewport = { xMin: 0, xMax: 8, yMi
 function createGraph(host, cleanup, options) { const graph = createParabolaGraph(host, options); cleanup.push(() => graph.destroy()); return graph; }
 function layout(root, cleanup, options, workbench) {
   const shell = element("div", "lesson09-layout"); const panel = element("div", "lesson09-graph-panel"); const host = element("div", "lesson09-graph-host");
-  panel.append(host); const graph = createGraph(host, cleanup, options); shell.append(panel, workbench); root.append(shell); return graph;
+  panel.append(host); const graph = createGraph(host, cleanup, options); shell.append(panel, workbench); applyClassroomSplit(shell, workbench, panel); root.append(shell); return graph;
 }
 function pointText(point) { return "(" + number(point.x) + ", " + number(point.y) + ")"; }
 function extremaText(analysis) { return "最小值 (minimum) " + number(analysis.minimum.y) + " 在 x=" + number(analysis.minimum.x) + "；最大值 (maximum) " + number(analysis.maximum.y) + " 在 x=" + number(analysis.maximum.x) + "。"; }

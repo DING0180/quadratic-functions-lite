@@ -1,5 +1,6 @@
 import { renderFormula } from "../formula.js";
 import { createParabolaGraph } from "../graph/parabola-svg.js";
+import { applyClassroomSplit } from "../classroom-layout.js";
 import "./lesson07.css";
 
 const COLORS = Object.freeze({ curve: "#19735d", point: "#d98935", double: "#7b55b7" });
@@ -180,7 +181,7 @@ function renderRoots(root, cleanup) {
   const reveal = button("Reveal 根"); reveal.dataset.lesson07RevealRoots = "";
   reveal.addEventListener("click", () => { answer.hidden = false; });
   workbench.append(element("p", "lesson07-question", "观察图象上的两个点。方程 " + quadraticText(analysis, { equalsY: false }) + "=0 的根是什么？"), formula(quadraticText(analysis, { latex: true }), quadraticText(analysis), "lesson07-formula lesson07-current"), reveal, answer);
-  layout.append(graphPanel, workbench); root.append(layout);
+  layout.append(graphPanel, workbench); applyClassroomSplit(layout, workbench, graphPanel); root.append(layout);
 }
 
 function renderCases(root, cleanup) {
@@ -215,7 +216,7 @@ function renderCases(root, cleanup) {
     updateGraph(graph, parameters);
   }
   workbench.append(element("p", "lesson07-prompt", "切换图象，观察交点、判别式 (discriminant) 与实数根如何一起变化。"), current, status, controls, reveal);
-  layout.append(graphPanel, workbench); root.append(layout); render();
+  layout.append(graphPanel, workbench); applyClassroomSplit(layout, workbench, graphPanel); root.append(layout); render();
 }
 
 function renderLab(root, cleanup) {
@@ -242,7 +243,7 @@ function renderLab(root, cleanup) {
   }
   slider.addEventListener("input", () => { parameters = { ...parameters, k: Number(slider.value) }; render(); });
   workbench.append(element("p", "lesson07-prompt", "拖动图象上下移动。当前函数、Δ、根和交点会同步更新。"), current, discriminant, roots, sliderLabel, reveal, conclusion);
-  layout.append(graphPanel, workbench); root.append(layout); render();
+  layout.append(graphPanel, workbench); applyClassroomSplit(layout, workbench, graphPanel); root.append(layout); render();
 }
 
 function renderGraphChallenge(root, cleanup, random) {

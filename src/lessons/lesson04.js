@@ -1,5 +1,6 @@
 import { renderFormula } from "../formula.js";
 import { createParabolaGraph } from "../graph/parabola-svg.js";
+import { applyClassroomSplit } from "../classroom-layout.js";
 import {
   BASE_POINTS,
   SHIFTED_POINTS,
@@ -69,6 +70,7 @@ function createLayout(root, options, cleanup) {
   const workbench = element("aside", "lesson04-workbench");
   graphPane.append(graphHost);
   layout.append(graphPane, workbench);
+  applyClassroomSplit(layout, workbench, graphPane);
   root.append(layout);
   const graph = createParabolaGraph(graphHost, { viewport: VIEWPORT, ...options });
   cleanup.push(() => graph.destroy());

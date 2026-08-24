@@ -122,6 +122,48 @@
   background: linear-gradient(#ffffff, #fbfdfc);
 }
 
+.classroom-split {
+  display: grid;
+  grid-template-columns: minmax(18rem, 34fr) minmax(0, 66fr);
+  gap: clamp(1rem, 2vw, 1.8rem);
+  align-items: stretch;
+}
+
+.classroom-split > .classroom-workspace,
+.classroom-split > .classroom-visualization { min-width: 0; }
+
+.classroom-split > .classroom-workspace { align-self: stretch; }
+
+.classroom-split > .classroom-visualization {
+  display: grid;
+  align-items: stretch;
+}
+
+.classroom-split > .classroom-visualization :is(.parabola-svg, [class$="-graph-host"]) {
+  width: 100%;
+  min-height: clamp(22rem, 52vh, 36rem);
+}
+
+.classroom-workspace :is([class*="-actions"], [class*="-controls"]) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .classroom-split { grid-template-columns: minmax(20rem, 38fr) minmax(0, 62fr); }
+}
+
+@media (min-width: 1024px) and (max-height: 800px) {
+  .classroom-split > .classroom-workspace { gap: .4rem; padding: .45rem; }
+}
+
+@media (max-width: 1023px) {
+  .classroom-split { grid-template-columns: minmax(0, 1fr); }
+  .classroom-split > .classroom-visualization :is(.parabola-svg, [class$="-graph-host"]) { min-height: clamp(19rem, 48vh, 30rem); }
+}
+
 .parabola-grid-line { stroke: #dfe8e3; stroke-width: 0.75; vector-effect: non-scaling-stroke; }
 .parabola-axis { stroke: #62756d; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
 .parabola-axis-name, .parabola-label { fill: #29453c; }

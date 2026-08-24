@@ -1,5 +1,6 @@
 import { renderFormula } from "../formula.js";
 import { createParabolaGraph } from "../graph/parabola-svg.js";
+import { applyClassroomSplit } from "../classroom-layout.js";
 import "./lesson05.css";
 
 const COLORS = Object.freeze({ a: "#cf684e", h: "#197b9b", k: "#c88818", curve: "#19735d", ghost: "#a8bbb4" });
@@ -174,7 +175,7 @@ function renderLab(root, _onStepChange, cleanup) {
   const reset = button("Reset", "lesson05-action lesson05-secondary"); reset.dataset.lesson05Reset = "";
   reset.addEventListener("click", () => { state = { ...INITIAL }; Object.entries(inputs).forEach(([key, input]) => { input.value = String(state[key]); }); setMode("free"); render(); });
   workbench.append(element("p", "lesson05-prompt", "拖动参数后，数值、函数、顶点、对称轴和图象会同时更新。"), modes, current, readouts, controls, reset);
-  layout.append(workbench, graphPanel); root.append(layout); setMode("free"); render();
+  layout.append(workbench, graphPanel); applyClassroomSplit(layout, workbench, graphPanel); root.append(layout); setMode("free"); render();
 }
 
 function renderProperties(root) {
