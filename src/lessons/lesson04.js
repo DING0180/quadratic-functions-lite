@@ -97,8 +97,10 @@ function shiftedCurve(h = 1, a = 1) {
 }
 
 function getKLabViewport(k) {
-  const farthestVisibleY = (4 + Math.abs(k)) ** 2 + 4;
-  return { ...K_LAB_VIEWPORT, yMax: Math.max(28, Math.ceil(farthestVisibleY / 4) * 4) };
+  const xMin = Math.min(-4, k - 4);
+  const xMax = Math.max(4, k + 4);
+  const farthestVisibleY = Math.max(xMin ** 2, xMax ** 2, (xMin - k) ** 2, (xMax - k) ** 2) + 4;
+  return { ...K_LAB_VIEWPORT, xMin, xMax, yMax: Math.max(28, Math.ceil(farthestVisibleY / 4) * 4) };
 }
 
 function colouredPoints(points, color) {
@@ -431,3 +433,4 @@ export function renderLesson04(stage, { step = 1, onStepChange = () => {}, rando
   stage.replaceChildren(root);
   return { destroy() { cleanup.forEach((dispose) => dispose()); } };
 }
+
