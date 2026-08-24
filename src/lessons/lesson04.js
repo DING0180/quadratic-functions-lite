@@ -12,6 +12,7 @@ import {
 
 const COLORS = Object.freeze({ base: "#2563eb", shifted: "#dc4055", arrow: "#b45f06" });
 const VIEWPORT = Object.freeze({ xMin: -4, xMax: 4, yMin: -4, yMax: 28 });
+const K_LAB_VIEWPORT = Object.freeze({ xMin: -4, xMax: 4, yMin: -4, yTickStep: 4 });
 const PLAYBACK_DELAY = 650;
 
 export const LESSON04_STEP_TITLES = Object.freeze([
@@ -68,6 +69,8 @@ function createLayout(root, options, cleanup) {
   const graphPane = element("div", "lesson04-graph-panel");
   const graphHost = element("div", "lesson04-graph-host");
   const workbench = element("aside", "lesson04-workbench");
+  workbench.tabIndex = 0;
+  workbench.setAttribute("aria-label", "Lesson 4 工作台，可独立滚动");
   graphPane.append(graphHost);
   layout.append(graphPane, workbench);
   applyClassroomSplit(layout, workbench, graphPane);
@@ -91,6 +94,11 @@ function baseCurve() {
 
 function shiftedCurve(h = 1, a = 1) {
   return { a, h, color: COLORS.shifted };
+}
+
+function getKLabViewport(k) {
+  const farthestVisibleY = (4 + Math.abs(k)) ** 2 + 4;
+  return { ...K_LAB_VIEWPORT, yMax: Math.max(28, Math.ceil(farthestVisibleY / 4) * 4) };
 }
 
 function colouredPoints(points, color) {
@@ -221,6 +229,7 @@ function renderDiscovery(root, _onStepChange, cleanup) {
 
 function renderKLab(root, _onStepChange, cleanup) {
   const { graph, workbench } = createLayout(root, {
+    viewport: getKLabViewport(0),
     curves: [baseCurve(), shiftedCurve(0)],
     ariaLabel: "通过改变 k 观察 y 等于 x 减 k 平方的左右平移",
   }, cleanup);
@@ -244,7 +253,7 @@ function renderKLab(root, _onStepChange, cleanup) {
     formulaHost.replaceChildren();
     renderFormula(formulaHost, currentFormula, { ariaLabel: "当前函数 " + currentFormula, displayMode: true });
     readout.textContent = "当前 k=" + k + "；" + properties.shift + "；顶点是 (" + k + ", 0)。";
-    graph.update({ curves: [baseCurve(), shiftedCurve(k)] });
+    graph.update({ viewport: getKLabViewport(k), curves: [baseCurve(), shiftedCurve(k)] });
   }
 
   slider.addEventListener("input", update);

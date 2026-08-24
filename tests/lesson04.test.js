@@ -17,6 +17,16 @@ describe("Lesson 04 horizontal-shift migration", () => {
     ]);
   });
 
+  it("exposes the workbench as a focusable independent scrolling region", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson04(stage, { step: 1, onStepChange() {} });
+    const workbench = stage.querySelector(".lesson04-workbench");
+
+    expect(workbench.tabIndex).toBe(0);
+    expect(workbench.getAttribute("aria-label")).toBe("Lesson 4 工作台，可独立滚动");
+    lesson.destroy();
+  });
+
   it("plots a blue and red point together for each shared x-value", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson04(stage, { step: 1, onStepChange() {} });
@@ -63,6 +73,19 @@ describe("Lesson 04 horizontal-shift migration", () => {
 
     expect(stage.querySelector("[data-lesson04-shift-readout]").textContent).toContain("向左平移 2 个单位");
     expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(2);
+    lesson.destroy();
+  });
+
+  it("expands the k exploration viewport only for the largest horizontal shifts", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson04(stage, { step: 2, onStepChange() {} });
+    const slider = stage.querySelector('[data-lesson04-slider="k"]');
+    const initialTicks = Array.from(stage.querySelectorAll(".parabola-tick-y"), (tick) => tick.textContent);
+
+    expect(initialTicks).not.toContain("68");
+    slider.value = "4";
+    slider.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(Array.from(stage.querySelectorAll(".parabola-tick-y"), (tick) => tick.textContent)).toContain("68");
     lesson.destroy();
   });
 

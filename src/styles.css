@@ -333,6 +333,27 @@ body { min-width: 320px; }
 .lesson04-step-controls { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid #d5e0da; }
 .lesson04-step-count { color: #64746f; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
 
+@media (min-width: 1024px) {
+  .lesson04-layout.classroom-split { align-items: start; }
+  .lesson04-layout.classroom-split > .lesson04-workbench.classroom-workspace {
+    align-self: start;
+    max-block-size: min(68dvh, 44rem);
+    overflow-y: scroll;
+    overscroll-behavior: contain;
+    scrollbar-color: #80a99b #edf4f0;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+  }
+  .lesson04-layout.classroom-split > .lesson04-graph-panel.classroom-visualization {
+    position: sticky;
+    top: 0.4rem;
+    align-self: start;
+  }
+  .lesson04-workbench::-webkit-scrollbar { width: 0.72rem; }
+  .lesson04-workbench::-webkit-scrollbar-track { background: #edf4f0; border-radius: 99px; }
+  .lesson04-workbench::-webkit-scrollbar-thumb { background: #80a99b; border: 3px solid #edf4f0; border-radius: 99px; }
+}
+
 @media (max-width: 860px) {
   .lesson04-layout { grid-template-columns: 1fr; }
   .lesson04-graph-host, .lesson04-graph-host .parabola-svg { min-height: 20rem; }
