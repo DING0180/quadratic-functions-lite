@@ -34,6 +34,103 @@
 .lesson02-curve-label { min-width: 0; font-size: 0.92rem; }
 .lesson02-curve-status { margin: 0; padding: 0.75rem 0.85rem; border-left: 3px solid #d98935; background: #f5f8f6; color: #40554e; line-height: 1.5; }
 
+.lesson02-equation-transform {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.16rem;
+  min-height: 5.5rem;
+  margin: 1rem 0;
+  padding: 1.15rem;
+  overflow: hidden;
+  border: 1px solid #cbdcd4;
+  border-radius: 0.85rem;
+  background: #f3f8f5;
+  color: #164f40;
+  font-size: clamp(1.4rem, 2.7vw, 2.2rem);
+}
+
+.lesson02-equation-transform .katex { font-size: 1em; }
+.lesson02-equation-base { font-weight: 800; }
+.lesson02-vanishing-term {
+  display: inline-flex;
+  transform-origin: center;
+  transition: opacity 760ms ease, transform 760ms cubic-bezier(.2, .75, .3, 1), filter 760ms ease;
+}
+.lesson02-equation-transform.is-transforming .lesson02-vanishing-term {
+  opacity: 0;
+  transform: translateX(2.8rem) translateY(-1.2rem) scale(0.72);
+  filter: blur(3px);
+}
+.lesson02-equation-transform.is-complete { box-shadow: inset 0 0 0 2px rgb(31 118 94 / 0.14); }
+
+.lesson02-motion-readout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.65rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #cbdcd4;
+  border-radius: 0.65rem;
+  background: #f7faf8;
+  color: #365048;
+  font-variant-numeric: tabular-nums;
+}
+.lesson02-motion-readout p { margin: 0; line-height: 1.45; }
+.lesson02-motion-readout > :nth-child(-n + 2) { color: #17634e; font-weight: 800; }
+.lesson02-motion-current, .lesson02-motion-conclusion { grid-column: 1 / -1; }
+.lesson02-motion-conclusion { color: #9a4d27; font-weight: 800; }
+
+.lesson02-practice-layout,
+.lesson02-comparison-layout {
+  display: grid;
+  grid-template-columns: minmax(17rem, 0.92fr) minmax(19rem, 1.08fr);
+  gap: clamp(1rem, 2vw, 1.7rem);
+  align-items: stretch;
+}
+
+.lesson02-practice-question-pane,
+.lesson02-practice-graph-pane,
+.lesson02-comparison-controls,
+.lesson02-comparison-graph {
+  min-width: 0;
+  border: 1px solid #d5e0da;
+  border-radius: 0.9rem;
+  background: #fff;
+  box-shadow: 0 0.35rem 1.35rem rgb(25 73 58 / 0.06);
+}
+
+.lesson02-practice-question-pane,
+.lesson02-practice-graph-pane,
+.lesson02-comparison-controls { padding: clamp(0.9rem, 1.5vw, 1.25rem); }
+.lesson02-practice-question-pane > :first-child,
+.lesson02-practice-graph-pane > :first-child,
+.lesson02-comparison-controls > :first-child { margin-top: 0; }
+.lesson02-practice-graph-pane { display: grid; grid-template-rows: auto minmax(16rem, 1fr); min-height: 22rem; }
+.lesson02-practice-graph-pane h3 { margin-bottom: 0.6rem; }
+.lesson02-practice-graph-placeholder { align-self: center; margin: 0; padding: 0.9rem; border-left: 3px solid #d98935; background: #f5f8f6; color: #52645e; line-height: 1.65; white-space: pre-line; }
+.lesson02-practice-graph { width: 100%; max-width: none; min-height: 16rem; margin: 0; padding: 0.35rem; }
+.lesson02-practice-graph .parabola-svg { min-height: 15rem; }
+
+.lesson02-comparison-controls { display: grid; align-content: start; }
+.lesson02-comparison-controls .lesson02-curve-toggles { grid-template-columns: 1fr; margin: 0.85rem 0; }
+.lesson02-comparison-graph { padding: 0.45rem; }
+.lesson02-comparison-graph .lesson02-graph-host,
+.lesson02-comparison-graph .parabola-svg { min-height: 20rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson02-vanishing-term { transition-duration: 1ms; }
+}
+
 @media (max-width: 560px) {
   .lesson02-curve-toggles { grid-template-columns: 1fr; }
+  .lesson02-motion-readout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .lesson02-practice-layout,
+  .lesson02-comparison-layout { grid-template-columns: 1fr; }
+  .lesson02-practice-graph-pane { min-height: 18rem; }
+  .lesson02-comparison-graph .lesson02-graph-host,
+  .lesson02-comparison-graph .parabola-svg { min-height: 17rem; }
 }

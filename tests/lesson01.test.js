@@ -35,7 +35,6 @@ describe("Lesson 01 quadratic-function concepts", () => {
     expect(stage.querySelector("[data-lesson01-bridge-answer]").hidden).toBe(false);
     lesson.destroy();
   });
-
   it("keeps the original formula while colored copies move into term cards", async () => {
     const stage = document.createElement("main");
     const lesson = lesson01.renderLesson01(stage, { step: 2, onStepChange() {} });
@@ -151,3 +150,4 @@ describe("Lesson 01 quadratic-function concepts", () => {
     lesson.destroy();
   });
 });
+

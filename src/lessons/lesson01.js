@@ -401,3 +401,4 @@ export function renderLesson01(stage, { step = 1, onStepChange = () => {}, rando
   stage.replaceChildren(root);
   return { destroy() { cleanup.forEach((handler) => handler()); } };
 }
+
