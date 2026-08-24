@@ -31,6 +31,7 @@
 .lesson01-action:focus-visible, .lesson01-select:focus-visible { outline: 3px solid #da8c35; outline-offset: 2px; }
 .lesson01-action:disabled { cursor: not-allowed; opacity: .55; }
 .lesson01-secondary { border-color: #768883; background: #f8faf9; color: #334640; }
+.lesson01-secondary:hover { background: #edf2ef; color: #223330; }
 .lesson01-term-controls, .lesson01-scan-controls, .lesson01-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
 .lesson01-token-formula { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .18rem; min-height: 5rem; }
 .lesson01-token-formula .lesson01-formula, .lesson01-token-slot .lesson01-formula { margin: 0; }
@@ -69,6 +70,7 @@
 .lesson01-case-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
 .lesson01-case-workspace { margin-top: .75rem; }
 .lesson01-case-workspace .lesson01-case-card { width: min(100%, 43rem); }
+.lesson01-case-workspace .lesson01-parameter-gate { width: min(100%, 70rem); }
 .lesson01-case-card { display: grid; align-content: start; gap: .6rem; min-width: 0; padding: .85rem; border: 1px solid #d5e0da; border-top: 4px solid #1f8a70; border-radius: .8rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / .06); }
 .lesson01-case-card.is-simplify { border-top-color: #5f67b8; }
 .lesson01-case-card h3, .lesson01-case-prompt { margin: 0; }
@@ -78,14 +80,23 @@
 .lesson01-case-card .lesson01-action { width: 100%; }
 .lesson01-case-answer { margin: 0; padding: .65rem .7rem; border-left: 3px solid #d98935; border-radius: .4rem; background: #fff7ec; color: #55442e; line-height: 1.5; }
 .lesson01-parameter-gate { display: grid; gap: .6rem; margin: 0; padding: .85rem; border: 1px solid #d5e0da; border-top: 4px solid #d84242; border-radius: .8rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / .06); }
-.lesson01-parameter-gate h3, .lesson01-parameter-legend { margin: 0; }
-.lesson01-parameter-legend { color: #465a54; font-weight: 700; line-height: 1.5; }
+.lesson01-parameter-gate h3 { margin: 0; }
+.lesson01-parameter-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(16rem, .9fr); gap: .75rem; align-items: stretch; }
+.lesson01-parameter-problem, .lesson01-parameter-checks { display: grid; align-content: start; gap: .6rem; min-width: 0; }
+.lesson01-parameter-checks { grid-template-columns: 1fr; }
 .lesson01-parameter-expression { display: flex; flex-wrap: wrap; align-items: center; gap: .08rem; padding: .55rem .7rem; border-radius: .55rem; background: #f7faf8; }
 .lesson01-parameter-piece { margin: 0; font-size: 1.08rem; }
 .lesson01-parameter-gate .lesson01-parameter-piece { font-size: .92rem; }
 .lesson01-parameter-piece.is-coefficient { padding: .18rem .28rem; border-radius: .35rem; background: #fff0ee; color: #c83737; box-shadow: inset 0 0 0 1px #efb3ae; }
 .lesson01-parameter-piece.is-exponent { color: inherit; }
 .lesson01-parameter-piece.is-exponent .msupsub > .vlist-t { display: inline-block; padding: .16rem .28rem; border-radius: .35rem; background: #edf8f0; color: #19735d; box-shadow: inset 0 0 0 1px #a8d7b8; }
+.lesson01-parameter-check { min-height: 0; padding: .7rem .75rem; border: 1px solid #d5e0da; border-left: 4px solid #1f8a70; border-radius: .55rem; background: #f5fbf7; }
+.lesson01-parameter-check.is-red { border-left-color: #d84242; background: #fff5f4; }
+.lesson01-parameter-check-label, .lesson01-parameter-check-rule, .lesson01-parameter-work { margin: 0; }
+.lesson01-parameter-check-label { color: #19735d; font-weight: 800; }
+.lesson01-parameter-check.is-red .lesson01-parameter-check-label { color: #c83737; }
+.lesson01-parameter-check-rule { margin-top: .2rem; font-weight: 800; line-height: 1.4; }
+.lesson01-parameter-work { margin-top: .45rem; padding-top: .45rem; border-top: 1px dashed currentColor; color: #465a54; line-height: 1.45; }
 .lesson01-practice-expression { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0; min-height: 5rem; }
 .lesson01-practice-expression .lesson01-formula { display: inline-block; margin: 0; }
 .lesson01-practice-term { display: inline-flex; align-items: center; border: 2px solid transparent; border-radius: .42rem; transition: border-color .18s ease, background .18s ease; }
@@ -111,6 +122,6 @@
 .lesson01-bridge-out { margin-top: 1.2rem; padding: .85rem 1rem; border-radius: .6rem; background: #eef7f1; }
 .lesson01-step-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; margin-top: 1.3rem; }
 .lesson01-step-count { color: #62736e; font-weight: 800; }
-@media (max-width: 760px) { .lesson01-compare-grid, .lesson01-example-grid, .lesson01-term-grid, .lesson01-summary-grid, .lesson01-decomposition-grid, .lesson01-case-grid { grid-template-columns: 1fr; } .lesson01-arrow { min-height: 1.5rem; } .lesson01-case-prompt { min-height: auto; } }
+@media (max-width: 760px) { .lesson01-compare-grid, .lesson01-example-grid, .lesson01-term-grid, .lesson01-summary-grid, .lesson01-decomposition-grid, .lesson01-case-grid, .lesson01-parameter-layout { grid-template-columns: 1fr; } .lesson01-arrow { min-height: 1.5rem; } .lesson01-case-prompt { min-height: auto; } }
 @media (min-width: 761px) and (max-height: 760px) { .lesson01-heading { margin-bottom: .6rem; } .lesson01-title { font-size: 1.7rem; } .lesson01-prompt, .lesson01-question { margin-block: .45rem; font-size: .96rem; line-height: 1.4; } .lesson01-card, .lesson01-worked-example { padding: .72rem; } .lesson01-action { min-height: 2.15rem; padding: .35rem .65rem; } .lesson01-step-controls { margin-top: .75rem; } .lesson01-model-diagram { height: calc(6rem + var(--lesson01-size) * .7rem); min-height: 6rem; } }
 
