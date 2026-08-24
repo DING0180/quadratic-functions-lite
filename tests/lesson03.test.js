@@ -8,7 +8,7 @@ describe("Lesson 03 y=ax²+k migration", () => {
     expect(LESSON03_STEP_TITLES).toEqual([
       "从 y=ax² 到 y=x²+1",
       "同 x 描点：每个 y 都 +1",
-      "从九个点到整体上移",
+      "从一个单位到 k 个单位",
       "推广：k 控制上下平移",
       "变化与不变",
       "顶点、增减性与最值",
@@ -19,7 +19,7 @@ describe("Lesson 03 y=ax²+k migration", () => {
     ]);
   });
 
-  it("lets students plot matching x-values before connecting the shifted curve", () => {
+  it("plots two colour-coded points for every x, then reveals and animates the vertical shift", () => {
     const stage = document.createElement("main");
     const changes = [];
     const lesson = renderLesson03(stage, { step: 2, onStepChange: (next) => changes.push(next) });
@@ -27,6 +27,8 @@ describe("Lesson 03 y=ax²+k migration", () => {
     stage.querySelector('[data-lesson03-point="0"]').click();
     expect(stage.textContent).toContain("(0, 0)");
     expect(stage.textContent).toContain("(0, 1)");
+    expect(Array.from(stage.querySelectorAll(".parabola-point"), (point) => point.getAttribute("fill")))
+      .toEqual(["#dc4055", "#2563eb"]);
     expect(stage.querySelector(".lesson03-connect").disabled).toBe(true);
 
     [-4, -3, -2, -1, 1, 2, 3, 4].forEach((x) => stage.querySelector(`[data-lesson03-point="${x}"]`).click());
@@ -34,7 +36,14 @@ describe("Lesson 03 y=ax²+k migration", () => {
 
     stage.querySelector(".lesson03-connect").click();
     expect(changes).toEqual([]);
-    expect(stage.querySelector(".lesson03-question").hidden).toBe(false);
+    expect(stage.querySelectorAll(".parabola-point")).toHaveLength(18);
+    expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(2);
+    expect(stage.querySelector("[data-lesson03-observe]").hidden).toBe(false);
+    expect(stage.querySelector("[data-lesson03-reveal]").hidden).toBe(false);
+
+    stage.querySelector("[data-lesson03-reveal]").click();
+    expect(stage.querySelector("[data-lesson03-answer]").hidden).toBe(false);
+    expect(stage.querySelector("[data-lesson03-overlap]").hidden).toBe(false);
     lesson.destroy();
   });
 
@@ -74,8 +83,57 @@ describe("Lesson 03 y=ax²+k migration", () => {
     lesson.destroy();
   });
 
-  it("uses compact graph panels in the tall animation and lab steps", () => {
-    [3, 4, 7, 8].forEach((step) => {
+  it("uses a graph-first layout for the k workbench", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson03(stage, { step: 4, onStepChange() {} });
+
+    expect(stage.querySelector(".lesson03-k-lab-layout")).not.toBeNull();
+    expect(stage.querySelector(".lesson03-k-lab-layout > .lesson03-workbench")).not.toBeNull();
+    expect(stage.querySelector(".lesson03-k-lab-layout > .lesson03-graph-panel")).not.toBeNull();
+    lesson.destroy();
+  });
+
+  it("pairs the properties reveal with a two-parabola observation animation", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson03(stage, { step: 6, onStepChange() {} });
+
+    expect(stage.querySelector(".lesson03-properties-layout")).not.toBeNull();
+    expect(stage.querySelectorAll(".parabola-curve")).toHaveLength(2);
+    expect(stage.querySelector(".lesson03-property-motion")).not.toBeNull();
+    expect(stage.querySelectorAll(".lesson03-property-table tbody tr:not([hidden])")).toHaveLength(0);
+
+    stage.querySelector("[data-lesson03-property-reveal]").click();
+    expect(stage.querySelectorAll(".lesson03-property-table tbody tr:not([hidden])")).toHaveLength(1);
+    expect(stage.querySelector(".lesson03-property-motion").textContent).toContain("开口方向");
+    lesson.destroy();
+  });
+
+  it("keeps the example graph hidden until students reveal the answer", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson03(stage, { step: 7, onStepChange() {} });
+
+    expect(stage.querySelector(".lesson03-example-layout")).not.toBeNull();
+    expect(stage.querySelectorAll(".lesson03-answer-input")).toHaveLength(3);
+    expect(stage.querySelector(".parabola-curve")).toBeNull();
+
+    stage.querySelector("[data-lesson03-example-reveal]").click();
+    expect(stage.querySelector(".parabola-curve")).not.toBeNull();
+    expect(stage.querySelector("[data-lesson03-example-answer]").hidden).toBe(false);
+    lesson.destroy();
+  });
+
+  it("balances the double-parameter workbench and graph in a two-column layout", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson03(stage, { step: 8, onStepChange() {} });
+
+    expect(stage.querySelector(".lesson03-parameter-layout")).not.toBeNull();
+    expect(stage.querySelector(".lesson03-parameter-layout > .lesson03-workbench")).not.toBeNull();
+    expect(stage.querySelector(".lesson03-parameter-layout > .lesson03-graph-panel")).not.toBeNull();
+    lesson.destroy();
+  });
+
+  it("uses a compact graph panel only where a large graph is not the teaching focus", () => {
+    [3].forEach((step) => {
       const stage = document.createElement("main");
       const lesson = renderLesson03(stage, { step, onStepChange() {} });
       expect(stage.querySelector(".lesson03-compact-graph")).not.toBeNull();
