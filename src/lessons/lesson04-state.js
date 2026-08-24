@@ -57,3 +57,32 @@ export function formatLesson04Formula({ a, h }) {
   validateVertexParameters({ a, h });
   return "y=" + formatCoefficient(a) + formatHorizontalTerm(h) + "^2";
 }
+
+const QUICK_CHECK_PARAMETERS = Object.freeze([
+  { a: 1, h: -3 },
+  { a: 2, h: 2 },
+  { a: -1, h: -2 },
+  { a: -0.5, h: 3 },
+  { a: 0.5, h: -1 },
+  { a: -2, h: 1 },
+]);
+
+export function createLesson04QuickCheck(random = Math.random) {
+  const safeRandom = Number(random());
+  const index = Number.isFinite(safeRandom)
+    ? Math.min(QUICK_CHECK_PARAMETERS.length - 1, Math.max(0, Math.floor(safeRandom * QUICK_CHECK_PARAMETERS.length)))
+    : 0;
+  const { a, h } = QUICK_CHECK_PARAMETERS[index];
+  const properties = getLesson04Properties({ a, h });
+  return {
+    a,
+    h,
+    formula: formatLesson04Formula({ a, h }),
+    direction: h < 0 ? "向左" : "向右",
+    units: Math.abs(h),
+    axis: properties.axisLatex,
+    vertex: properties.vertex,
+    monotonicity: properties.monotonicity,
+    monotonicityChoice: a > 0 ? "upward" : "downward",
+  };
+}

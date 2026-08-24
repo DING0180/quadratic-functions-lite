@@ -3,6 +3,7 @@ import {
   BASE_POINTS,
   SHIFTED_POINTS,
   TRANSLATION_ARROWS,
+  createLesson04QuickCheck,
   formatLesson04Formula,
   getLesson04Properties,
 } from "../src/lessons/lesson04-state.js";
@@ -39,5 +40,20 @@ describe("Lesson 04 migration mathematics", () => {
   it("rejects a zero coefficient or non-finite parameters", () => {
     expect(() => getLesson04Properties({ a: 0, h: 1 })).toThrow();
     expect(() => formatLesson04Formula({ a: 1, h: Infinity })).toThrow();
+  });
+
+  it("creates a checkable random y=a(x-h)² challenge with its derived properties", () => {
+    const challenge = createLesson04QuickCheck(() => 0);
+
+    expect(challenge).toMatchObject({
+      a: 1,
+      h: -3,
+      formula: "y=(x+3)^2",
+      direction: "向左",
+      units: 3,
+      axis: "x=-3",
+      vertex: { x: -3, y: 0 },
+      monotonicity: "在 x<-3 时递减，在 x>-3 时递增",
+    });
   });
 });

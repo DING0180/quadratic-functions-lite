@@ -275,15 +275,15 @@ body { min-width: 320px; }
 .lesson04-heading { margin-bottom: 1.1rem; }
 .lesson04-kicker { margin: 0; color: #1b765d; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.13em; }
 .lesson04-title { margin: 0.35rem 0 0; font-size: clamp(1.65rem, 3.1vw, 3rem); line-height: 1.18; }
-.lesson04-layout { display: grid; grid-template-columns: minmax(18rem, 63fr) minmax(17rem, 37fr); gap: clamp(1rem, 2vw, 1.75rem); align-items: start; }
+.lesson04-layout { display: grid; grid-template-columns: minmax(25rem, 70fr) minmax(18rem, 30fr); gap: clamp(1rem, 2vw, 1.75rem); align-items: start; }
 .lesson04-graph-panel, .lesson04-workbench {
   border: 1px solid #d5e0da;
   border-radius: 0.9rem;
   background: #fff;
   box-shadow: 0 0.35rem 1.35rem rgb(25 73 58 / 0.06);
 }
-.lesson04-graph-panel { min-width: 0; padding: 0.55rem; background: #fbfdfc; }
-.lesson04-graph-host { min-height: 19rem; }
+.lesson04-graph-panel { min-width: 0; padding: clamp(0.75rem, 1.2vw, 1rem); background: #fbfdfc; }
+.lesson04-graph-host, .lesson04-graph-host .parabola-svg { min-height: clamp(25rem, 50vh, 34rem); }
 .lesson04-workbench { display: grid; align-content: start; gap: 0.9rem; padding: clamp(1rem, 1.7vw, 1.45rem); }
 .lesson04-formula { margin: 0; color: #164f40; font-size: clamp(1.05rem, 1.5vw, 1.35rem); }
 .lesson04-prompt { margin: 0; color: #465a54; font-size: clamp(1rem, 1.2vw, 1.15rem); font-weight: 700; line-height: 1.65; }
@@ -297,6 +297,21 @@ body { min-width: 320px; }
 .lesson04-point-table th { color: #1b5d4c; font-weight: 800; }
 .lesson04-point-table td:nth-child(3) { color: #2563eb; font-weight: 800; }
 .lesson04-point-table td:nth-child(5) { color: #dc4055; font-weight: 800; }
+.lesson04-point-work, .lesson04-observation { display: grid; gap: 0.9rem; }
+.lesson04-property-table { width: 100%; border-collapse: collapse; color: #40524d; font-size: 0.92rem; }
+.lesson04-property-table th, .lesson04-property-table td { padding: 0.55rem 0.45rem; border-bottom: 1px solid #dce7e1; text-align: left; }
+.lesson04-property-table thead th { color: #1b5d4c; font-weight: 800; }
+.lesson04-property-table tbody tr { transition: background 180ms ease, color 180ms ease; }
+.lesson04-property-table tbody tr.is-active { background: #ecf8f4; color: #155f4d; }
+.lesson04-check-number { margin: 0; color: #1b765d; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.12em; }
+.lesson04-check-group { display: grid; gap: 0.45rem; margin: 0; padding: 0.7rem 0.8rem; border: 1px solid #d5e0da; border-radius: 0.65rem; }
+.lesson04-check-label { color: #365048; font-size: 0.93rem; font-weight: 800; }
+.lesson04-choice { display: flex; align-items: center; gap: 0.45rem; color: #465a54; cursor: pointer; }
+.lesson04-choice input { accent-color: #17634e; }
+.lesson04-text-answer { display: grid; gap: 0.35rem; }
+.lesson04-text-answer input { width: 100%; min-height: 2.35rem; padding: 0.45rem 0.6rem; border: 1px solid #b8c9c1; border-radius: 0.45rem; color: #223330; font: inherit; }
+.lesson04-text-answer input:focus { border-color: #17634e; outline: 3px solid rgb(23 99 78 / 0.18); }
+.lesson04-feedback { min-height: 2.8em; margin: 0; color: #1a6853; font-weight: 700; line-height: 1.5; }
 .lesson04-slider-label { color: #365048; font-weight: 800; }
 .lesson04-action {
   min-height: 2.65rem;
@@ -320,13 +335,13 @@ body { min-width: 320px; }
 
 @media (max-width: 860px) {
   .lesson04-layout { grid-template-columns: 1fr; }
-  .lesson04-graph-host { min-height: 17rem; }
+  .lesson04-graph-host, .lesson04-graph-host .parabola-svg { min-height: 20rem; }
 }
 
 @media (min-width: 761px) and (max-height: 760px) {
   .lesson04-heading { margin-bottom: 0.65rem; }
   .lesson04-title { font-size: 1.7rem; }
-  .lesson04-graph-host { min-height: 14rem; }
+  .lesson04-graph-host, .lesson04-graph-host .parabola-svg { min-height: 22rem; }
   .lesson04-workbench { gap: 0.55rem; padding: 0.75rem; }
   .lesson04-action { min-height: 2.15rem; padding: 0.35rem 0.65rem; }
   .lesson04-step-controls { margin-top: 0.75rem; padding-top: 0.6rem; }

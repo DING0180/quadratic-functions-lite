@@ -65,6 +65,7 @@ describe("parabola SVG", () => {
     const point = container.querySelector(".parabola-point");
     expect(point.getAttribute("r")).toBe("9");
     expect(point.getAttribute("fill")).toBe("#19735d");
+    expect(point.style.fill).toBe("rgb(25, 115, 93)");
   });
 
   it("renders optional labelled translation arrows", () => {

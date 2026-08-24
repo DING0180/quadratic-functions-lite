@@ -5,6 +5,7 @@ import {
   BASE_POINTS,
   SHIFTED_POINTS,
   TRANSLATION_ARROWS,
+  createLesson04QuickCheck,
   formatLesson04Formula,
   getLesson04Properties,
 } from "./lesson04-state.js";
@@ -14,11 +15,10 @@ const VIEWPORT = Object.freeze({ xMin: -4, xMax: 4, yMin: -4, yMax: 28 });
 const PLAYBACK_DELAY = 650;
 
 export const LESSON04_STEP_TITLES = Object.freeze([
-  "同 x 描点：两组点",
-  "连接两条抛物线",
-  "观察：向右平移 1 个单位",
-  "对应点验证",
+  "描点、连线与观察",
   "探索：y=(x-k)²",
+  "性质复习：y=(x-1)²",
+  "Quick Check",
 ]);
 
 function element(tag, className = "", text = "") {
@@ -44,7 +44,7 @@ function createRoot(step) {
   const root = element("section", "lesson04-step");
   const header = element("header", "lesson04-heading");
   header.append(
-    element("p", "lesson04-kicker", "LESSON 04 · " + String(step).padStart(2, "0") + " / 05"),
+    element("p", "lesson04-kicker", "LESSON 04 · " + String(step).padStart(2, "0") + " / " + String(LESSON04_STEP_TITLES.length).padStart(2, "0")),
     element("h2", "lesson04-title", LESSON04_STEP_TITLES[step - 1]),
   );
   root.append(header);
@@ -77,38 +77,27 @@ function createLayout(root, options, cleanup) {
   return { graph, workbench };
 }
 
-function addConclusion(workbench, text) {
+function addConclusion(container, text) {
   const conclusion = element("p", "lesson04-conclusion", text);
   conclusion.dataset.lesson04Conclusion = "";
   conclusion.hidden = true;
-  workbench.append(conclusion);
+  container.append(conclusion);
   return conclusion;
-}
-
-function addReveal(workbench, reveal) {
-  const control = button("揭示结论", "lesson04-action lesson04-secondary");
-  control.dataset.lesson04Reveal = "";
-  control.addEventListener("click", reveal);
-  workbench.append(control);
 }
 
 function baseCurve() {
   return { a: 1, color: COLORS.base };
 }
 
-function shiftedCurve(k = 1) {
-  return { a: 1, h: k, color: COLORS.shifted };
+function shiftedCurve(h = 1, a = 1) {
+  return { a, h, color: COLORS.shifted };
 }
 
 function colouredPoints(points, color) {
   return points.map((point) => ({ ...point, color, radius: 5 }));
 }
 
-function allPoints() {
-  return [...colouredPoints(BASE_POINTS, COLORS.base), ...colouredPoints(SHIFTED_POINTS, COLORS.shifted)];
-}
-
-function addLegend(workbench) {
+function addLegend(container) {
   const legend = element("div", "lesson04-legend");
   [[COLORS.base, "蓝色：y=x²"], [COLORS.shifted, "红色：y=(x-1)²"]].forEach(([color, text]) => {
     const item = element("span", "lesson04-legend-item");
@@ -117,7 +106,7 @@ function addLegend(workbench) {
     item.append(swatch, document.createTextNode(text));
     legend.append(item);
   });
-  workbench.append(legend);
+  container.append(legend);
 }
 
 function createPointTable() {
@@ -140,126 +129,93 @@ function fillPointRows(body, count) {
   }));
 }
 
-function renderPairedPlot(root, _onStepChange, cleanup) {
-  const { graph, workbench } = createLayout(root, { points: [], curves: [], ariaLabel: "同一组 x 值下 y 等于 x 平方与 y 等于 x 减一平方的描点比较" }, cleanup);
+function renderDiscovery(root, _onStepChange, cleanup) {
+  const { graph, workbench } = createLayout(root, {
+    points: [], curves: [], arrows: [],
+    ariaLabel: "同一组 x 值下 y 等于 x 平方与 y 等于 x 减一平方的描点、连线与平移观察",
+  }, cleanup);
   let visibleCount = 0;
   let connected = false;
+  let arrowCount = 0;
+  let playbackTimer = null;
+  const pointWork = element("div", "lesson04-point-work");
+  pointWork.dataset.lesson04PointWork = "";
+  const observation = element("div", "lesson04-observation");
+  observation.dataset.lesson04Observation = "";
+  observation.hidden = true;
   const { table, body } = createPointTable();
-  const status = element("p", "lesson04-status");
-  status.setAttribute("aria-live", "polite");
+  const pointStatus = element("p", "lesson04-status");
+  pointStatus.setAttribute("aria-live", "polite");
+  const observationStatus = element("p", "lesson04-status");
+  observationStatus.setAttribute("aria-live", "polite");
   const generate = button("生成下一组蓝红点");
   const connect = button("连接两条曲线", "lesson04-action lesson04-secondary");
   generate.dataset.lesson04GeneratePair = "";
   connect.dataset.lesson04ConnectPairs = "";
-  const conclusion = addConclusion(workbench, "九组相同的 x 值已经分别产生蓝点和红点；接下来连接两组点。 ");
-
-  function update() {
-    generate.disabled = visibleCount >= BASE_POINTS.length;
-    connect.disabled = visibleCount < BASE_POINTS.length;
-    status.textContent = connected
-      ? "两条曲线已连接：蓝色和红色各有 9 个点。"
-      : "已生成 " + visibleCount + "/" + BASE_POINTS.length + " 组同 x 的蓝红点。";
-    fillPointRows(body, visibleCount);
-    graph.update({
-      points: [...colouredPoints(BASE_POINTS.slice(0, visibleCount), COLORS.base), ...colouredPoints(SHIFTED_POINTS.slice(0, visibleCount), COLORS.shifted)],
-      curves: connected ? [baseCurve(), shiftedCurve()] : [],
-    });
-    conclusion.hidden = !connected;
-  }
-
-  generate.addEventListener("click", () => { visibleCount = Math.min(BASE_POINTS.length, visibleCount + 1); update(); });
-  connect.addEventListener("click", () => { if (visibleCount === BASE_POINTS.length) { connected = true; update(); } });
-  workbench.append(
-    formula("y=x^2", "蓝色函数 y 等于 x 平方"),
-    formula("y=(x-1)^2", "红色函数 y 等于 x 减一的平方"),
-    element("p", "lesson04-prompt", "每次固定同一个 x，同时计算两个函数值。例如 x=1 时，蓝点是 (1,1)，红点是 (1,0)。"),
-    table,
-    generate,
-    connect,
-    status,
-  );
-  addLegend(workbench);
-  addReveal(workbench, () => { visibleCount = BASE_POINTS.length; connected = true; update(); });
-  update();
-}
-
-function renderConnection(root, _onStepChange, cleanup) {
-  const { workbench } = createLayout(root, {
-    curves: [baseCurve(), shiftedCurve()],
-    points: allPoints(),
-    ariaLabel: "九个蓝色点和九个红色点连接成的两条抛物线",
-  }, cleanup);
-  const conclusion = addConclusion(workbench, "蓝色 y=x² 与红色 y=(x-1)² 的形状、开口方向完全相同。 ");
-  workbench.append(
-    formula("y=x^2", "蓝色函数"),
-    formula("y=(x-1)^2", "红色函数"),
-    element("p", "lesson04-prompt", "九个蓝点和九个红点都在同一个坐标系中。分别连接后，观察它们的形状和位置。"),
-  );
-  addLegend(workbench);
-  addReveal(workbench, () => { conclusion.hidden = false; });
-}
-
-function renderComparison(root, _onStepChange, cleanup) {
-  const { workbench } = createLayout(root, {
-    curves: [baseCurve(), shiftedCurve()],
-    points: allPoints(),
-    ariaLabel: "蓝色基准抛物线和红色右移一单位抛物线的比较",
-  }, cleanup);
-  const conclusion = addConclusion(workbench, "红色图象由蓝色图象向右平移 1 个单位得到：形状不变，顶点从 (0,0) 移到 (1,0)。");
-  workbench.append(
-    formula("y=x^2", "蓝色基准函数"),
-    formula("y=(x-1)^2", "红色新函数"),
-    element("p", "lesson04-prompt", "两条图象的开口与宽窄不变。红色顶点在哪里？它相对蓝色顶点怎样移动？"),
-  );
-  addLegend(workbench);
-  addReveal(workbench, () => { conclusion.hidden = false; });
-}
-
-function renderCorrespondence(root, _onStepChange, cleanup) {
-  const { graph, workbench } = createLayout(root, {
-    curves: [baseCurve(), shiftedCurve()], points: allPoints(), arrows: [],
-    ariaLabel: "选择八对可见对应点验证向右平移一单位",
-  }, cleanup);
-  let arrowCount = 0;
-  let playbackTimer = null;
-  const status = element("p", "lesson04-status");
-  status.setAttribute("aria-live", "polite");
-  const conclusion = addConclusion(workbench, "对应点的横坐标都 +1，纵坐标不变；因此图象整体向右平移 1 个单位。 ");
-  const showAll = button("显示对应点箭头");
+  const showAll = button("显示对应点移动");
   const play = button("逐对播放", "lesson04-action lesson04-secondary");
-  showAll.dataset.lesson04ShowArrows = "";
-  play.dataset.lesson04PlayArrows = "";
+  const conclusion = addConclusion(observation, "红色 y=(x-1)² 由蓝色 y=x² 向右平移 1 个单位得到：形状不变，顶点从 (0,0) 移到 (1,0)。");
 
   function cancelPlayback() {
     if (playbackTimer !== null) window.clearTimeout(playbackTimer);
     playbackTimer = null;
   }
+
   function update() {
-    status.textContent = "已显示 " + arrowCount + "/" + TRANSLATION_ARROWS.length + " 对可见对应点。";
-    conclusion.hidden = arrowCount < TRANSLATION_ARROWS.length;
-    graph.update({ arrows: TRANSLATION_ARROWS.slice(0, arrowCount).map((arrow) => ({ ...arrow, color: COLORS.arrow })) });
+    generate.disabled = visibleCount >= BASE_POINTS.length;
+    connect.disabled = visibleCount < BASE_POINTS.length;
+    fillPointRows(body, visibleCount);
+    pointWork.hidden = connected;
+    observation.hidden = !connected;
+    pointStatus.textContent = "已生成 " + visibleCount + "/" + BASE_POINTS.length + " 组同 x 的蓝红点。";
+    observationStatus.textContent = "已显示 " + arrowCount + "/" + TRANSLATION_ARROWS.length + " 对可见对应点。";
+    conclusion.hidden = !connected || arrowCount < TRANSLATION_ARROWS.length;
+    graph.update({
+      points: [...colouredPoints(BASE_POINTS.slice(0, visibleCount), COLORS.base), ...colouredPoints(SHIFTED_POINTS.slice(0, visibleCount), COLORS.shifted)],
+      curves: connected ? [baseCurve(), shiftedCurve()] : [],
+      arrows: connected ? TRANSLATION_ARROWS.slice(0, arrowCount).map((arrow) => ({ ...arrow, color: COLORS.arrow })) : [],
+    });
   }
-  function schedule() {
+
+  function playNext() {
     cancelPlayback();
-    if (arrowCount >= TRANSLATION_ARROWS.length) return;
-    playbackTimer = window.setTimeout(() => {
-      playbackTimer = null;
-      arrowCount = Math.min(TRANSLATION_ARROWS.length, arrowCount + 1);
-      update();
-      schedule();
-    }, PLAYBACK_DELAY);
+    if (arrowCount >= TRANSLATION_ARROWS.length) arrowCount = 0;
+    arrowCount += 1;
+    update();
+    if (arrowCount < TRANSLATION_ARROWS.length) playbackTimer = window.setTimeout(playNext, PLAYBACK_DELAY);
   }
-  showAll.addEventListener("click", () => { cancelPlayback(); arrowCount = TRANSLATION_ARROWS.length; update(); });
-  play.addEventListener("click", () => { if (arrowCount >= TRANSLATION_ARROWS.length) arrowCount = 0; arrowCount += 1; update(); schedule(); });
+
+  generate.addEventListener("click", () => {
+    visibleCount = Math.min(BASE_POINTS.length, visibleCount + 1);
+    update();
+  });
+  connect.addEventListener("click", () => {
+    if (visibleCount === BASE_POINTS.length) {
+      connected = true;
+      update();
+    }
+  });
+  showAll.addEventListener("click", () => {
+    cancelPlayback();
+    arrowCount = TRANSLATION_ARROWS.length;
+    update();
+  });
+  play.addEventListener("click", playNext);
   cleanup.push(cancelPlayback);
-  workbench.append(
-    formula("(x,y)\\longrightarrow(x+1,y)", "对应点向右移动一个单位"),
-    element("p", "lesson04-prompt", "从图中选取可同时看见的对应点：点的横坐标加 1，纵坐标不变。"),
-    showAll,
-    play,
-    status,
+
+  pointWork.append(
+    formula("y=x^2", "蓝色函数 y 等于 x 平方"),
+    formula("y=(x-1)^2", "红色函数 y 等于 x 减一的平方"),
+    element("p", "lesson04-prompt", "每次固定同一个 x，同时计算两个函数值。例如 x=1 时，蓝点是 (1,1)，红点是 (1,0)。"),
+    table, generate, connect, pointStatus,
   );
-  addReveal(workbench, () => { cancelPlayback(); arrowCount = TRANSLATION_ARROWS.length; update(); });
+  observation.append(
+    formula("(x,y)\\longrightarrow(x+1,y)", "对应点向右移动一个单位"),
+    element("p", "lesson04-prompt", "两条曲线已在同一个坐标系中。观察红色点如何对应蓝色点：横坐标怎样变化，纵坐标是否变化？"),
+    showAll, play, observationStatus,
+  );
+  workbench.append(pointWork, observation);
+  addLegend(workbench);
   update();
 }
 
@@ -278,7 +234,8 @@ function renderKLab(root, _onStepChange, cleanup) {
   const formulaHost = element("div", "lesson04-formula");
   const readout = element("p", "lesson04-status");
   readout.dataset.lesson04ShiftReadout = "";
-  const conclusion = addConclusion(workbench, "在 y=(x-k)² 中，k>0 时向右平移 k 个单位；k<0 时向左平移 |k| 个单位。 ");
+  const conclusion = addConclusion(workbench, "在 y=(x-k)² 中，k>0 时向右平移 k 个单位；k<0 时向左平移 |k| 个单位。");
+  const reveal = button("揭示结论", "lesson04-action lesson04-secondary");
 
   function update() {
     const k = Number(slider.value);
@@ -291,28 +248,177 @@ function renderKLab(root, _onStepChange, cleanup) {
   }
 
   slider.addEventListener("input", update);
+  reveal.addEventListener("click", () => { conclusion.hidden = false; });
   workbench.append(
-    formula("y=x^2", "蓝色基准函数"),
-    formulaHost,
-    element("label", "lesson04-slider-label", "改变 k，观察红色图象的左右移动"),
-    slider,
-    readout,
-    element("p", "lesson04-prompt", "蓝色 y=x² 保持不动。拖动滑块，比较红色 y=(x-k)² 与蓝色图象的位置。"),
+    formula("y=x^2", "蓝色基准函数"), formulaHost,
+    element("label", "lesson04-slider-label", "改变 k，观察红色图象的左右移动"), slider, readout,
+    element("p", "lesson04-prompt", "蓝色 y=x² 保持不动。拖动滑块，比较红色 y=(x-k)² 与蓝色图象的位置。"), reveal,
   );
   addLegend(workbench);
-  addReveal(workbench, () => { conclusion.hidden = false; });
   update();
 }
 
-const RENDERERS = Object.freeze([renderPairedPlot, renderConnection, renderComparison, renderCorrespondence, renderKLab]);
+function renderProperties(root, _onStepChange, cleanup) {
+  const { graph, workbench } = createLayout(root, {
+    curves: [baseCurve(), shiftedCurve()],
+    points: [{ x: 1, y: 0, color: COLORS.shifted, radius: 8 }],
+    guides: [{ x: 1, color: COLORS.shifted }],
+    ariaLabel: "y 等于 x 减一平方的顶点、对称轴和增减性复习",
+  }, cleanup);
+  const table = document.createElement("table");
+  table.className = "lesson04-property-table";
+  table.dataset.lesson04PropertiesTable = "";
+  table.innerHTML = "<thead><tr><th>性质</th><th>y=(x-1)²</th></tr></thead>";
+  const body = document.createElement("tbody");
+  const properties = [
+    ["顶点", "(1, 0)"],
+    ["对称轴", "x=1"],
+    ["增减性", "x<1 时递减；x>1 时递增"],
+    ["最小值", "0"],
+  ];
+  const rows = properties.map(([name, value]) => {
+    const row = document.createElement("tr");
+    row.append(element("th", "", name), element("td", "", value));
+    body.append(row);
+    return row;
+  });
+  table.append(body);
+  const status = element("p", "lesson04-status", "先从顶点 (1, 0) 开始观察。");
+  const nextProperty = button("逐条观察性质", "lesson04-action lesson04-secondary");
+  let activeIndex = 0;
 
-export function renderLesson04(stage, { step = 1, onStepChange = () => {} }) {
+  function update() {
+    rows.forEach((row, index) => row.classList.toggle("is-active", index === activeIndex));
+    const messages = [
+      "顶点从 (0,0) 向右移动到 (1,0)。",
+      "经过顶点的竖直直线 x=1 是对称轴。",
+      "顶点左侧 x<1 时递减；右侧 x>1 时递增。",
+      "开口向上，所以最小值是 0。",
+    ];
+    status.textContent = messages[activeIndex];
+    graph.update({
+      highlightedCurves: activeIndex === 2
+        ? [{ a: 1, h: 1, xMin: -4, xMax: 4, color: "#b45f06" }]
+        : [],
+    });
+  }
+
+  nextProperty.addEventListener("click", () => {
+    activeIndex = (activeIndex + 1) % properties.length;
+    update();
+  });
+  workbench.append(
+    formula("y=(x-1)^2", "复习函数 y 等于 x 减一的平方"),
+    element("p", "lesson04-prompt", "图象相对 y=x² 向右平移 1 个单位。用表格依次读出它的顶点、对称轴和增减性。"),
+    table, nextProperty, status,
+  );
+  addLegend(workbench);
+  update();
+}
+
+function createChoiceGroup(field, legend, choices) {
+  const group = document.createElement("fieldset");
+  group.className = "lesson04-check-group";
+  group.append(element("legend", "lesson04-check-label", legend));
+  choices.forEach(({ value, label }) => {
+    const choice = element("label", "lesson04-choice");
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "lesson04-" + field;
+    input.value = value;
+    input.dataset.lesson04Answer = field;
+    choice.append(input, document.createTextNode(label));
+    group.append(choice);
+  });
+  return group;
+}
+
+function createTextAnswer(field, label, placeholder) {
+  const wrapper = element("label", "lesson04-text-answer");
+  wrapper.append(element("span", "lesson04-check-label", label));
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = placeholder;
+  input.dataset.lesson04Answer = field;
+  wrapper.append(input);
+  return wrapper;
+}
+
+function normaliseAnswer(value) {
+  return String(value ?? "").replaceAll(" ", "").replaceAll("（", "(").replaceAll("）", ")");
+}
+
+function renderQuickCheck(root, _onStepChange, cleanup, random) {
+  const { graph, workbench } = createLayout(root, {
+    viewport: { xMin: -7, xMax: 7, yMin: -36, yMax: 36, yTickStep: 4 },
+    curves: [], ariaLabel: "随机 y 等于 a 乘 x 减 h 平方的性质检测图象",
+  }, cleanup);
+  const questionNumber = element("p", "lesson04-check-number");
+  const formulaHost = element("div", "lesson04-formula");
+  const direction = createChoiceGroup("direction", "相对 y=ax²，图象如何左右平移？", [
+    { value: "向左", label: "向左" }, { value: "向右", label: "向右" },
+  ]);
+  const units = createTextAnswer("units", "平移多少个单位？", "例如：3");
+  const axis = createTextAnswer("axis", "对称轴是什么？", "例如：x=2");
+  const vertex = createTextAnswer("vertex", "顶点坐标是什么？", "例如：(2, 0)");
+  const monotonicity = createChoiceGroup("monotonicity", "增减性是哪一种？", [
+    { value: "upward", label: "左减右增（开口向上）" }, { value: "downward", label: "左增右减（开口向下）" },
+  ]);
+  const check = button("检查答案");
+  check.dataset.lesson04Check = "";
+  const next = button("下一题（随机）", "lesson04-action lesson04-secondary");
+  const feedback = element("p", "lesson04-feedback");
+  feedback.dataset.lesson04Feedback = "";
+  feedback.setAttribute("aria-live", "polite");
+  let questionIndex = 0;
+  let challenge;
+
+  function chosen(field) {
+    return workbench.querySelector('[data-lesson04-answer="' + field + '"]:checked')?.value ?? "";
+  }
+
+  function updateChallenge() {
+    challenge = createLesson04QuickCheck(random);
+    questionIndex += 1;
+    questionNumber.textContent = "QUICK CHECK · " + String(questionIndex).padStart(2, "0");
+    formulaHost.replaceChildren();
+    renderFormula(formulaHost, challenge.formula, { ariaLabel: "题目函数 " + challenge.formula, displayMode: true });
+    graph.update({ curves: [{ a: challenge.a, h: challenge.h, color: COLORS.shifted }] });
+    workbench.querySelectorAll("[data-lesson04-answer]").forEach((input) => {
+      if (input.type === "radio") input.checked = false;
+      else input.value = "";
+    });
+    feedback.textContent = "先由 h 判断左右平移，再读出对称轴、顶点和增减性。";
+  }
+
+  check.addEventListener("click", () => {
+    const checks = [
+      ["平移方向", chosen("direction") === challenge.direction],
+      ["平移单位", Number(workbench.querySelector('[data-lesson04-answer="units"]').value) === challenge.units],
+      ["对称轴", normaliseAnswer(workbench.querySelector('[data-lesson04-answer="axis"]').value) === normaliseAnswer(challenge.axis)],
+      ["顶点", normaliseAnswer(workbench.querySelector('[data-lesson04-answer="vertex"]').value) === normaliseAnswer("(" + challenge.vertex.x + ",0)")],
+      ["增减性", chosen("monotonicity") === challenge.monotonicityChoice],
+    ];
+    const correct = checks.filter(([, result]) => result).length;
+    feedback.textContent = correct + " / 5 项正确。" + checks.map(([label, result]) => label + "：" + (result ? "正确" : "再想一想")).join("；");
+  });
+  next.addEventListener("click", updateChallenge);
+  workbench.append(
+    questionNumber,
+    element("p", "lesson04-prompt", "相对基准函数 y=ax²，独立判断这个函数的平移与图象性质。"),
+    formulaHost, direction, units, axis, vertex, monotonicity, check, next, feedback,
+  );
+  updateChallenge();
+}
+
+const RENDERERS = Object.freeze([renderDiscovery, renderKLab, renderProperties, renderQuickCheck]);
+
+export function renderLesson04(stage, { step = 1, onStepChange = () => {}, random = Math.random } = {}) {
   const safeStep = Math.min(RENDERERS.length, Math.max(1, Number(step) || 1));
   const cleanup = [];
   const root = createRoot(safeStep);
-  RENDERERS[safeStep - 1](root, onStepChange, cleanup);
+  RENDERERS[safeStep - 1](root, onStepChange, cleanup, random);
   appendNavigation(root, safeStep, onStepChange);
   stage.replaceChildren(root);
   return { destroy() { cleanup.forEach((dispose) => dispose()); } };
 }
-
