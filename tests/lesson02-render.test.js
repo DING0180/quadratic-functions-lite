@@ -31,6 +31,18 @@ describe("Lesson 02 parameter explorer", () => {
     view.destroy();
   });
 
+  it("keeps the extreme y=x² points inside the plotting area with visible breathing room", () => {
+    const stage = document.createElement("div");
+    const view = renderLesson02(stage, { step: 2, onStepChange() {} });
+
+    stage.querySelector('[data-x="4"]').click();
+    const point = stage.querySelector(".parabola-point");
+
+    expect(Number(point.getAttribute("cx"))).toBeLessThan(482);
+    expect(Number(point.getAttribute("cy"))).toBeGreaterThan(38);
+    view.destroy();
+  });
+
   it("reduces the lesson to eleven steps after merging point plotting and connection", () => {
     const stage = document.createElement("div");
     const view = renderLesson02(stage, { step: 12, onStepChange() {} });
