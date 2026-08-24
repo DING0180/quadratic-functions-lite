@@ -82,15 +82,15 @@ describe("Lesson 05 vertex-form integration", () => {
     lesson.destroy();
   });
 
-  it("keeps the random property graph hidden until students submit the y=2x² transformation answers", () => {
+  it("lets students reveal the random property answer and graph before completing every response", () => {
     const stage = document.createElement("main");
     const lesson = renderLesson05(stage, { step: 5, onStepChange() {}, random: () => 0 });
     const graph = stage.querySelector("[data-lesson05-property-graph]");
     const check = stage.querySelector("[data-lesson05-check-property]");
 
     check.click();
-    expect(graph.hidden).toBe(true);
-    expect(stage.querySelector("[data-lesson05-property-feedback]").textContent).toContain("请先完成");
+    expect(graph.hidden).toBe(false);
+    expect(stage.querySelector("[data-lesson05-property-feedback]").textContent).toContain("正确答案");
 
     const answer = (key, value) => {
       const input = stage.querySelector('[data-lesson05-property-answer="' + key + '"]');
@@ -112,4 +112,20 @@ describe("Lesson 05 vertex-form integration", () => {
     expect(stage.querySelector("[data-lesson05-property-feedback]").textContent).toContain("全部正确");
     lesson.destroy();
   });
+
+  it("uses an observable moving point before revealing the step-three properties", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson05(stage, { step: 3, onStepChange() {} });
+    const firstProperty = stage.querySelector("[data-lesson05-property-row]");
+    const motionStatus = stage.querySelector("[data-lesson05-property-motion-status]");
+
+    expect(stage.querySelector("[data-lesson05-property-graph]")).not.toBeNull();
+    expect(firstProperty.hidden).toBe(true);
+    stage.querySelector("[data-lesson05-property-motion]").click();
+    expect(motionStatus.textContent).toContain("左侧");
+    stage.querySelector("[data-lesson05-reveal-properties]").click();
+    expect(firstProperty.hidden).toBe(false);
+    lesson.destroy();
+  });
 });
+
