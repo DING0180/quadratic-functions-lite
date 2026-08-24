@@ -1,5 +1,6 @@
 import { renderFormula } from "../formula.js";
 import { createParabolaGraph } from "../graph/parabola-svg.js";
+import { applyClassroomSplit } from "../classroom-layout.js";
 import "./lesson03.css";
 import {
   LESSON03_POINT_X_VALUES,
@@ -198,7 +199,10 @@ function renderPointLab(root, onStepChange, cleanup) {
       const k = Number(progress.toFixed(2));
       graph.update({
         curves: [{ a: 1, k, color: COLORS.pointBase }, { a: 1, k: 1, color: COLORS.pointShifted }],
-        points: pairedPoints(),
+        points: state.rows.flatMap(({ x, baseY, shiftedY }) => [
+          { x, y: baseY + k, color: COLORS.pointBase },
+          { x, y: shiftedY, color: COLORS.pointShifted },
+        ]),
         labels: progress === 1 ? [{ x: 2.15, y: 7.8, text: "两条曲线重合" }] : [{ x: 2.15, y: 6 + k, text: "红色曲线向上移动" }],
       });
       if (progress === 1) overlap.disabled = false;
@@ -209,6 +213,7 @@ function renderPointLab(root, onStepChange, cleanup) {
     element("p", "lesson03-prompt", "每次选择同一个 x，同时描出红色原函数点与蓝色新函数点。"), choices, status, table, connect, observe, reveal, answer, overlap,
   );
   layout.append(graphPane, workbench);
+  applyClassroomSplit(layout, workbench, graphPane);
   root.append(layout);
   update();
 }
@@ -259,6 +264,7 @@ function renderKLab(root, _onStepChange, cleanup) {
     slider, functionReadout, readout, conclusion,
   );
   layout.append(workbench, graphPane);
+  applyClassroomSplit(layout, workbench, graphPane);
   root.append(layout);
 }
 
@@ -344,6 +350,7 @@ function renderProperties(root, _onStepChange, cleanup) {
   });
   workbench.append(element("h3", "", "先观察，再总结"), table, reveal, motion);
   layout.append(graphPane, workbench);
+  applyClassroomSplit(layout, workbench, graphPane);
   root.append(element("p", "lesson03-prompt", "固定 k 后，a 的符号仍决定开口方向、增减性和最值类型。"), layout);
 }
 
@@ -398,6 +405,7 @@ function renderExamples(root, _onStepChange, cleanup) {
   actions.append(next, reveal);
   workbench.append(question, prompt, ...fields, answer, actions);
   layout.append(workbench, graphPane);
+  applyClassroomSplit(layout, workbench, graphPane);
   root.append(layout);
   update();
 }
@@ -451,6 +459,7 @@ function renderParameterLab(root, _onStepChange, cleanup) {
   controls.append(...modes, keep, element("label", "", "a（形状）"), aInput, element("label", "", "k（上下位置）"), kInput);
   workbench.append(element("p", "lesson03-prompt", "使用 Study a、Study k 和 Free Mode 分开观察两个参数的职责。"), controls, readout, notice, element("p", "lesson03-question", "哪个参数控制形状？哪个参数控制上下位置？"), reveal, conclusion);
   layout.append(workbench, graphPane);
+  applyClassroomSplit(layout, workbench, graphPane);
   root.append(layout);
   update();
 }

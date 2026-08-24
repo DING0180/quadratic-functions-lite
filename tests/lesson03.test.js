@@ -44,6 +44,16 @@ describe("Lesson 03 y=ax²+k migration", () => {
     stage.querySelector("[data-lesson03-reveal]").click();
     expect(stage.querySelector("[data-lesson03-answer]").hidden).toBe(false);
     expect(stage.querySelector("[data-lesson03-overlap]").hidden).toBe(false);
+
+    const requestAnimationFrame = window.requestAnimationFrame;
+    window.requestAnimationFrame = (callback) => {
+      callback(performance.now() + 1200);
+      return 1;
+    };
+    stage.querySelector("[data-lesson03-overlap]").click();
+    window.requestAnimationFrame = requestAnimationFrame;
+    const [redPoint, bluePoint] = stage.querySelectorAll(".parabola-point");
+    expect(redPoint.getAttribute("cy")).toBe(bluePoint.getAttribute("cy"));
     lesson.destroy();
   });
 
