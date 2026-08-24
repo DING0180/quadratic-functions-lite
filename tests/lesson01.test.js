@@ -6,19 +6,25 @@ import * as lesson01 from "../src/lessons/lesson01.js";
 afterEach(() => document.body.replaceChildren());
 
 describe("Lesson 01 quadratic-function concepts", () => {
-  it("compares linear and quadratic functions side by side and highlights their actual exponents", () => {
+  it("reveals a vertical quadratic comparison only after the linear examples", () => {
     const stage = document.createElement("main");
     const lesson = lesson01.renderLesson01(stage, { step: 1, onStepChange() {} });
 
     expect(lesson01.LESSON01_STEP_TITLES).toHaveLength(5);
     expect(stage.querySelector(".lesson01-compare-grid")).not.toBeNull();
+    expect(stage.querySelector(".lesson01-linear-group .lesson01-example-grid").classList).toContain("is-vertical");
+    expect(stage.querySelector(".lesson01-quadratic-group .lesson01-example-grid").classList).toContain("is-vertical");
     expect(stage.querySelectorAll("[data-lesson01-linear-example]")).toHaveLength(3);
     expect(stage.querySelectorAll("[data-lesson01-quadratic-example]")).toHaveLength(3);
-    expect(stage.querySelector(".lesson01-quadratic-group").hidden).toBe(false);
+    expect(stage.querySelector(".lesson01-quadratic-group").hidden).toBe(true);
     expect(stage.querySelector("[data-lesson01-linear-form]").hidden).toBe(false);
-    expect(stage.querySelector("[data-lesson01-quadratic-form]").hidden).toBe(false);
+    expect(stage.querySelector("[data-lesson01-quadratic-form]").hidden).toBe(true);
 
     const advance = stage.querySelector("[data-lesson01-bridge-advance]");
+    advance.click();
+    expect(stage.querySelector(".lesson01-quadratic-group").hidden).toBe(false);
+    expect(stage.querySelector("[data-lesson01-quadratic-form]").hidden).toBe(false);
+    expect(advance.disabled).toBe(false);
     advance.click();
     expect(stage.querySelectorAll("[data-lesson01-power-badge]")).toHaveLength(0);
     expect(stage.querySelectorAll("[data-lesson01-power-highlight='1']")).toHaveLength(3);
@@ -30,7 +36,7 @@ describe("Lesson 01 quadratic-function concepts", () => {
     lesson.destroy();
   });
 
-  it("moves the existing formula tokens into term cards before revealing their labels", async () => {
+  it("keeps the original formula while colored copies move into term cards", async () => {
     const stage = document.createElement("main");
     const lesson = lesson01.renderLesson01(stage, { step: 2, onStepChange() {} });
 
@@ -45,61 +51,78 @@ describe("Lesson 01 quadratic-function concepts", () => {
 
     const advance = stage.querySelector("[data-lesson01-decompose-advance]");
     advance.click();
-    expect(quadraticToken.classList).toContain("is-flip-moving");
-    expect(source.querySelector("[data-lesson01-token-prefix]").classList).toContain("is-consumed");
-    expect(source.querySelector("[data-lesson01-token-separator='quadratic']").classList).toContain("is-consumed");
+    expect(stage.querySelector("[data-lesson01-flight-token='quadratic']").classList).toContain("is-flip-moving");
+    expect(source).toContain(quadraticToken);
+    expect(quadraticToken.classList).toContain("is-quadratic");
     await new Promise((resolve) => window.setTimeout(resolve));
-    expect(quadraticSlot).toContain(quadraticToken);
+    expect(source).toContain(quadraticToken);
+    expect(quadraticSlot.querySelector("[data-lesson01-decomposed-token='quadratic']")).not.toBeNull();
     expect(quadraticCard.classList).toContain("is-revealed");
     expect(quadraticCard.querySelector("[data-lesson01-token-label]").hidden).toBe(false);
     advance.click();
     await new Promise((resolve) => window.setTimeout(resolve));
-    expect(stage.querySelector("[data-lesson01-token-slot='linear']")).toContain(stage.querySelector("[data-lesson01-general-token='linear']"));
+    expect(stage.querySelector("[data-lesson01-token-slot='linear'] [data-lesson01-decomposed-token='linear']")).not.toBeNull();
     advance.click();
     await new Promise((resolve) => window.setTimeout(resolve));
-    expect(stage.querySelector("[data-lesson01-token-slot='constant']")).toContain(stage.querySelector("[data-lesson01-general-token='constant']"));
+    expect(stage.querySelector("[data-lesson01-token-slot='constant'] [data-lesson01-decomposed-token='constant']")).not.toBeNull();
     lesson.destroy();
   });
 
-  it("reveals a term after the FLIP safety timeout when an animation completion signal stalls", async () => {
+  it("reveals a copied term after the FLIP safety timeout when an animation completion signal stalls", async () => {
     vi.useFakeTimers();
     const stage = document.createElement("main");
     const lesson = lesson01.renderLesson01(stage, { step: 2, onStepChange() {} });
-    const token = stage.querySelector("[data-lesson01-general-token='quadratic']");
-    token.animate = () => ({ finished: new Promise(() => {}) });
+    const originalAnimate = HTMLElement.prototype.animate;
+    HTMLElement.prototype.animate = () => ({ finished: new Promise(() => {}) });
 
     stage.querySelector("[data-lesson01-decompose-advance]").click();
     await vi.advanceTimersByTimeAsync(650);
 
     expect(stage.querySelector("[data-lesson01-token-label='quadratic']").hidden).toBe(false);
     lesson.destroy();
+    HTMLElement.prototype.animate = originalAnimate;
     vi.useRealTimers();
   });
 
-  it("uses a shuffled quadratic expression for the coefficient quick check", () => {
+  it("asks all four term and coefficient questions and reveals each answer on the original formula", () => {
     const stage = document.createElement("main");
     const lesson = lesson01.renderLesson01(stage, { step: 3, onStepChange() {}, random: () => 0 });
     expect(stage.querySelector("[data-lesson01-practice-prompt]").textContent).toContain("二次项");
     expect(stage.querySelector("[data-lesson01-practice-function]").getAttribute("aria-label")).toContain("−3x²");
-    expect(stage.querySelector("[data-lesson01-practice-answer]").hidden).toBe(true);
+    expect(stage.querySelector("[data-lesson01-practice-answer-term='quadratic']")).toBeNull();
     stage.querySelector("[data-lesson01-practice-check]").click();
-    expect(stage.querySelector("[data-lesson01-practice-answer]").textContent).toContain("a=−3");
+    expect(stage.querySelector("[data-lesson01-practice-term='quadratic']").classList).toContain("is-answer-term");
     stage.querySelector("[data-lesson01-practice-reset]").click();
-    expect(stage.querySelector("[data-lesson01-practice-answer]").hidden).toBe(true);
+    expect(stage.querySelector("[data-lesson01-practice-prompt]").textContent).toContain("二次项系数");
+    stage.querySelector("[data-lesson01-practice-check]").click();
+    expect(stage.querySelector("[data-lesson01-practice-coefficient='quadratic']").classList).toContain("is-answer-coefficient");
+    stage.querySelector("[data-lesson01-practice-reset]").click();
+    expect(stage.querySelector("[data-lesson01-practice-prompt]").textContent).toContain("一次项");
+    stage.querySelector("[data-lesson01-practice-reset]").click();
+    expect(stage.querySelector("[data-lesson01-practice-prompt]").textContent).toContain("一次项系数");
     lesson.destroy();
   });
 
-  it("offers parallel standard, simplification, and parameter questions with independent new problems", () => {
+  it("shows one selected problem type at a time and keeps its new-problem interaction", () => {
     const stage = document.createElement("main");
     const lesson = lesson01.renderLesson01(stage, { step: 4, onStepChange() {}, random: () => 0 });
 
-    expect(stage.querySelectorAll("[data-lesson01-case]")).toHaveLength(3);
+    const selector = stage.querySelector("[data-lesson01-case-selector]");
+    expect(stage.querySelectorAll("[data-lesson01-case]")).toHaveLength(1);
+    expect(selector.value).toBe("standard");
     const standardFormula = stage.querySelector("[data-lesson01-case-formula='standard']");
     const before = standardFormula.getAttribute("aria-label");
     stage.querySelector("[data-lesson01-case-new='standard']").click();
     expect(standardFormula.getAttribute("aria-label")).not.toBe(before);
 
+    selector.value = "simplify";
+    selector.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(stage.querySelectorAll("[data-lesson01-case]")).toHaveLength(1);
     expect(stage.querySelector("[data-lesson01-case-new='simplify']")).not.toBeNull();
+
+    selector.value = "parameter";
+    selector.dispatchEvent(new Event("change", { bubbles: true }));
+    expect(stage.querySelectorAll("[data-lesson01-case]")).toHaveLength(1);
     expect(stage.querySelector("[data-lesson01-case-new='parameter']")).not.toBeNull();
     expect(stage.querySelector("[data-lesson01-parameter-coefficient]").getAttribute("aria-label")).toContain("(m+3)");
     expect(stage.querySelector("[data-lesson01-parameter-exponent]").getAttribute("aria-label")).toContain("m²−2m+1");

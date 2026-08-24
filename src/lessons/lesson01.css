@@ -11,14 +11,14 @@
 .lesson01-group-title { margin: 0 0 .55rem; color: #17634e; font-size: 1.05rem; }
 .lesson01-quadratic-group .lesson01-group-title { color: #5f3e8d; }
 .lesson01-example-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; }
+.lesson01-example-grid.is-vertical { grid-template-columns: 1fr; }
 .lesson01-example-formula { position: relative; min-width: 0; padding: .35rem .5rem; border: 1px solid #e0e9e4; border-radius: .5rem; background: #fbfdfc; }
 .lesson01-example-formula .lesson01-formula { margin: 0; text-align: center; font-size: clamp(.95rem, 1.3vw, 1.2rem); }
 .lesson01-standard-form { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem .85rem; margin-top: .65rem; padding: .5rem .7rem; border-left: 4px solid #1f8a70; border-radius: .45rem; background: #eef7f1; }
 .lesson01-standard-form .lesson01-formula, .lesson01-standard-form p { margin: 0; }
 .lesson01-quadratic-group .lesson01-standard-form { border-left-color: #7b55b7; background: #f6f1fb; }
 .lesson01-form-note { color: #465a54; font-size: .9rem; }
-.lesson01-example-formula.is-power-highlighted .msupsub { padding: .04em .13em .08em; border-radius: .28rem; background: #fff1c8; color: #a93d20; box-shadow: inset 0 0 0 2px #f2bd58; animation: lesson01-power-emphasis .46s cubic-bezier(.2, 1.3, .5, 1) both; }
-.lesson01-quadratic-group .lesson01-example-formula.is-power-highlighted .msupsub { color: #68429c; background: #f1eafb; box-shadow: inset 0 0 0 2px #af8cda; }
+.lesson01-example-formula.is-power-highlighted .msupsub > .vlist-t { color: #d84242; font-weight: 800; animation: lesson01-power-emphasis .46s cubic-bezier(.2, 1.3, .5, 1) both; }
 @keyframes lesson01-power-emphasis { from { opacity: .25; transform: scale(.78); } to { opacity: 1; transform: scale(1); } }
 .lesson01-card, .lesson01-worked-example { min-width: 0; padding: clamp(.85rem, 1.8vw, 1.3rem); border: 1px solid #d5e0da; border-radius: .9rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / .06); }
 .lesson01-card-label, .lesson01-coefficient { color: #17634e; font-weight: 800; }
@@ -38,9 +38,13 @@
 .lesson01-token-separator { transition: opacity .2s ease; }
 .lesson01-token-separator.is-muted { opacity: .18; }
 .lesson01-token-prefix.is-consumed, .lesson01-token-separator.is-consumed { opacity: 0; }
-.lesson01-general-token { will-change: transform, opacity; position: relative; z-index: 1; }
-.lesson01-general-token.is-flip-moving.is-css-fallback { transform: translate(var(--lesson01-flip-x), var(--lesson01-flip-y)); opacity: .72; }
-.lesson01-general-token.is-flip-moving.is-css-fallback.is-flip-settled { transform: translate(0, 0); opacity: 1; transition: transform 560ms cubic-bezier(.2, .8, .2, 1), opacity 560ms cubic-bezier(.2, .8, .2, 1); }
+.lesson01-general-token, .lesson01-decomposed-token, .lesson01-flight-token { will-change: transform, opacity; position: relative; z-index: 1; }
+.lesson01-general-token.is-quadratic, .lesson01-decomposed-token.is-quadratic, .lesson01-flight-token.is-quadratic { color: #1f8a70; }
+.lesson01-general-token.is-linear, .lesson01-decomposed-token.is-linear, .lesson01-flight-token.is-linear { color: #5f67b8; }
+.lesson01-general-token.is-constant, .lesson01-decomposed-token.is-constant, .lesson01-flight-token.is-constant { color: #d06f24; }
+.lesson01-flight-token { position: fixed; margin: 0; pointer-events: none; z-index: 20; }
+.lesson01-flight-token.is-flip-moving.is-css-fallback { transform: translate(0, 0); opacity: .82; }
+.lesson01-flight-token.is-flip-moving.is-css-fallback.is-flip-settled { transform: translate(var(--lesson01-flip-x), var(--lesson01-flip-y)); opacity: 1; transition: transform 560ms cubic-bezier(.2, .8, .2, 1), opacity 560ms cubic-bezier(.2, .8, .2, 1); }
 .lesson01-decomposition-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
 .lesson01-decomposition-card { visibility: hidden; min-width: 0; min-height: 5.4rem; padding: .8rem; border: 1px solid #d5e0da; border-top: 4px solid #1f8a70; border-radius: .75rem; background: #fff; opacity: 0; transition: opacity .18s ease; }
 .lesson01-decomposition-card.is-revealed { visibility: visible; opacity: 1; }
@@ -52,6 +56,8 @@
 .lesson01-decomposition-card p { margin: 0; color: #465a54; line-height: 1.5; }
 @keyframes lesson01-decomposition-in { from { opacity: 0; transform: translateY(.6rem); } to { opacity: 1; transform: translateY(0); } }
 .lesson01-case-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.lesson01-case-workspace { margin-top: .75rem; }
+.lesson01-case-workspace .lesson01-case-card { width: min(100%, 43rem); }
 .lesson01-case-card { display: grid; align-content: start; gap: .6rem; min-width: 0; padding: .85rem; border: 1px solid #d5e0da; border-top: 4px solid #1f8a70; border-radius: .8rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / .06); }
 .lesson01-case-card.is-simplify { border-top-color: #5f67b8; }
 .lesson01-case-card h3, .lesson01-case-prompt { margin: 0; }
@@ -69,6 +75,13 @@
 .lesson01-parameter-piece.is-coefficient { padding: .18rem .28rem; border-radius: .35rem; background: #fff0ee; color: #c83737; box-shadow: inset 0 0 0 1px #efb3ae; }
 .lesson01-parameter-piece.is-exponent { color: inherit; }
 .lesson01-parameter-piece.is-exponent .msupsub > .vlist-t { display: inline-block; padding: .16rem .28rem; border-radius: .35rem; background: #edf8f0; color: #19735d; box-shadow: inset 0 0 0 1px #a8d7b8; }
+.lesson01-practice-expression { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0; min-height: 5rem; }
+.lesson01-practice-expression .lesson01-formula { display: inline-block; margin: 0; }
+.lesson01-practice-term { display: inline-flex; align-items: center; border: 2px solid transparent; border-radius: .42rem; transition: border-color .18s ease, background .18s ease; }
+.lesson01-practice-term.is-answer-term { border-color: #d84242; background: #fff1ef; }
+.lesson01-practice-coefficient { border-radius: .28rem; transition: background .18s ease, color .18s ease, box-shadow .18s ease; }
+.lesson01-practice-coefficient.is-answer-coefficient { background: #eee8ff; color: #5f46a7; box-shadow: inset 0 0 0 2px #8063c7; }
+.lesson01-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .lesson01-general-formula { display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; padding: .85rem; border: 1px solid #d5e0da; border-radius: .8rem; background: #fff; }
 .lesson01-formula-part { margin: 0; padding: .35rem .45rem; border-radius: .45rem; transition: background .16s ease, box-shadow .16s ease; }
 .lesson01-formula-part.is-active { background: #e8f5ef; box-shadow: inset 0 0 0 2px #1f8a70; }
