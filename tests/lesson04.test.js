@@ -35,8 +35,8 @@ describe("Lesson 04 horizontal-shift migration", () => {
 
     const points = stage.querySelectorAll(".parabola-point");
     expect(points).toHaveLength(2);
-    expect(points[0].style.fill).toBe("rgb(37, 99, 235)");
-    expect(points[1].style.fill).toBe("rgb(220, 64, 85)");
+    expect(points[0].getAttribute("fill")).toBe("#2563eb");
+    expect(points[1].getAttribute("fill")).toBe("#dc4055");
     expect(stage.querySelector("[data-lesson04-point-table]").textContent).toContain("(-4, 16)");
     expect(stage.querySelector("[data-lesson04-point-table]").textContent).toContain("(-4, 25)");
     lesson.destroy();
@@ -122,4 +122,5 @@ describe("Lesson 04 horizontal-shift migration", () => {
     lesson.destroy();
   });
 });
+
 

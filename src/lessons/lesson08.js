@@ -86,9 +86,10 @@ function appendNavigation(root, step, onStepChange) {
   root.append(navigation);
 }
 
-function graphOptions({ parameters = ROOT_FUNCTION, viewport, points = [], labels = [], highlightedCurves = [], horizontalGuides = [], curves = null, ariaLabel = "二次函数图象" }) {
+function graphOptions({ parameters = ROOT_FUNCTION, viewport, xAxisTickMarks = false, points = [], labels = [], highlightedCurves = [], horizontalGuides = [], curves = null, ariaLabel = "二次函数图象" }) {
   return {
     viewport,
+    xAxisTickMarks,
     curves: curves ?? [{ ...parameters, color: COLORS.curve }],
     highlightedCurves,
     horizontalGuides,
@@ -192,7 +193,7 @@ function renderZoom(root, cleanup) {
   const sliderLabel = element("label", "lesson08-slider"); sliderLabel.append(element("span", "", "Zoom level"));
   const slider = document.createElement("input"); slider.type = "range"; slider.min = "0"; slider.max = String(ZOOM_STAGES.length - 1); slider.step = "1"; slider.value = "0"; slider.dataset.lesson08Zoom = ""; slider.setAttribute("aria-label", "Root Finder Zoom"); sliderLabel.append(slider);
   const table = element("div", "lesson08-value-table");
-  const graph = layoutWithGraph(root, cleanup, { viewport: ZOOM_STAGES[0].viewport }, workbench);
+  const graph = layoutWithGraph(root, cleanup, { viewport: ZOOM_STAGES[0].viewport, xAxisTickMarks: true }, workbench);
   function render() {
     const stage = ZOOM_STAGES[index]; const bracket = createRootBracket(ROOT_FUNCTION, ...stage.bracket);
     if (!stage.samples.includes(selected)) selected = stage.samples[0];
@@ -200,7 +201,7 @@ function renderZoom(root, cleanup) {
     viewportReadout.textContent = "当前坐标范围：x∈[" + number(stage.viewport.xMin) + ", " + number(stage.viewport.xMax) + "]";
     selectedReadout.textContent = "选中的函数值：f(" + number(selected) + ")=" + number(evaluate(ROOT_FUNCTION, selected));
     table.replaceChildren(...stage.samples.map((x) => { const sample = button("x=" + number(x) + " → " + number(evaluate(ROOT_FUNCTION, x)), "lesson08-sample"); sample.dataset.lesson08Sample = String(x); sample.setAttribute("aria-pressed", String(x === selected)); sample.addEventListener("click", () => { selected = x; render(); }); return sample; }));
-    updateGraph(graph, { viewport: stage.viewport, points: [{ x: bracket.left, y: bracket.leftValue, color: COLORS.root, radius: 6 }, { x: bracket.right, y: bracket.rightValue, color: COLORS.root, radius: 6 }, { x: selected, y: evaluate(ROOT_FUNCTION, selected), color: COLORS.guide, radius: 8 }], highlightedCurves: [{ ...ROOT_FUNCTION, xMin: bracket.left, xMax: bracket.right, color: COLORS.root }], ariaLabel: "Root Finder Zoom，当前根区间 " + rootIntervalText(bracket) + "，x 轴刻度每 " + number(stage.viewport.xTickStep) });
+    updateGraph(graph, { viewport: stage.viewport, xAxisTickMarks: true, points: [{ x: bracket.left, y: bracket.leftValue, color: COLORS.root, radius: 6 }, { x: bracket.right, y: bracket.rightValue, color: COLORS.root, radius: 6 }, { x: selected, y: evaluate(ROOT_FUNCTION, selected), color: COLORS.guide, radius: 8 }], highlightedCurves: [{ ...ROOT_FUNCTION, xMin: bracket.left, xMax: bracket.right, color: COLORS.root }], ariaLabel: "Root Finder Zoom，当前根区间 " + rootIntervalText(bracket) + "，x 轴刻度每 " + number(stage.viewport.xTickStep) });
   }
   slider.addEventListener("input", () => { index = Number(slider.value); render(); });
   workbench.append(element("p", "lesson08-prompt", "拖动 Zoom：真正改变坐标范围。点击函数值表的一行，图上的同一个取样点会亮起。"), formula("y=x^2-2", "y=x²-2", "lesson08-formula lesson08-current"), bracketReadout, viewportReadout, sliderLabel, table, selectedReadout); render();
@@ -409,4 +410,5 @@ export function renderLesson08(stage, { step = 1, onStepChange = () => {}, rando
   stage.replaceChildren(root);
   return { destroy() { cleanup.forEach((dispose) => dispose()); } };
 }
+
 

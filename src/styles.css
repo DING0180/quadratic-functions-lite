@@ -137,6 +137,8 @@ body { min-width: 320px; }
 .lesson02-graph-host { min-height: 17rem; }
 .parabola-svg { display: block; width: 100%; height: auto; min-height: 17rem; overflow: visible; }
 .parabola-axis { stroke: #7b8e87; stroke-width: 1.25; }
+.parabola-axis-tick { stroke: #52655f; stroke-width: 1.25; }
+.parabola-axis-tick[data-edge="true"] { stroke-width: 1.8; }
 .parabola-axis-name { fill: #40554e; font-size: 14px; font-style: italic; font-weight: 800; }
 .parabola-tick { fill: #60716b; font-size: 12px; text-anchor: middle; }
 .parabola-tick-y { text-anchor: start; }
@@ -367,3 +369,4 @@ body { min-width: 320px; }
   .lesson04-action { min-height: 2.15rem; padding: 0.35rem 0.65rem; }
   .lesson04-step-controls { margin-top: 0.75rem; padding-top: 0.6rem; }
 }
+

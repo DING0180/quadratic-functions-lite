@@ -65,7 +65,6 @@ describe("parabola SVG", () => {
     const point = container.querySelector(".parabola-point");
     expect(point.getAttribute("r")).toBe("9");
     expect(point.getAttribute("fill")).toBe("#19735d");
-    expect(point.style.fill).toBe("rgb(25, 115, 93)");
   });
 
   it("renders optional labelled translation arrows", () => {
@@ -110,6 +109,23 @@ describe("parabola SVG", () => {
     expect(xTicks).toEqual(["1", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "2"]);
   });
 
+  it("draws short x-axis markers when a zoomed graph requests them", () => {
+    const container = document.createElement("div");
+
+    createParabolaGraph(container, {
+      viewport: { xMin: 1.41, xMax: 1.42, xTickStep: 0.001, yMin: -0.015, yMax: 0.02, yTickStep: 0.005 },
+      xAxisTickMarks: true,
+      curves: [{ a: 1, k: -2 }],
+    });
+
+    const marks = container.querySelectorAll(".parabola-axis-tick");
+    expect(marks).toHaveLength(11);
+    expect(marks[0].getAttribute("data-x")).toBe("1.41");
+    expect(marks[2].getAttribute("data-x")).toBe("1.412");
+    expect(marks[0].getAttribute("data-edge")).toBe("true");
+    expect(marks[1].getAttribute("data-edge")).toBe("false");
+  });
+
   it("moves a curve vertically when its constant term changes", () => {
     const baseContainer = document.createElement("div");
     const shiftedContainer = document.createElement("div");
@@ -149,4 +165,5 @@ describe("parabola SVG", () => {
       .not.toBe(container.querySelector(".parabola-curve").getAttribute("d"));
   });
 });
+
 

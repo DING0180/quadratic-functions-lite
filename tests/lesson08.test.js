@@ -85,6 +85,10 @@ describe("Lesson 08 approximate roots and graph inequalities", () => {
     expect(stage.querySelector("[data-lesson08-current-bracket]").textContent).toContain("1.4");
     expect(xTicks()).toContain("1.41");
     expect(xTicks()).toContain("1.49");
+    expect(stage.querySelectorAll(".parabola-axis-tick")).toHaveLength(11);
+    zoom.value = "3";
+    zoom.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(Array.from(stage.querySelectorAll(".parabola-axis-tick"), (tick) => tick.getAttribute("data-x"))).toContain("1.412");
     stage.querySelector("[data-lesson08-sample='1.42']").click();
     expect(stage.querySelector("[data-lesson08-selected-sample]").textContent).toContain("1.42");
     lesson.destroy();
@@ -118,4 +122,5 @@ describe("Lesson 08 approximate roots and graph inequalities", () => {
     lesson.destroy();
   });
 });
+
 

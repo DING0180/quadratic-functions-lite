@@ -106,7 +106,7 @@ function appendGrid(svg, scale, id, viewport, customViewport) {
   svg.append(grid);
 }
 
-function appendAxes(svg, scale, id, viewport, customViewport) {
+function appendAxes(svg, scale, id, viewport, customViewport, xAxisTickMarks) {
   const xAxis = createSvgElement("line", "parabola-axis");
   xAxis.setAttribute("x1", String(PADDING));
   xAxis.setAttribute("x2", String(WIDTH - PADDING));
@@ -129,6 +129,18 @@ function appendAxes(svg, scale, id, viewport, customViewport) {
   for (let index = xTickStart; index <= xTickEnd; index += 1) {
     const value = Number((index * xTickStep).toFixed(8));
     if (value === 0) continue;
+    if (xAxisTickMarks) {
+      const edge = index === xTickStart || index === xTickEnd;
+      const markHalfLength = edge ? 6 : 4;
+      const marker = createSvgElement("line", "parabola-axis-tick");
+      marker.setAttribute("x1", String(scale.x(value)));
+      marker.setAttribute("x2", String(scale.x(value)));
+      marker.setAttribute("y1", String(scale.y(0) - markHalfLength));
+      marker.setAttribute("y2", String(scale.y(0) + markHalfLength));
+      marker.dataset.x = String(value);
+      marker.dataset.edge = String(edge);
+      svg.append(marker);
+    }
     const tick = createSvgElement("text", "parabola-tick");
     tick.setAttribute("x", String(scale.x(value)));
     tick.setAttribute("y", String(scale.y(0) + 18));
@@ -306,7 +318,7 @@ export function createParabolaGraph(container, initialOptions = {}) {
 
     appendDefinitions(svg, id);
     appendGrid(svg, scale, id, viewport, options.viewport != null);
-    appendAxes(svg, scale, id, viewport, options.viewport != null);
+    appendAxes(svg, scale, id, viewport, options.viewport != null, options.xAxisTickMarks === true);
     const plotContent = createSvgElement("g", "parabola-plot-content parabola-plot-area");
     plotContent.setAttribute("clip-path", "url(#" + id + "-plot-area)");
     options.guides.forEach((guide) => appendGuide(plotContent, guide, scale, viewport));
@@ -332,4 +344,5 @@ export function createParabolaGraph(container, initialOptions = {}) {
     },
   };
 }
+
 
