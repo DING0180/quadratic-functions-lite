@@ -179,6 +179,7 @@ function renderPlotter(root, onStepChange, cleanup) {
   const graphHost = element("div", "lesson02-graph-host");
   graphPane.append(graphHost);
   const graph = createParabolaGraph(graphHost, {
+    viewport: { xMin: -4.5, xMax: 4.5, yMin: -18, yMax: 18, yTickStep: 4 },
     curves: [{ a: 1, color: COLORS.positive }],
     points: [],
     curveProgress: 0,
