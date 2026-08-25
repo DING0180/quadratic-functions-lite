@@ -8,13 +8,14 @@ afterEach(() => {
 });
 
 describe("Lesson 06 general-form to vertex-form classroom", () => {
-  it("keeps the requested five-step knowledge-first flow", () => {
+  it("keeps the requested six-step knowledge-first flow with a parameter exploration lab", () => {
     expect(LESSON06_STEP_TITLES).toEqual([
       "Bridge In：两种形式",
       "教师示范：配方法",
       "配方后读顶点与对称轴",
       "Quick Random Challenge",
       "Summary + Bridge Out",
+      "参数探索实验室",
     ]);
   });
 
@@ -202,6 +203,28 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     expect(answer.textContent).toContain("x=3");
     expect(stage.querySelector(".parabola-svg")).not.toBeNull();
     expect(stage.querySelector("[data-lesson06-challenge-graph]").classList.contains("lesson06-challenge-graph")).toBe(true);
+    lesson.destroy();
+  });
+
+  it("puts vertex-form and general-form parameter controls beside independent live graphs", () => {
+    const stage = document.createElement("main");
+    const lesson = renderLesson06(stage, { step: 6, onStepChange() {} });
+
+    const vertexFormula = stage.querySelector("[data-lesson06-vertex-lab-formula]");
+    const generalFormula = stage.querySelector("[data-lesson06-general-lab-formula]");
+    const hControl = stage.querySelector('[data-lesson06-vertex-slider="h"]');
+    const bControl = stage.querySelector('[data-lesson06-general-slider="b"]');
+    expect(stage.querySelectorAll(".lesson06-parameter-graph .parabola-svg")).toHaveLength(2);
+    expect(stage.querySelectorAll("[data-lesson06-vertex-slider]")).toHaveLength(3);
+    expect(stage.querySelectorAll("[data-lesson06-general-slider]")).toHaveLength(3);
+    expect(stage.textContent).toContain("a、h、k 分别控制什么");
+
+    hControl.value = "2";
+    hControl.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(vertexFormula.getAttribute("aria-label")).toBe("y=(x-2)²");
+    bControl.value = "-4";
+    bControl.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(generalFormula.getAttribute("aria-label")).toBe("y=x²-4x");
     lesson.destroy();
   });
 });

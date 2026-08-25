@@ -4,7 +4,7 @@ import "./lesson06.css";
 
 const VIEWPORT = Object.freeze({ xMin: -6, xMax: 6, yMin: -8, yMax: 12, yTickStep: 2 });
 const COLORS = Object.freeze({ curve: "#19735d", vertex: "#c88818" });
-export const LESSON06_STEP_TITLES = Object.freeze(["Bridge In：两种形式", "教师示范：配方法", "配方后读顶点与对称轴", "Quick Random Challenge", "Summary + Bridge Out"]);
+export const LESSON06_STEP_TITLES = Object.freeze(["Bridge In：两种形式", "教师示范：配方法", "配方后读顶点与对称轴", "Quick Random Challenge", "Summary + Bridge Out", "参数探索实验室"]);
 
 function element(tag, className = "", text = "") { const node = document.createElement(tag); if (className) node.className = className; if (text) node.textContent = text; return node; }
 function button(text, className = "lesson06-action") { const node = element("button", className, text); node.type = "button"; return node; }
@@ -410,7 +410,77 @@ function renderChallengeDetailed(root, _change, cleanup, random) {
   render();
 }
 
+function parameterControl(label, key, state, options, dataset, onInput) {
+  const control = element("label", "lesson06-parameter-control");
+  const title = element("span", "lesson06-parameter-label", label);
+  const input = document.createElement("input");
+  input.type = "range";
+  input.min = String(options.min);
+  input.max = String(options.max);
+  input.step = String(options.step);
+  input.value = String(state[key]);
+  input.dataset[dataset] = key;
+  const output = element("output", "lesson06-parameter-value", key + "=" + number(state[key]));
+  input.addEventListener("input", () => {
+    let value = Number(input.value);
+    if (key === "a" && value === 0) { value = options.zeroFallback; input.value = String(value); }
+    state[key] = value;
+    output.textContent = key + "=" + number(value);
+    onInput();
+  });
+  control.append(title, input, output);
+  return control;
+}
+
+function renderParameterLab(root, _change, cleanup) {
+  const vertexState = { a: 1, h: 0, k: 0 };
+  const generalState = { a: 1, b: 0, c: 0 };
+  const layout = element("div", "lesson06-parameter-lab");
+  const vertexPanel = element("section", "lesson06-parameter-panel");
+  const generalPanel = element("section", "lesson06-parameter-panel");
+  const vertexFormula = formula(vertexText(vertexState), "lesson06-formula lesson06-hero", "lesson06VertexLabFormula");
+  const generalFormula = formula(generalText(generalState), "lesson06-formula lesson06-hero", "lesson06GeneralLabFormula");
+  const vertexControls = element("div", "lesson06-parameter-controls");
+  const generalControls = element("div", "lesson06-parameter-controls");
+  const vertexGraphPanel = element("div", "lesson06-graph-panel lesson06-parameter-graph");
+  const generalGraphPanel = element("div", "lesson06-graph-panel lesson06-parameter-graph");
+  const vertexGraph = addGraph(vertexGraphPanel, vertexState, cleanup, vertexText(vertexState) + " 的图象");
+  const generalGraph = addGraph(generalGraphPanel, vertexFromGeneral(generalState), cleanup, generalText(generalState) + " 的图象");
+  function updateVertex() {
+    const text = vertexText(vertexState);
+    renderFormula(vertexFormula, text.replaceAll("²", "^2"), { ariaLabel: text, displayMode: true });
+    updateGraph(vertexGraph, vertexState, text + " 的图象");
+  }
+  function updateGeneral() {
+    const text = generalText(generalState);
+    const vertex = vertexFromGeneral(generalState);
+    renderFormula(generalFormula, text.replaceAll("²", "^2"), { ariaLabel: text, displayMode: true });
+    updateGraph(generalGraph, vertex, text + " 的图象");
+  }
+  const aOptions = { min: -3, max: 3, step: .5, zeroFallback: .5 };
+  vertexControls.append(
+    parameterControl("二次项系数", "a", vertexState, aOptions, "lesson06VertexSlider", updateVertex),
+    parameterControl("水平位置", "h", vertexState, { min: -4, max: 4, step: .5 }, "lesson06VertexSlider", updateVertex),
+    parameterControl("竖直位置", "k", vertexState, { min: -5, max: 5, step: .5 }, "lesson06VertexSlider", updateVertex),
+  );
+  generalControls.append(
+    parameterControl("二次项系数", "a", generalState, aOptions, "lesson06GeneralSlider", updateGeneral),
+    parameterControl("一次项系数", "b", generalState, { min: -8, max: 8, step: 1 }, "lesson06GeneralSlider", updateGeneral),
+    parameterControl("常数项", "c", generalState, { min: -8, max: 8, step: 1 }, "lesson06GeneralSlider", updateGeneral),
+  );
+  vertexPanel.append(element("h3", "lesson06-parameter-title", "顶点式：拖动 a、h、k"), vertexFormula, vertexControls, vertexGraphPanel);
+  generalPanel.append(element("h3", "lesson06-parameter-title", "一般式：拖动 a、b、c"), generalFormula, generalControls, generalGraphPanel);
+  layout.append(vertexPanel, generalPanel);
+  const discussion = element("section", "lesson06-parameter-discussion");
+  discussion.append(
+    element("h3", "", "讨论与观察"),
+    element("p", "", "顶点式中，a、h、k 分别控制什么？先只拖动其中一个滑块，观察开口、对称轴和顶点怎样变化。"),
+    element("p", "", "一般式中，a、b、c 分别控制什么？固定另外两个系数再拖动一个；它与顶点式里的哪个变化最相近？"),
+  );
+  root.append(element("p", "lesson06-prompt", "左右两幅图像互不影响。每次只拖动一个参数，再说出你观察到的变化；a 不能等于 0。"), layout, discussion);
+}
+
 function renderSummary(root) { const route = element("div", "lesson06-summary-route"); ["一般式 (general form)", "配方法 (completing the square)", "顶点式 (vertex form)", "顶点 / 对称轴"].forEach((label, index) => { route.append(element("strong", "lesson06-route-node", label)); if (index < 3) route.append(element("span", "lesson06-route-arrow", "→")); }); root.append(route, element("p", "lesson06-bridge-out", "Bridge Out：令 y=0，一般式 y=ax²+bx+c 会变成一元二次方程；下一课将研究它与 x 轴的交点。")); }
 
-const RENDERERS = Object.freeze([renderBridge, renderDemoDetailed, renderInteractive, renderChallengeDetailed, renderSummary]);
+const RENDERERS = Object.freeze([renderBridge, renderDemoDetailed, renderInteractive, renderChallengeDetailed, renderSummary, renderParameterLab]);
 export function renderLesson06(stage, { step = 1, onStepChange = () => {}, random = Math.random }) { const safeStep = Math.min(LESSON06_STEP_TITLES.length, Math.max(1, Number(step) || 1)); const cleanup = []; const root = createRoot(safeStep); RENDERERS[safeStep - 1](root, onStepChange, cleanup, random); appendNavigation(root, safeStep, onStepChange); stage.replaceChildren(root); return { destroy() { cleanup.forEach((dispose) => dispose()); } }; }

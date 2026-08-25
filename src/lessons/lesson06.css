@@ -34,3 +34,16 @@
 .lesson06-challenge-layout { grid-template-columns: minmax(18rem, .78fr) minmax(31rem, 1.45fr); }
 .lesson06-challenge-graph .parabola-svg { min-height: clamp(30rem, 64vh, 42rem); }
 @media (min-width: 761px) and (max-height: 800px) { .lesson06-graph-panel.lesson06-challenge-graph .parabola-svg { min-height: 29rem !important; height: 62vh !important; } }
+.lesson06-parameter-lab { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; margin-top: .85rem; }
+.lesson06-parameter-panel { min-width: 0; padding: .9rem; border: 1px solid #d5e0da; border-radius: .9rem; background: #fff; box-shadow: 0 .35rem 1.35rem rgb(25 73 58 / 6%); }
+.lesson06-parameter-title { margin: 0 0 .45rem; color: #155f4d; font-size: 1.08rem; }
+.lesson06-parameter-panel .lesson06-hero { margin: 0; padding: .5rem .6rem; font-size: clamp(1.15rem, 1.8vw, 1.55rem); }
+.lesson06-parameter-controls { display: grid; gap: .55rem; margin-top: .8rem; }
+.lesson06-parameter-control { display: grid; grid-template-columns: 5.9rem minmax(0, 1fr) 4.4rem; gap: .55rem; align-items: center; color: #40554e; font-size: .9rem; font-weight: 700; }
+.lesson06-parameter-control input[type="range"] { width: 100%; margin: 0; accent-color: #19735d; cursor: pointer; }
+.lesson06-parameter-value { padding: .24rem .38rem; border-radius: .35rem; background: #eff8f4; color: #155f4d; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .84rem; font-weight: 800; text-align: center; }
+.lesson06-parameter-graph { width: 100%; margin-top: .8rem; padding: .35rem; }.lesson06-parameter-graph .parabola-svg { min-height: clamp(17rem, 38vh, 26rem); height: auto; }
+.lesson06-parameter-discussion { margin-top: 1rem; padding: .85rem .95rem; border-left: 5px solid #d98935; border-radius: .7rem; background: #fff9ed; color: #465a54; }.lesson06-parameter-discussion h3 { margin: 0; color: #7b5508; }.lesson06-parameter-discussion p { margin: .45rem 0 0; line-height: 1.55; }.lesson06-parameter-discussion p + p { padding-top: .45rem; border-top: 1px solid #f0d9a8; }
+@media (max-width: 850px) { .lesson06-parameter-lab { grid-template-columns: 1fr; } }
+@media (max-width: 460px) { .lesson06-parameter-control { grid-template-columns: 1fr 4.4rem; }.lesson06-parameter-label { grid-column: 1 / -1; } }
+@media (min-width: 761px) and (max-height: 800px) { .lesson06-parameter-panel { padding: .65rem; }.lesson06-parameter-controls { gap: .35rem; margin-top: .55rem; }.lesson06-parameter-graph .parabola-svg { min-height: 16rem; height: 35vh; }.lesson06-parameter-discussion { margin-top: .7rem; padding: .65rem .75rem; } }
