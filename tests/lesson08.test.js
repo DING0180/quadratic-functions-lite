@@ -69,11 +69,13 @@ describe("Lesson 08 approximate roots and graph inequalities", () => {
     lesson.destroy();
   });
 
-  it("zooms through successively tighter root brackets with matching decimal axis ticks", () => {
+  it("uses zoom controls only while retaining thousandth-place root ticks", () => {
     const stage = document.createElement("main");
     const lesson = lesson08.renderLesson08(stage, { step: 4, onStepChange() {} });
     const zoom = stage.querySelector("[data-lesson08-zoom]");
     const xTicks = () => Array.from(stage.querySelectorAll(".parabola-tick:not(.parabola-tick-y)"), (tick) => tick.textContent);
+    expect(stage.querySelectorAll("[data-lesson08-sample]")).toHaveLength(0);
+    expect(stage.querySelector("[data-lesson08-selected-sample]")).toBeNull();
     expect(xTicks()).toContain("1.1");
     expect(xTicks()).toContain("1.9");
     zoom.value = "1";
@@ -89,8 +91,6 @@ describe("Lesson 08 approximate roots and graph inequalities", () => {
     zoom.value = "3";
     zoom.dispatchEvent(new Event("input", { bubbles: true }));
     expect(Array.from(stage.querySelectorAll(".parabola-axis-tick"), (tick) => tick.getAttribute("data-x"))).toContain("1.412");
-    stage.querySelector("[data-lesson08-sample='1.42']").click();
-    expect(stage.querySelector("[data-lesson08-selected-sample]").textContent).toContain("1.42");
     lesson.destroy();
   });
 

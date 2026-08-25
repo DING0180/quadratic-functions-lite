@@ -178,33 +178,28 @@ function renderFirstBracket(root, cleanup) {
 }
 
 const ZOOM_STAGES = Object.freeze([
-  { bracket: [1, 2], viewport: { xMin: 1, xMax: 2, yMin: -1.2, yMax: 2.2, xTickStep: 0.1, yTickStep: 0.5 }, samples: [1, 1.3, 1.4, 1.5, 1.6, 2] },
-  { bracket: [1.3, 1.6], viewport: { xMin: 1.3, xMax: 1.6, yMin: -0.4, yMax: 0.7, xTickStep: 0.1, yTickStep: 0.1 }, samples: [1.3, 1.4, 1.42, 1.5, 1.6] },
-  { bracket: [1.4, 1.5], viewport: { xMin: 1.4, xMax: 1.5, yMin: -0.06, yMax: 0.28, xTickStep: 0.01, yTickStep: 0.05 }, samples: [1.4, 1.41, 1.42, 1.43, 1.44, 1.45, 1.49, 1.5] },
-  { bracket: [1.41, 1.42], viewport: { xMin: 1.41, xMax: 1.42, yMin: -0.015, yMax: 0.02, xTickStep: 0.001, yTickStep: 0.005 }, samples: [1.41, 1.413, 1.414, 1.415, 1.42] },
+  { bracket: [1, 2], viewport: { xMin: 1, xMax: 2, yMin: -1.2, yMax: 2.2, xTickStep: 0.1, yTickStep: 0.5 } },
+  { bracket: [1.3, 1.6], viewport: { xMin: 1.3, xMax: 1.6, yMin: -0.4, yMax: 0.7, xTickStep: 0.1, yTickStep: 0.1 } },
+  { bracket: [1.4, 1.5], viewport: { xMin: 1.4, xMax: 1.5, yMin: -0.06, yMax: 0.28, xTickStep: 0.01, yTickStep: 0.05 } },
+  { bracket: [1.41, 1.42], viewport: { xMin: 1.41, xMax: 1.42, yMin: -0.015, yMax: 0.02, xTickStep: 0.001, yTickStep: 0.005 } },
 ]);
 
 function renderZoom(root, cleanup) {
-  let index = 0; let selected = 1.4;
+  let index = 0;
   const workbench = element("div", "lesson08-workbench");
   const bracketReadout = element("p", "lesson08-status"); bracketReadout.dataset.lesson08CurrentBracket = "";
   const viewportReadout = element("p", "lesson08-status"); viewportReadout.dataset.lesson08ViewportReadout = "";
-  const selectedReadout = element("p", "lesson08-selected"); selectedReadout.dataset.lesson08SelectedSample = "";
   const sliderLabel = element("label", "lesson08-slider"); sliderLabel.append(element("span", "", "Zoom level"));
   const slider = document.createElement("input"); slider.type = "range"; slider.min = "0"; slider.max = String(ZOOM_STAGES.length - 1); slider.step = "1"; slider.value = "0"; slider.dataset.lesson08Zoom = ""; slider.setAttribute("aria-label", "Root Finder Zoom"); sliderLabel.append(slider);
-  const table = element("div", "lesson08-value-table");
   const graph = layoutWithGraph(root, cleanup, { viewport: ZOOM_STAGES[0].viewport, xAxisTickMarks: true }, workbench);
   function render() {
     const stage = ZOOM_STAGES[index]; const bracket = createRootBracket(ROOT_FUNCTION, ...stage.bracket);
-    if (!stage.samples.includes(selected)) selected = stage.samples[0];
     bracketReadout.textContent = "当前根区间 (current bracket)：x∈" + rootIntervalText(bracket);
     viewportReadout.textContent = "当前坐标范围：x∈[" + number(stage.viewport.xMin) + ", " + number(stage.viewport.xMax) + "]";
-    selectedReadout.textContent = "选中的函数值：f(" + number(selected) + ")=" + number(evaluate(ROOT_FUNCTION, selected));
-    table.replaceChildren(...stage.samples.map((x) => { const sample = button("x=" + number(x) + " → " + number(evaluate(ROOT_FUNCTION, x)), "lesson08-sample"); sample.dataset.lesson08Sample = String(x); sample.setAttribute("aria-pressed", String(x === selected)); sample.addEventListener("click", () => { selected = x; render(); }); return sample; }));
-    updateGraph(graph, { viewport: stage.viewport, xAxisTickMarks: true, points: [{ x: bracket.left, y: bracket.leftValue, color: COLORS.root, radius: 6 }, { x: bracket.right, y: bracket.rightValue, color: COLORS.root, radius: 6 }, { x: selected, y: evaluate(ROOT_FUNCTION, selected), color: COLORS.guide, radius: 8 }], highlightedCurves: [{ ...ROOT_FUNCTION, xMin: bracket.left, xMax: bracket.right, color: COLORS.root }], ariaLabel: "Root Finder Zoom，当前根区间 " + rootIntervalText(bracket) + "，x 轴刻度每 " + number(stage.viewport.xTickStep) });
+    updateGraph(graph, { viewport: stage.viewport, xAxisTickMarks: true, points: [{ x: bracket.left, y: bracket.leftValue, color: COLORS.root, radius: 6 }, { x: bracket.right, y: bracket.rightValue, color: COLORS.root, radius: 6 }], highlightedCurves: [{ ...ROOT_FUNCTION, xMin: bracket.left, xMax: bracket.right, color: COLORS.root }], ariaLabel: "Root Finder Zoom，当前根区间 " + rootIntervalText(bracket) + "，x 轴刻度每 " + number(stage.viewport.xTickStep) });
   }
   slider.addEventListener("input", () => { index = Number(slider.value); render(); });
-  workbench.append(element("p", "lesson08-prompt", "拖动 Zoom：真正改变坐标范围。点击函数值表的一行，图上的同一个取样点会亮起。"), formula("y=x^2-2", "y=x²-2", "lesson08-formula lesson08-current"), bracketReadout, viewportReadout, sliderLabel, table, selectedReadout); render();
+  workbench.append(element("p", "lesson08-prompt", "拖动 Zoom：坐标范围和 x 轴刻度会逐步细化。观察根落在哪两个相邻刻度之间。"), formula("y=x^2-2", "y=x²-2", "lesson08-formula lesson08-current"), bracketReadout, viewportReadout, sliderLabel); render();
 }
 
 function renderShrink(root, cleanup) {
