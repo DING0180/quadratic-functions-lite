@@ -70,6 +70,48 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     lesson.destroy();
   });
 
+  it("splits both 2 factors before moving their common factor outside the parentheses", () => {
+    vi.useFakeTimers();
+    try {
+      const stage = document.createElement("main");
+      const lesson = renderLesson06(stage, { step: 2, onStepChange() {} });
+      const next = stage.querySelector("[data-lesson06-demo-next]");
+      const animatedFormula = stage.querySelector("[data-lesson06-demo-formula]");
+
+      next.click();
+      expect(animatedFormula.getAttribute("aria-label")).toBe("y=\\color{#c25443}{2x^2-8x}+3");
+      vi.advanceTimersByTime(1900);
+      expect(animatedFormula.getAttribute("aria-label")).toBe("y=\\color{#c25443}{2}\\cdot x^2-\\color{#c25443}{2}\\cdot4x+3");
+      vi.advanceTimersByTime(1900);
+      expect(animatedFormula.getAttribute("aria-label")).toBe("y=\\color{#197b9b}{2}(x^2-4x)+3");
+      lesson.destroy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("shows +4, then -4, then groups the completed square in separate animation frames", () => {
+    vi.useFakeTimers();
+    try {
+      const stage = document.createElement("main");
+      const lesson = renderLesson06(stage, { step: 2, onStepChange() {} });
+      const next = stage.querySelector("[data-lesson06-demo-next]");
+      const animatedFormula = stage.querySelector("[data-lesson06-demo-formula]");
+
+      next.click();
+      vi.runAllTimers();
+      next.click();
+      expect(animatedFormula.getAttribute("aria-label")).toBe("y=2(x^2-4x\\color{#c88818}{+4})+3");
+      vi.advanceTimersByTime(1900);
+      expect(animatedFormula.getAttribute("aria-label")).toBe("y=2(x^2-4x+4\\color{#c88818}{-4})+3");
+      vi.advanceTimersByTime(1900);
+      expect(animatedFormula.getAttribute("aria-label")).toBe("y=2[\\color{#197b9b}{x^2-4x+4}-4]+3");
+      lesson.destroy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("keeps completed equations visible and lets students return to the previous stable equation", () => {
     vi.useFakeTimers();
     try {
@@ -96,24 +138,49 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     }
   });
 
-  it("merges completing-square practice with the direct-reading conclusion", () => {
-    const stage = document.createElement("main");
-    const lesson = renderLesson06(stage, { step: 3, onStepChange() {} });
+  it("starts the third page from the general form and only reveals the symbolic derivation through slow steps", () => {
+    vi.useFakeTimers();
+    try {
+      const stage = document.createElement("main");
+      const lesson = renderLesson06(stage, { step: 3, onStepChange() {} });
+      const next = stage.querySelector("[data-lesson06-symbolic-next]");
+      const panel = stage.querySelector("[data-lesson06-symbolic-conclusion]");
 
-    const formAnswer = stage.querySelector("[data-lesson06-practice-form]");
-    const formulaAnswer = stage.querySelector("[data-lesson06-practice-answer]");
-    const reveal = stage.querySelector("[data-lesson06-practice-reveal]");
-    expect(formAnswer.hidden).toBe(true);
-    expect(formulaAnswer.hidden).toBe(true);
-    reveal.click();
-    expect(formAnswer.hidden).toBe(false);
-    expect(formAnswer.querySelector(".lesson06-morph-formula").getAttribute("aria-label")).toBe("y=2(x-2)^2-5");
-    expect(formulaAnswer.hidden).toBe(true);
-    reveal.click();
-    expect(formulaAnswer.hidden).toBe(false);
-    expect(formulaAnswer.querySelector("[data-lesson06-direct-axis]").getAttribute("aria-label")).toBe("x=-\\frac{b}{2a}");
-    expect(formulaAnswer.querySelector("[data-lesson06-direct-vertex]").getAttribute("aria-label")).toBe("\\left(-\\frac{b}{2a},\\frac{4ac-b^2}{4a}\\right)");
-    lesson.destroy();
+      expect(stage.querySelector("[data-lesson06-symbolic-general]").getAttribute("aria-label")).toBe("y=ax^2+bx+c");
+      expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(1);
+      expect(panel.hidden).toBe(true);
+      next.click();
+      expect(next.disabled).toBe(true);
+      vi.runAllTimers();
+      expect(stage.querySelectorAll("[data-lesson06-symbolic-line]")).toHaveLength(2);
+      lesson.destroy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("reveals formula-typeset vertex and symmetry-axis conclusions after the symbolic square-completion", () => {
+    vi.useFakeTimers();
+    try {
+      const stage = document.createElement("main");
+      const lesson = renderLesson06(stage, { step: 3, onStepChange() {} });
+      const next = stage.querySelector("[data-lesson06-symbolic-next]");
+      while (!next.disabled) {
+        next.click();
+        vi.runAllTimers();
+      }
+      const panel = stage.querySelector("[data-lesson06-symbolic-conclusion]");
+      expect(panel.hidden).toBe(false);
+      const answer = stage.querySelector("[data-lesson06-hk-answer]");
+      expect(answer.hidden).toBe(true);
+      stage.querySelector("[data-lesson06-hk-reveal]").click();
+      expect(answer.hidden).toBe(false);
+      expect(answer.querySelector("[data-lesson06-direct-axis]").getAttribute("aria-label")).toBe("x=-\\frac{b}{2a}");
+      expect(answer.querySelector("[data-lesson06-direct-vertex]").getAttribute("aria-label")).toBe("\\left(-\\frac{b}{2a},\\frac{4ac-b^2}{4a}\\right)");
+      lesson.destroy();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("reveals a deterministic random challenge by reading coefficients and applying the direct formulas", () => {
@@ -121,10 +188,13 @@ describe("Lesson 06 general-form to vertex-form classroom", () => {
     const lesson = renderLesson06(stage, { step: 4, onStepChange() {}, random: () => 0.999 });
 
     const answer = stage.querySelector("[data-lesson06-challenge-answer]");
+    const graph = stage.querySelector("[data-lesson06-challenge-graph]");
     expect(answer).not.toBeNull();
     expect(answer.hidden).toBe(true);
+    expect(graph.hidden).toBe(true);
     stage.querySelector("[data-lesson06-challenge-reveal]").click();
     expect(answer.hidden).toBe(false);
+    expect(graph.hidden).toBe(false);
     expect(answer.textContent).toContain("a=-1，b=6，c=-6");
     expect(answer.querySelector("[data-lesson06-challenge-axis-formula]").getAttribute("aria-label")).toContain("x=-\\frac{b}{2a}");
     expect(answer.querySelector("[data-lesson06-challenge-vertex-formula]").getAttribute("aria-label")).toContain("\\frac{4ac-b^2}{4a}");

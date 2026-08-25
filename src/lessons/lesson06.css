@@ -9,7 +9,7 @@
 .lesson06-derivation-sequence { display: grid; gap: .65rem; width: min(100%, 58rem); }
 .lesson06-equation-stage { width: min(100%, 58rem); min-height: 13.5rem; padding: 1rem 1.1rem; border: 1px solid #d5e0da; border-left: 5px solid #c25443; border-radius: .85rem; background: #fff; box-shadow: 0 .2rem .8rem rgb(25 73 58 / 5%); }
 .lesson06-stage-formula { display: grid; place-items: center; min-height: 5.2rem; overflow: hidden; text-align: center; }
-.lesson06-stage-formula-moving .katex-display { animation: lesson06-formula-move .82s cubic-bezier(.2, .75, .24, 1) both; }
+.lesson06-stage-formula-moving .katex-display { animation: lesson06-formula-move 1.35s cubic-bezier(.2, .75, .24, 1) both; }
 @keyframes lesson06-formula-move { 0% { opacity: 0; transform: translateX(1.35rem) scale(.975); } 55% { opacity: 1; transform: translateX(-.18rem) scale(1.01); } 100% { opacity: 1; transform: translateX(0) scale(1); } }
 .lesson06-motion-controls { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
 .lesson06-derivation-line { padding: .7rem .85rem; border: 1px solid #d5e0da; border-left: 5px solid #71827b; border-radius: .75rem; background: #fff; box-shadow: 0 .2rem .8rem rgb(25 73 58 / 5%); }
