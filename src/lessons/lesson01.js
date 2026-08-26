@@ -176,7 +176,7 @@ function renderGeneral(root) {
     if (separator) source.append(separator);
   });
   const conclusion = element("p", "lesson01-reveal"); conclusion.hidden = true;
-  const advance = button("开始拆分：移动 ax²"); advance.dataset.lesson01DecomposeAdvance = "";
+  const advance = button("开始拆分：同时移动三项"); advance.dataset.lesson01DecomposeAdvance = "";
   let phase = 0;
   const activeFlights = new Set();
   function createDecomposedToken(part) {
@@ -251,30 +251,30 @@ function renderGeneral(root) {
   advance.addEventListener("click", async () => {
     if (advance.disabled) return;
     advance.disabled = true;
-    if (phase === 3) {
+    if (phase === 1) {
       focusCoefficient(parts[0]);
-      phase = 4;
+      phase = 2;
       advance.disabled = false;
       advance.textContent = "继续：聚焦一次项系数 b";
       return;
     }
-    if (phase === 4) {
+    if (phase === 2) {
       focusCoefficient(parts[1]);
-      phase = 5;
+      phase = 3;
       conclusion.textContent = "项是完整的一块：ax²、bx；系数是项中的一部分：a 是二次项系数，b 是一次项系数。";
       conclusion.hidden = false;
       advance.textContent = "系数已聚焦";
       return;
     }
-    const part = parts[phase];
-    await moveToken(part);
-    part.details.hidden = false;
-    phase += 1;
-    if (phase === 1) { advance.disabled = false; advance.textContent = "继续：移动 bx"; }
-    if (phase === 2) { advance.disabled = false; advance.textContent = "继续：最后移动 c"; }
-    if (phase === 3) { conclusion.textContent = "三项已经拆分完成。继续观察：每个完整的项中，哪一部分才是系数？"; conclusion.hidden = false; advance.disabled = false; advance.textContent = "继续：聚焦二次项系数 a"; }
+    await Promise.all(parts.map((part) => moveToken(part)));
+    parts.forEach((part) => { part.details.hidden = false; });
+    phase = 1;
+    conclusion.textContent = "三项已经同步拆分完成。继续观察：每个完整的项中，哪一部分才是系数？";
+    conclusion.hidden = false;
+    advance.disabled = false;
+    advance.textContent = "继续：聚焦二次项系数 a";
   });
-  root.append(element("p", "lesson01-prompt", "一般地，y=ax²+bx+c（a、b、c 为常数，a≠0）叫做二次函数。原式会保留；每次点击会复制一块同色数学 token，并平滑移动到对应位置。"), source, cards, advance, conclusion);
+  root.append(element("p", "lesson01-prompt", "一般地，y=ax²+bx+c（a、b、c 为常数，a≠0）叫做二次函数。原式会保留；点击后会同时复制三块同色数学 token，并平滑移动到对应位置。"), source, cards, advance, conclusion);
   return () => activeFlights.forEach((flight) => flight.remove());
 }
 

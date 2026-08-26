@@ -35,7 +35,7 @@ describe("Lesson 01 quadratic-function concepts", () => {
     expect(stage.querySelector("[data-lesson01-bridge-answer]").hidden).toBe(false);
     lesson.destroy();
   });
-  it("keeps the original formula while colored copies move into term cards", async () => {
+  it("keeps the original formula while all colored copies move into term cards together", async () => {
     const stage = document.createElement("main");
     const lesson = lesson01.renderLesson01(stage, { step: 2, onStepChange() {} });
 
@@ -50,7 +50,10 @@ describe("Lesson 01 quadratic-function concepts", () => {
 
     const advance = stage.querySelector("[data-lesson01-decompose-advance]");
     advance.click();
-    expect(stage.querySelector("[data-lesson01-flight-token='quadratic']").classList).toContain("is-flip-moving");
+    expect(stage.querySelectorAll("[data-lesson01-flight-token]")).toHaveLength(3);
+    ["quadratic", "linear", "constant"].forEach((id) => {
+      expect(stage.querySelector("[data-lesson01-flight-token='" + id + "']").classList).toContain("is-flip-moving");
+    });
     expect(source).toContain(quadraticToken);
     expect(quadraticToken.classList).toContain("is-quadratic");
     await new Promise((resolve) => window.setTimeout(resolve));
@@ -58,11 +61,7 @@ describe("Lesson 01 quadratic-function concepts", () => {
     expect(quadraticSlot.querySelector("[data-lesson01-decomposed-token='quadratic']")).not.toBeNull();
     expect(quadraticCard.classList).toContain("is-revealed");
     expect(quadraticCard.querySelector("[data-lesson01-token-label]").hidden).toBe(false);
-    advance.click();
-    await new Promise((resolve) => window.setTimeout(resolve));
     expect(stage.querySelector("[data-lesson01-token-slot='linear'] [data-lesson01-decomposed-token='linear']")).not.toBeNull();
-    advance.click();
-    await new Promise((resolve) => window.setTimeout(resolve));
     expect(stage.querySelector("[data-lesson01-token-slot='constant'] [data-lesson01-decomposed-token='constant']")).not.toBeNull();
     expect(advance.disabled).toBe(false);
     expect(advance.textContent).toContain("二次项系数 a");
@@ -87,7 +86,9 @@ describe("Lesson 01 quadratic-function concepts", () => {
     stage.querySelector("[data-lesson01-decompose-advance]").click();
     await vi.advanceTimersByTimeAsync(650);
 
-    expect(stage.querySelector("[data-lesson01-token-label='quadratic']").hidden).toBe(false);
+    ["quadratic", "linear", "constant"].forEach((id) => {
+      expect(stage.querySelector("[data-lesson01-token-label='" + id + "']").hidden).toBe(false);
+    });
     lesson.destroy();
     HTMLElement.prototype.animate = originalAnimate;
     vi.useRealTimers();
