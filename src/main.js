@@ -51,11 +51,12 @@ sidebarTogglePath.setAttribute("d", "m7 4 6 6-6 6");
 sidebarToggleIcon.append(sidebarTogglePath);
 sidebarToggle.append(sidebarToggleIcon);
 const brand = createElement("div", "brand");
-const brandTitle = createElement("h1", "brand-title", "二次函数");
-const brandSubtitle = createElement("p", "brand-subtitle", "互动课堂 · Lite");
+const brandTitle = createElement("h1", "brand-title", "二次函数互动课堂 · Lite");
+const brandSchool = createElement("p", "brand-school", "重庆德普外国语学校");
+const brandProgram = createElement("p", "brand-program", "双语初中 · 二次函数学习");
 const formula = createElement("div", "brand-formula");
 renderFormula(formula, "y=ax^2+bx+c", { ariaLabel: "二次函数一般式" });
-brand.append(brandTitle, brandSubtitle, formula);
+brand.append(brandTitle, brandSchool, brandProgram, formula);
 
 const navigation = createElement("nav", "lesson-navigation");
 navigation.id = "lesson-navigation";
@@ -78,6 +79,7 @@ root.replaceChildren(classroom);
 
 let activeLesson = null;
 let sidebarCollapsed = true;
+let sidebarOpeningTimer = null;
 
 function setSidebarCollapsed(collapsed) {
   sidebarCollapsed = collapsed;
@@ -85,6 +87,14 @@ function setSidebarCollapsed(collapsed) {
   sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
   sidebarToggle.setAttribute("aria-label", collapsed ? "展开课时导航" : "收起课时导航");
   sidebarToggle.title = collapsed ? "展开课时导航" : "收起课时导航";
+  window.clearTimeout(sidebarOpeningTimer);
+  sidebar.classList.remove("sidebar--opening");
+  if (!collapsed) {
+    sidebar.classList.add("sidebar--opening");
+    sidebarOpeningTimer = window.setTimeout(() => {
+      sidebar.classList.remove("sidebar--opening");
+    }, 760);
+  }
 }
 
 sidebarToggle.addEventListener("click", () => {
@@ -96,12 +106,14 @@ sidebar.addEventListener("click", (event) => {
 });
 
 function renderSidebar(activeLessonId) {
-  lessonList.replaceChildren(...COURSE.map((item) => {
+  lessonList.replaceChildren(...COURSE.map((item, index) => {
     const itemElement = document.createElement("li");
     const link = document.createElement("a");
     link.href = "#" + item.id;
     link.className = "lesson-link";
     link.dataset.lessonId = item.id;
+    link.style.setProperty("--sidebar-entry-index", String(index));
+    link.style.setProperty("--sidebar-entry-delay", String(index * 38) + "ms");
     if (item.id === activeLessonId) link.setAttribute("aria-current", "page");
 
     const number = createElement("span", "lesson-link-number", item.number);
