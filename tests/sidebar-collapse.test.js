@@ -18,7 +18,7 @@ describe("desktop sidebar collapse control", () => {
     const sidebar = document.querySelector(".sidebar");
     const toggle = document.querySelector(".sidebar-toggle");
     const lessonLinks = document.querySelectorAll(".lesson-link");
-    expect(document.querySelector(".brand-title").textContent).toBe("二次函数互动课堂 · Lite");
+    expect(document.querySelector(".brand-title")).toBeNull();
     expect(document.querySelector(".brand-school").textContent).toBe("重庆德普外国语学校");
     expect(document.querySelector(".brand-program").textContent).toBe("双语初中 · 二次函数学习");
     expect(lessonLinks).toHaveLength(11);
