@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LESSON06_STEP_TITLES, renderLesson06, vertexFromGeneral } from "../src/lessons/lesson06.js";
 
@@ -8,6 +10,13 @@ afterEach(() => {
 });
 
 describe("Lesson 06 general-form to vertex-form classroom", () => {
+  it("reserves a large, readable canvas for both parameter-lab graphs", () => {
+    const css = readFileSync(resolve(process.cwd(), "src/lessons/lesson06.css"), "utf8");
+
+    expect(css).toContain(".lesson06-parameter-graph .parabola-svg { min-height: clamp(24rem, 54vh, 34rem); height: auto; }");
+    expect(css).toContain(".lesson06-graph-panel.lesson06-parameter-graph .parabola-svg { min-height: 20rem !important; height: 45vh !important; }");
+  });
+
   it("keeps the requested six-step knowledge-first flow with a parameter exploration lab", () => {
     expect(LESSON06_STEP_TITLES).toEqual([
       "Bridge In：两种形式",
