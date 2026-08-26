@@ -39,6 +39,17 @@ function lessonStepHash(lessonId, step) {
 
 const classroom = createElement("div", "classroom");
 const sidebar = createElement("aside", "sidebar");
+const sidebarToggle = createElement("button", "sidebar-toggle");
+sidebarToggle.type = "button";
+sidebarToggle.setAttribute("aria-controls", "lesson-navigation");
+const sidebarToggleIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+sidebarToggleIcon.setAttribute("class", "sidebar-toggle-icon");
+sidebarToggleIcon.setAttribute("viewBox", "0 0 20 20");
+sidebarToggleIcon.setAttribute("aria-hidden", "true");
+const sidebarTogglePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+sidebarTogglePath.setAttribute("d", "m7 4 6 6-6 6");
+sidebarToggleIcon.append(sidebarTogglePath);
+sidebarToggle.append(sidebarToggleIcon);
 const brand = createElement("div", "brand");
 const brandTitle = createElement("h1", "brand-title", "二次函数");
 const brandSubtitle = createElement("p", "brand-subtitle", "互动课堂 · Lite");
@@ -47,11 +58,12 @@ renderFormula(formula, "y=ax^2+bx+c", { ariaLabel: "二次函数一般式" });
 brand.append(brandTitle, brandSubtitle, formula);
 
 const navigation = createElement("nav", "lesson-navigation");
+navigation.id = "lesson-navigation";
 navigation.setAttribute("aria-label", "课时导航");
 const navigationTitle = createElement("p", "navigation-label", "本章课时");
 const lessonList = createElement("ol", "lesson-list");
 navigation.append(navigationTitle, lessonList);
-sidebar.append(brand, navigation);
+sidebar.append(brand, navigation, sidebarToggle);
 
 const stage = createElement("section", "lesson-stage");
 stage.setAttribute("aria-live", "polite");
@@ -65,6 +77,23 @@ classroom.append(sidebar, stage);
 root.replaceChildren(classroom);
 
 let activeLesson = null;
+let sidebarCollapsed = true;
+
+function setSidebarCollapsed(collapsed) {
+  sidebarCollapsed = collapsed;
+  classroom.classList.toggle("classroom--sidebar-collapsed", collapsed);
+  sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+  sidebarToggle.setAttribute("aria-label", collapsed ? "展开课时导航" : "收起课时导航");
+  sidebarToggle.title = collapsed ? "展开课时导航" : "收起课时导航";
+}
+
+sidebarToggle.addEventListener("click", () => {
+  setSidebarCollapsed(!sidebarCollapsed);
+});
+
+sidebar.addEventListener("click", (event) => {
+  if (event.target === sidebar) setSidebarCollapsed(!sidebarCollapsed);
+});
 
 function renderSidebar(activeLessonId) {
   lessonList.replaceChildren(...COURSE.map((item) => {
@@ -132,6 +161,7 @@ function render() {
 }
 
 window.addEventListener("hashchange", render);
+setSidebarCollapsed(true);
 render();
 
 
