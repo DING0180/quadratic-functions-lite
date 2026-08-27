@@ -225,13 +225,19 @@ function appendHorizontalGuide(svg, guide, scale, viewport) {
 
 function appendPoint(svg, point, scale) {
   const [x, y] = Array.isArray(point) ? point : [point.x, point.y];
-  const circle = createSvgElement("circle", "parabola-point");
+  const extraClassName = Array.isArray(point) ? "" : point.className ?? "";
+  const circle = createSvgElement("circle", ["parabola-point", extraClassName].filter(Boolean).join(" "));
   circle.setAttribute("cx", String(scale.x(x)));
   circle.setAttribute("cy", String(scale.y(y)));
   circle.setAttribute("r", String(Array.isArray(point) ? 4 : point.radius ?? 4));
   if (!Array.isArray(point) && point.color) {
     circle.setAttribute("fill", point.color);
     circle.style.fill = point.color;
+  }
+  if (!Array.isArray(point)) {
+    Object.entries(point.attributes ?? {}).forEach(([name, value]) => {
+      if (value !== undefined && value !== null) circle.setAttribute(name, String(value));
+    });
   }
   svg.append(circle);
 }
@@ -348,5 +354,6 @@ export function createParabolaGraph(container, initialOptions = {}) {
     },
   };
 }
+
 
 
