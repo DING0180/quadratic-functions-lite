@@ -216,6 +216,9 @@ export function createHomeLanding() {
     draggingPointerId = event.pointerId ?? "mouse";
     graphHost.setPointerCapture?.(event.pointerId);
     renderManualState(vertexFromPointer(event));
+    // Updating the SVG replaces the original handle. Restore focus to its
+    // replacement so the same drag target remains keyboard-adjustable.
+    queueMicrotask(() => graphHost.querySelector(".home-vertex-handle")?.focus());
   }
 
   function handlePointerMove(event) {
