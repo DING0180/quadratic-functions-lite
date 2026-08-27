@@ -26,7 +26,8 @@ export function createHomeLanding() {
     element("p", "home-department-name", "双语初中数学组"),
   );
   identity.append(logo, identityCopy);
-  header.append(identity);
+  const courseMeta = element("p", "home-course-meta", "11 lessons · From graph to model");
+  header.append(identity, courseMeta);
 
   const content = element("section", "home-content");
   const introduction = element("div", "home-introduction");
@@ -53,7 +54,18 @@ export function createHomeLanding() {
   figure.append(graphHost, equation, caption);
 
   content.append(introduction, figure);
-  page.append(header, content);
+  const learningPath = element("ol", "home-learning-path");
+  [
+    ["01", "认识函数"],
+    ["02", "观察图象"],
+    ["03", "建立模型"],
+  ].forEach(([number, label]) => {
+    const item = element("li", "home-path-item");
+    item.append(element("span", "home-path-number", number), element("span", "home-path-label", label));
+    learningPath.append(item);
+  });
+
+  page.append(header, content, learningPath);
 
   const graph = createParabolaGraph(graphHost, {
     viewport: { xMin: -3, xMax: 5, yMin: -4, yMax: 8, xTickStep: 1, yTickStep: 2 },

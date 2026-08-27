@@ -8,6 +8,23 @@ afterEach(() => {
 });
 
 describe("desktop sidebar collapse control", () => {
+  it("returns from the classroom shell to the existing home route", async () => {
+    document.body.innerHTML = '<div id="app"></div>';
+    window.history.replaceState(null, "", "/#lesson-05/step-01");
+
+    await import("../src/main.js?sidebar-home-link-test=" + Date.now());
+
+    const homeLink = document.querySelector(".sidebar-home-link");
+    expect(homeLink).not.toBeNull();
+    expect(homeLink.getAttribute("href")).toBe("#home");
+    expect(homeLink.textContent).toContain("返回主页");
+
+    window.location.hash = homeLink.getAttribute("href");
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+
+    expect(document.querySelector(".home-shell")).not.toBeNull();
+  });
+
   it("starts compact and can reopen then collapse after changing lessons", async () => {
     document.body.innerHTML = '<div id="app"></div>';
     window.history.replaceState(null, "", "/#lesson-06/step-06");

@@ -6,24 +6,26 @@
   --home-rule: #d9cfb9;
   min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   padding: clamp(1.25rem, 2.8vw, 3.25rem) clamp(1.35rem, 5vw, 6.25rem) clamp(1.5rem, 3.4vw, 4rem);
-  background: var(--home-paper);
+  background: radial-gradient(circle at 76% 42%, rgb(255 253 247 / 0.94) 0 18%, transparent 48%), var(--home-paper);
   color: var(--home-ink);
 }
 
 .home-header,
 .home-content { width: min(100%, 88rem); margin-inline: auto; }
 
+.home-header { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
 .home-identity { display: inline-flex; align-items: center; gap: clamp(0.75rem, 1.4vw, 1.15rem); }
 .home-school-logo { width: clamp(2.75rem, 4.2vw, 4.25rem); height: clamp(2.75rem, 4.2vw, 4.25rem); object-fit: contain; mix-blend-mode: multiply; }
 .home-identity-copy { display: grid; gap: 0.12rem; padding-left: clamp(0.75rem, 1.4vw, 1.15rem); border-left: 1px solid var(--home-gold); }
 .home-school-name, .home-department-name { margin: 0; }
 .home-school-name { font-size: clamp(0.92rem, 1.1vw, 1.08rem); font-weight: 750; letter-spacing: 0.08em; }
 .home-department-name { color: var(--home-ink-soft); font-size: clamp(0.72rem, 0.84vw, 0.82rem); letter-spacing: 0.12em; }
+.home-course-meta { margin: 0; color: #6b7e76; font-family: Georgia, "Times New Roman", serif; font-size: clamp(0.7rem, 0.8vw, 0.8rem); letter-spacing: 0.08em; }
 
-.home-content { min-height: 0; display: grid; grid-template-columns: minmax(19rem, 0.82fr) minmax(25rem, 1.18fr); gap: clamp(2rem, 6vw, 7rem); align-items: center; padding-block: clamp(2rem, 5.5vh, 5rem) 0; }
+.home-content { min-height: 0; display: grid; grid-template-columns: minmax(19rem, 0.82fr) minmax(25rem, 1.18fr); gap: clamp(2rem, 6vw, 7rem); align-items: center; padding-block: clamp(1.25rem, 3.5vh, 3rem) 0; }
 .home-introduction { display: grid; justify-items: start; align-content: center; max-width: 34rem; }
 .home-course-kicker { margin: 0 0 clamp(1rem, 2vw, 1.85rem); color: var(--home-gold); font-size: clamp(0.7rem, 0.78vw, 0.82rem); font-weight: 800; letter-spacing: 0.16em; }
 .home-title { max-width: 8ch; margin: 0; color: var(--home-ink); font-family: "Noto Serif SC", "Songti SC", "STSong", serif; font-size: clamp(3rem, 5.3vw, 5.9rem); font-weight: 700; line-height: 1.06; letter-spacing: -0.055em; text-wrap: balance; }
@@ -40,13 +42,18 @@
 .home-math-visual { position: relative; min-width: 0; margin: 0; padding: clamp(0.75rem, 1.5vw, 1.35rem) clamp(0.6rem, 1.2vw, 1.1rem) clamp(1.25rem, 2vw, 1.8rem); border: 1px solid var(--home-rule); border-radius: 0.65rem; background: rgb(255 253 247 / 0.56); box-shadow: 0 1.4rem 3.2rem rgb(58 74 58 / 0.09); }
 .home-math-visual::before { content: ""; position: absolute; top: 0; left: clamp(1rem, 2vw, 1.8rem); width: 3.7rem; height: 0.2rem; background: var(--home-gold); }
 .home-graph-host { min-height: 0; }
-.home-math-visual .parabola-svg { min-height: 0; height: min(48dvh, 31rem); }
+.home-math-visual .parabola-svg { min-height: 0; height: min(40dvh, 27rem); }
 .home-math-visual .parabola-grid-line { stroke: #ddd7c8; stroke-width: 1; }
 .home-math-visual .parabola-axis { stroke: #789187; }
 .home-math-visual .parabola-tick { fill: #62766e; font-size: 11px; }
 .home-math-visual .parabola-label { fill: var(--home-ink); font-size: 14px; }
 .home-equation { width: max-content; max-width: calc(100% - 2rem); margin: -0.8rem auto 0; padding: 0.48rem 0.9rem; border: 1px solid #e2d7bd; border-radius: 0.25rem; background: #fbf7ed; color: var(--home-ink); font-size: clamp(1rem, 1.3vw, 1.3rem); }
 .home-graph-caption { margin-top: 0.75rem; color: #5d6e66; font-size: clamp(0.72rem, 0.82vw, 0.8rem); letter-spacing: 0.04em; text-align: center; }
+
+.home-learning-path { width: min(100%, 88rem); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 3rem); margin: clamp(1.2rem, 3.2vh, 2.2rem) auto 0; padding: clamp(0.85rem, 1.4vw, 1.15rem) 0 0; border-top: 1px solid var(--home-rule); list-style: none; }
+.home-path-item { display: flex; align-items: baseline; gap: 0.65rem; color: var(--home-ink-soft); }
+.home-path-number { color: var(--home-gold); font-family: Georgia, "Times New Roman", serif; font-size: clamp(0.82rem, 0.95vw, 0.98rem); }
+.home-path-label { font-size: clamp(0.78rem, 0.9vw, 0.92rem); font-weight: 700; letter-spacing: 0.06em; }
 
 @media (min-width: 761px) and (max-height: 800px) {
   .home-shell { padding-block: 1rem 1.25rem; }
@@ -57,13 +64,17 @@
   .home-summary { margin-top: 0.75rem; line-height: 1.55; }
   .home-start-learning { min-height: 3rem; margin-top: 1.15rem; padding-block: 0.5rem; }
   .home-math-visual .parabola-svg { height: min(46dvh, 23rem); }
+  .home-learning-path { margin-top: 0.85rem; padding-top: 0.65rem; }
 }
 
 @media (max-width: 760px) {
   .home-shell { overflow: visible; padding: 1.2rem 1.15rem 2.5rem; }
+  .home-header { align-items: flex-start; }
+  .home-course-meta { display: none; }
   .home-content { grid-template-columns: 1fr; gap: 2.4rem; padding-top: 2.5rem; }
   .home-title { max-width: 10ch; font-size: clamp(2.8rem, 12vw, 4.6rem); }
   .home-math-visual .parabola-svg { height: auto; min-height: 18rem; }
+  .home-learning-path { grid-template-columns: 1fr; gap: 0.7rem; margin-top: 1.8rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

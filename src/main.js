@@ -58,13 +58,26 @@ const formula = createElement("div", "brand-formula");
 renderFormula(formula, "y=ax^2+bx+c", { ariaLabel: "二次函数一般式" });
 brand.append(brandSchool, brandProgram, formula);
 
+const homeReturnLink = createElement("a", "sidebar-home-link");
+homeReturnLink.href = "#home";
+homeReturnLink.setAttribute("aria-label", "返回主页");
+const homeReturnIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+homeReturnIcon.setAttribute("class", "sidebar-home-icon");
+homeReturnIcon.setAttribute("viewBox", "0 0 24 24");
+homeReturnIcon.setAttribute("aria-hidden", "true");
+const homeReturnPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+homeReturnPath.setAttribute("d", "m3.5 10 8.5-7 8.5 7v9.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5V10Zm5.5 11v-6.5h6V21");
+homeReturnIcon.append(homeReturnPath);
+const homeReturnLabel = createElement("span", "sidebar-home-label", "返回主页");
+homeReturnLink.append(homeReturnIcon, homeReturnLabel);
+
 const navigation = createElement("nav", "lesson-navigation");
 navigation.id = "lesson-navigation";
 navigation.setAttribute("aria-label", "课时导航");
 const navigationTitle = createElement("p", "navigation-label", "本章课时");
 const lessonList = createElement("ol", "lesson-list");
 navigation.append(navigationTitle, lessonList);
-sidebar.append(brand, navigation, sidebarToggle);
+sidebar.append(brand, homeReturnLink, navigation, sidebarToggle);
 
 const stage = createElement("section", "lesson-stage");
 stage.setAttribute("aria-live", "polite");
