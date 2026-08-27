@@ -1,6 +1,7 @@
 import "./styles.css";
 import { COURSE, getLessonFromHash } from "./course.js";
 import { renderFormula } from "./formula.js";
+import { createHomeLanding } from "./home.js";
 import { renderLesson01 } from "./lessons/lesson01.js";
 import { renderLesson02 } from "./lessons/lesson02.js";
 import { renderLesson03 } from "./lessons/lesson03.js";
@@ -74,7 +75,7 @@ const stageStatus = createElement("p", "stage-status", "课堂壳已就绪");
 const stageMessage = createElement("p", "stage-message", "本课教学内容将在后续逐课加入。");
 
 classroom.append(sidebar, stage);
-root.replaceChildren(classroom);
+const home = createHomeLanding();
 
 let activeLesson = null;
 let sidebarCollapsed = true;
@@ -133,6 +134,15 @@ function renderGenericLesson(lesson) {
 function render() {
   activeLesson?.destroy();
   activeLesson = null;
+
+  const homeRoute = window.location.hash === "" || window.location.hash === "#home";
+  if (homeRoute) {
+    document.title = "二次函数互动课堂｜重庆德普外国语学校";
+    root.replaceChildren(home.element);
+    return;
+  }
+
+  root.replaceChildren(classroom);
 
   const lesson = getLessonFromHash(window.location.hash);
   const isLesson01 = lesson.id === "lesson-01";
