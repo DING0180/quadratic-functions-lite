@@ -14,6 +14,8 @@ const HOME_GRAPH_VIEWPORT = Object.freeze({ xMin: -3, xMax: 5, yMin: -4, yMax: 1
 const HOME_GRAPH_START = Object.freeze({ h: 0, k: 0 });
 const HOME_GRAPH_FINAL = Object.freeze({ h: 1, k: -2 });
 const HOME_GRAPH_DURATION = 2400;
+const HOME_GRAPH_SNAP = 0.5;
+const HOME_GRAPH_DRAG_BOUNDS = Object.freeze({ hMin: -2.5, hMax: 4.5, kMin: -3, kMax: 8 });
 
 function roundForDisplay(value) {
   const rounded = Math.round(value * 10) / 10;
@@ -22,6 +24,21 @@ function roundForDisplay(value) {
 
 function displayNumber(value) {
   return String(roundForDisplay(value)).replace("-", "−");
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function snapVertex(value) {
+  return roundForDisplay(Math.round(value / HOME_GRAPH_SNAP) * HOME_GRAPH_SNAP);
+}
+
+function normalizeVertex({ h, k }) {
+  return {
+    h: snapVertex(clamp(h, HOME_GRAPH_DRAG_BOUNDS.hMin, HOME_GRAPH_DRAG_BOUNDS.hMax)),
+    k: snapVertex(clamp(k, HOME_GRAPH_DRAG_BOUNDS.kMin, HOME_GRAPH_DRAG_BOUNDS.kMax)),
+  };
 }
 
 function homeFormulaState({ h, k }) {
@@ -34,13 +51,37 @@ function homeFormulaState({ h, k }) {
   return { latex: `y=(${horizontalTerm})^2${verticalTerm}`, ariaLabel: `二次函数，顶点为 ${displayNumber(horizontal)}，${displayNumber(vertical)}` };
 }
 
+function generalFormulaState({ h, k }) {
+  const horizontal = roundForDisplay(h);
+  const vertical = roundForDisplay(k);
+  const linear = roundForDisplay(-2 * horizontal);
+  const constant = roundForDisplay(horizontal ** 2 + vertical);
+  const signedTerm = (value, suffix = "") => value === 0 ? "" : `${value > 0 ? "+" : "-"}${Math.abs(value)}${suffix}`;
+  const spokenTerm = (value, suffix = "") => value === 0 ? "" : `${value > 0 ? "加" : "减"} ${Math.abs(value)}${suffix}`;
+  return {
+    latex: `y=x^2${signedTerm(linear, "x")}${signedTerm(constant)}`,
+    ariaLabel: `一般式：y 等于 x 平方${spokenTerm(linear, "x")}${constant === 0 ? "" : ` ${spokenTerm(constant)}`}`,
+  };
+}
+
 function graphOptions({ h, k }) {
   const point = { x: roundForDisplay(h), y: roundForDisplay(k) };
   return {
     viewport: HOME_GRAPH_VIEWPORT,
     plotPadding: 26,
     curves: [{ a: 1, h: point.x, k: point.y, color: "#075445" }],
-    points: [{ ...point, color: "#bd842e", radius: 6 }],
+    points: [{
+      ...point,
+      color: "#e34d45",
+      radius: 8,
+      className: "home-vertex-handle",
+      attributes: {
+        role: "slider",
+        tabindex: "0",
+        "aria-label": "拖拽顶点以改变二次函数图象",
+        "aria-valuetext": `顶点 V(${displayNumber(point.x)}, ${displayNumber(point.y)})`,
+      },
+    }],
     guides: [{ x: point.x, color: "#bd842e" }],
     labels: [{ x: point.x + 0.25, y: point.y + 0.8, text: `V(${displayNumber(point.x)}, ${displayNumber(point.y)})` }],
     ariaLabel: `二次函数图象，顶点为 ${displayNumber(point.x)}，${displayNumber(point.y)}，对称轴 x 等于 ${displayNumber(point.x)}`,
@@ -91,32 +132,27 @@ export function createHomeLanding() {
   const graphHost = element("div", "home-graph-host");
   const equation = element("div", "home-equation");
   const caption = element("figcaption", "home-graph-caption", "顶点 V(0, 0) · 对称轴 x = 0");
-  figure.append(graphHost, equation, caption);
+  const generalFormula = element("div", "home-general-form");
+  const formulaDetails = element("div", "home-function-details");
+  const vertexFormulaDetail = element("div", "home-vertex-form-detail");
+  vertexFormulaDetail.append(element("p", "home-formula-label", "顶点式"), equation, caption);
+  const generalFormulaDetail = element("div", "home-general-form-detail");
+  generalFormulaDetail.append(element("p", "home-formula-label", "一般式"), generalFormula);
+  formulaDetails.append(vertexFormulaDetail, generalFormulaDetail);
+  figure.append(graphHost, formulaDetails);
 
   content.append(introduction, figure);
-  const learningPath = element("ol", "home-learning-path");
-  [
-    ["01", "认识函数"],
-    ["02", "观察图象"],
-    ["03", "建立模型"],
-  ].forEach(([number, label]) => {
-    const item = element("li", "home-path-item");
-    item.append(element("span", "home-path-number", number), element("span", "home-path-label", label));
-    learningPath.append(item);
-  });
-
-  const learningJourney = element("section", "home-learning-journey");
-  learningJourney.setAttribute("aria-label", "学习路径");
-  learningJourney.append(element("p", "home-learning-label", "学习路径"), learningPath);
-  page.append(header, content, learningJourney);
+  page.append(header, content);
 
   let formulaBucket = -1;
-  function setMathCopy(state, progress) {
+  function setMathCopy(state, progress, force = false) {
     const bucket = Math.round(progress * 12);
-    if (bucket !== formulaBucket || progress === 1) {
+    if (force || bucket !== formulaBucket || progress === 1) {
       formulaBucket = bucket;
       const formula = homeFormulaState(state);
       renderFormula(equation, formula.latex, { ariaLabel: formula.ariaLabel });
+      const generalFormulaData = generalFormulaState(state);
+      renderFormula(generalFormula, generalFormulaData.latex, { ariaLabel: generalFormulaData.ariaLabel });
     }
     caption.textContent = `顶点 V(${displayNumber(state.h)}, ${displayNumber(state.k)}) · 对称轴 x = ${displayNumber(state.h)}`;
   }
@@ -129,6 +165,8 @@ export function createHomeLanding() {
   const cancel = window.cancelAnimationFrame ?? window.clearTimeout;
   let frame = null;
   let destroyed = false;
+  let currentState = HOME_GRAPH_START;
+  let draggingPointerId = null;
 
   function renderState(progress) {
     const eased = easeInOut(progress);
@@ -136,9 +174,79 @@ export function createHomeLanding() {
       h: HOME_GRAPH_START.h + (HOME_GRAPH_FINAL.h - HOME_GRAPH_START.h) * eased,
       k: HOME_GRAPH_START.k + (HOME_GRAPH_FINAL.k - HOME_GRAPH_START.k) * eased,
     };
+    currentState = state;
     graph.update(graphOptions(state));
     setMathCopy(state, progress);
   }
+
+  function renderManualState(nextState) {
+    if (frame !== null) {
+      cancel(frame);
+      frame = null;
+    }
+    currentState = normalizeVertex(nextState);
+    graph.update(graphOptions(currentState));
+    setMathCopy(currentState, 1, true);
+  }
+
+  function vertexFromPointer(event) {
+    const svg = graphHost.querySelector(".parabola-svg");
+    const bounds = svg?.getBoundingClientRect();
+    if (!bounds || bounds.width <= 0 || bounds.height <= 0) return currentState;
+    const renderedScale = Math.min(bounds.width / 520, bounds.height / 360);
+    const renderedWidth = 520 * renderedScale;
+    const renderedHeight = 360 * renderedScale;
+    const svgX = (event.clientX - bounds.left - (bounds.width - renderedWidth) / 2) / renderedScale;
+    const svgY = (event.clientY - bounds.top - (bounds.height - renderedHeight) / 2) / renderedScale;
+    const plotWidth = 520 - 52;
+    const plotHeight = 360 - 52;
+    return normalizeVertex({
+      h: HOME_GRAPH_VIEWPORT.xMin + ((svgX - 26) / plotWidth) * (HOME_GRAPH_VIEWPORT.xMax - HOME_GRAPH_VIEWPORT.xMin),
+      k: HOME_GRAPH_VIEWPORT.yMin + ((334 - svgY) / plotHeight) * (HOME_GRAPH_VIEWPORT.yMax - HOME_GRAPH_VIEWPORT.yMin),
+    });
+  }
+
+  function isVertexHandle(target) {
+    return target instanceof Element && target.closest(".home-vertex-handle");
+  }
+
+  function handlePointerDown(event) {
+    if (!isVertexHandle(event.target)) return;
+    event.preventDefault();
+    draggingPointerId = event.pointerId ?? "mouse";
+    graphHost.setPointerCapture?.(event.pointerId);
+    renderManualState(vertexFromPointer(event));
+  }
+
+  function handlePointerMove(event) {
+    if (draggingPointerId === null || (event.pointerId != null && event.pointerId !== draggingPointerId)) return;
+    renderManualState(vertexFromPointer(event));
+  }
+
+  function finishDragging(event) {
+    if (draggingPointerId === null || (event.pointerId != null && event.pointerId !== draggingPointerId)) return;
+    graphHost.releasePointerCapture?.(event.pointerId);
+    draggingPointerId = null;
+  }
+
+  function handleVertexKeyboard(event) {
+    if (!isVertexHandle(event.target)) return;
+    const adjustments = {
+      ArrowLeft: { h: -HOME_GRAPH_SNAP, k: 0 }, ArrowRight: { h: HOME_GRAPH_SNAP, k: 0 },
+      ArrowDown: { h: 0, k: -HOME_GRAPH_SNAP }, ArrowUp: { h: 0, k: HOME_GRAPH_SNAP },
+    };
+    const adjustment = adjustments[event.key];
+    if (!adjustment) return;
+    event.preventDefault();
+    renderManualState({ h: currentState.h + adjustment.h, k: currentState.k + adjustment.k });
+    graphHost.querySelector(".home-vertex-handle")?.focus();
+  }
+
+  graphHost.addEventListener("pointerdown", handlePointerDown);
+  graphHost.addEventListener("pointermove", handlePointerMove);
+  graphHost.addEventListener("pointerup", finishDragging);
+  graphHost.addEventListener("pointercancel", finishDragging);
+  graphHost.addEventListener("keydown", handleVertexKeyboard);
 
   if (reducedMotion) {
     renderState(1);
@@ -159,7 +267,13 @@ export function createHomeLanding() {
     destroy() {
       destroyed = true;
       if (frame !== null) cancel(frame);
+      graphHost.removeEventListener("pointerdown", handlePointerDown);
+      graphHost.removeEventListener("pointermove", handlePointerMove);
+      graphHost.removeEventListener("pointerup", finishDragging);
+      graphHost.removeEventListener("pointercancel", finishDragging);
+      graphHost.removeEventListener("keydown", handleVertexKeyboard);
       graph.destroy();
     },
   };
 }
+
