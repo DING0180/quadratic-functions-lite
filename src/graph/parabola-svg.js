@@ -23,9 +23,11 @@ function getViewport(options) {
     yMax: Y_MAX,
     xTickStep: 1,
     yTickStep: 4,
+    plotPadding: options.plotPadding ?? PADDING,
     ...(options.viewport ?? {}),
   };
   if (![viewport.xMin, viewport.xMax, viewport.yMin, viewport.yMax, viewport.xTickStep, viewport.yTickStep].every(Number.isFinite)
+    || !Number.isFinite(viewport.plotPadding) || viewport.plotPadding < 16 || viewport.plotPadding >= HEIGHT / 2
     || viewport.xMin >= viewport.xMax || viewport.yMin >= viewport.yMax || viewport.xTickStep <= 0 || viewport.yTickStep <= 0) {
     throw new TypeError("viewport needs finite increasing bounds");
   }
@@ -33,20 +35,21 @@ function getViewport(options) {
 }
 
 function createScale(viewport) {
-  const innerWidth = WIDTH - PADDING * 2;
-  const innerHeight = HEIGHT - PADDING * 2;
+  const padding = viewport.plotPadding;
+  const innerWidth = WIDTH - padding * 2;
+  const innerHeight = HEIGHT - padding * 2;
 
   return {
     x(value) {
-      return PADDING + ((value - viewport.xMin) / (viewport.xMax - viewport.xMin)) * innerWidth;
+      return padding + ((value - viewport.xMin) / (viewport.xMax - viewport.xMin)) * innerWidth;
     },
     y(value) {
-      return HEIGHT - PADDING - ((value - viewport.yMin) / (viewport.yMax - viewport.yMin)) * innerHeight;
+      return HEIGHT - padding - ((value - viewport.yMin) / (viewport.yMax - viewport.yMin)) * innerHeight;
     },
   };
 }
 
-function appendDefinitions(svg, id) {
+function appendDefinitions(svg, id, padding) {
   const defs = createSvgElement("defs");
   const marker = createSvgElement("marker", "parabola-axis-arrow");
   marker.setAttribute("id", id + "-axis-arrow");
@@ -64,10 +67,10 @@ function appendDefinitions(svg, id) {
   const clipPath = createSvgElement("clipPath");
   clipPath.setAttribute("id", id + "-plot-area");
   const rect = createSvgElement("rect");
-  rect.setAttribute("x", String(PADDING));
-  rect.setAttribute("y", String(PADDING));
-  rect.setAttribute("width", String(WIDTH - PADDING * 2));
-  rect.setAttribute("height", String(HEIGHT - PADDING * 2));
+  rect.setAttribute("x", String(padding));
+  rect.setAttribute("y", String(padding));
+  rect.setAttribute("width", String(WIDTH - padding * 2));
+  rect.setAttribute("height", String(HEIGHT - padding * 2));
   clipPath.append(rect);
   defs.append(marker, clipPath);
   svg.append(defs);
@@ -107,9 +110,10 @@ function appendGrid(svg, scale, id, viewport, customViewport) {
 }
 
 function appendAxes(svg, scale, id, viewport, customViewport, xAxisTickMarks) {
+  const padding = viewport.plotPadding;
   const xAxis = createSvgElement("line", "parabola-axis");
-  xAxis.setAttribute("x1", String(PADDING));
-  xAxis.setAttribute("x2", String(WIDTH - PADDING));
+  xAxis.setAttribute("x1", String(padding));
+  xAxis.setAttribute("x2", String(WIDTH - padding));
   xAxis.setAttribute("y1", String(scale.y(0)));
   xAxis.setAttribute("y2", String(scale.y(0)));
   xAxis.setAttribute("marker-end", "url(#" + id + "-axis-arrow)");
@@ -118,8 +122,8 @@ function appendAxes(svg, scale, id, viewport, customViewport, xAxisTickMarks) {
   const yAxis = createSvgElement("line", "parabola-axis");
   yAxis.setAttribute("x1", String(scale.x(0)));
   yAxis.setAttribute("x2", String(scale.x(0)));
-  yAxis.setAttribute("y1", String(HEIGHT - PADDING));
-  yAxis.setAttribute("y2", String(PADDING));
+  yAxis.setAttribute("y1", String(HEIGHT - padding));
+  yAxis.setAttribute("y2", String(padding));
   yAxis.setAttribute("marker-end", "url(#" + id + "-axis-arrow)");
   svg.append(yAxis);
 
@@ -161,14 +165,14 @@ function appendAxes(svg, scale, id, viewport, customViewport, xAxisTickMarks) {
   });
 
   const xName = createSvgElement("text", "parabola-axis-name");
-  xName.setAttribute("x", String(WIDTH - PADDING - 3));
+  xName.setAttribute("x", String(WIDTH - padding - 3));
   xName.setAttribute("y", String(scale.y(0) - 9));
   xName.textContent = "x";
   svg.append(xName);
 
   const yName = createSvgElement("text", "parabola-axis-name");
   yName.setAttribute("x", String(scale.x(0) - 9));
-  yName.setAttribute("y", String(PADDING + 12));
+  yName.setAttribute("y", String(padding + 12));
   yName.setAttribute("text-anchor", "end");
   yName.textContent = "y";
   svg.append(yName);
@@ -316,7 +320,7 @@ export function createParabolaGraph(container, initialOptions = {}) {
     svg.setAttribute("role", "img");
     svg.setAttribute("aria-label", options.ariaLabel ?? "二次函数图象");
 
-    appendDefinitions(svg, id);
+    appendDefinitions(svg, id, viewport.plotPadding);
     appendGrid(svg, scale, id, viewport, options.viewport != null);
     appendAxes(svg, scale, id, viewport, options.viewport != null, options.xAxisTickMarks === true);
     const plotContent = createSvgElement("g", "parabola-plot-content parabola-plot-area");

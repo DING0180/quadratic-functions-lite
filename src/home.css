@@ -28,30 +28,33 @@
 .home-content { min-height: 0; display: grid; grid-template-columns: minmax(19rem, 0.82fr) minmax(25rem, 1.18fr); gap: clamp(2rem, 6vw, 7rem); align-items: center; padding-block: clamp(1.25rem, 3.5vh, 3rem) 0; }
 .home-introduction { display: grid; justify-items: start; align-content: center; max-width: 34rem; }
 .home-course-kicker { margin: 0 0 clamp(1rem, 2vw, 1.85rem); color: var(--home-gold); font-size: clamp(0.7rem, 0.78vw, 0.82rem); font-weight: 800; letter-spacing: 0.16em; }
-.home-title { max-width: 8ch; margin: 0; color: var(--home-ink); font-family: "Noto Serif SC", "Songti SC", "STSong", serif; font-size: clamp(3rem, 5.3vw, 5.9rem); font-weight: 700; line-height: 1.06; letter-spacing: -0.055em; text-wrap: balance; }
-.home-course-name { margin: clamp(1rem, 2.4vw, 1.8rem) 0 0; color: var(--home-gold); font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.45rem, 2.1vw, 2.3rem); letter-spacing: 0.01em; }
+.home-title { max-width: 8ch; margin: 0; color: var(--home-ink); font-family: "Noto Serif SC", "Songti SC", "STSong", serif; font-size: clamp(2.8rem, 4.78vw, 5.25rem); font-weight: 700; line-height: 1.08; letter-spacing: -0.052em; text-wrap: balance; }
+.home-course-name { margin: clamp(0.9rem, 1.8vw, 1.35rem) 0 0; color: #a77931; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.25rem, 1.75vw, 1.95rem); letter-spacing: 0.025em; }
 .home-summary { max-width: 29rem; margin: clamp(1.15rem, 2vw, 1.7rem) 0 0; color: #4b655d; font-size: clamp(0.94rem, 1.05vw, 1.08rem); line-height: 1.75; }
 
 .home-start-learning { display: grid; grid-template-columns: auto auto; gap: 0.52rem 0.9rem; align-items: center; min-height: 3.5rem; margin-top: clamp(1.7rem, 3.6vw, 3.25rem); padding: 0.72rem 1.2rem 0.72rem 1.3rem; border: 1px solid var(--home-ink); border-radius: 0.3rem; background: var(--home-ink); box-shadow: 0 0.8rem 1.8rem rgb(6 63 53 / 0.15); color: #fffdf7; font-size: 1.02rem; font-weight: 800; letter-spacing: 0.06em; text-decoration: none; transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease; }
 .home-start-learning::before { content: "→"; grid-row: span 2; color: #e5c582; font-size: 1.4rem; font-weight: 400; }
 .home-start-learning-english { color: #e3d7be; font-family: Georgia, "Times New Roman", serif; font-size: 0.73rem; font-weight: 400; letter-spacing: 0.05em; }
 .home-start-learning:hover { background: #075445; box-shadow: 0 1rem 2rem rgb(6 63 53 / 0.22); transform: translateY(-0.14rem); }
-.home-start-learning:active { transform: translateY(0.04rem); }
+.home-start-learning:active { transform: translateY(1px) scale(0.985); }
 .home-start-learning:focus-visible { outline: 3px solid var(--home-gold); outline-offset: 4px; }
 
-.home-math-visual { position: relative; min-width: 0; margin: 0; padding: clamp(0.75rem, 1.5vw, 1.35rem) clamp(0.6rem, 1.2vw, 1.1rem) clamp(1.25rem, 2vw, 1.8rem); border: 1px solid var(--home-rule); border-radius: 0.65rem; background: rgb(255 253 247 / 0.56); box-shadow: 0 1.4rem 3.2rem rgb(58 74 58 / 0.09); }
-.home-math-visual::before { content: ""; position: absolute; top: 0; left: clamp(1rem, 2vw, 1.8rem); width: 3.7rem; height: 0.2rem; background: var(--home-gold); }
+.home-math-visual { position: relative; min-width: 0; margin: 0; padding: 0.45rem 0 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.home-math-visual::before { content: ""; position: absolute; top: 0; left: 0; width: 3rem; height: 1px; background: var(--home-gold); }
 .home-graph-host { min-height: 0; }
-.home-math-visual .parabola-svg { min-height: 0; height: min(40dvh, 27rem); }
+.home-math-visual .parabola-svg { min-height: 0; height: min(43dvh, 28rem); }
 .home-math-visual .parabola-grid-line { stroke: #ddd7c8; stroke-width: 1; }
 .home-math-visual .parabola-axis { stroke: #789187; }
 .home-math-visual .parabola-tick { fill: #62766e; font-size: 11px; }
 .home-math-visual .parabola-label { fill: var(--home-ink); font-size: 14px; }
-.home-equation { width: max-content; max-width: calc(100% - 2rem); margin: -0.8rem auto 0; padding: 0.48rem 0.9rem; border: 1px solid #e2d7bd; border-radius: 0.25rem; background: #fbf7ed; color: var(--home-ink); font-size: clamp(1rem, 1.3vw, 1.3rem); }
-.home-graph-caption { margin-top: 0.75rem; color: #5d6e66; font-size: clamp(0.72rem, 0.82vw, 0.8rem); letter-spacing: 0.04em; text-align: center; }
+.home-equation { width: max-content; max-width: calc(100% - 2rem); margin: -0.35rem auto 0; padding: 0.25rem 0.3rem; color: var(--home-ink); font-size: clamp(1rem, 1.3vw, 1.3rem); }
+.home-graph-caption { margin-top: 0.45rem; color: #5d6e66; font-size: clamp(0.72rem, 0.82vw, 0.8rem); letter-spacing: 0.04em; text-align: center; }
 
-.home-learning-path { width: min(100%, 88rem); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 3rem); margin: clamp(1.2rem, 3.2vh, 2.2rem) auto 0; padding: clamp(0.85rem, 1.4vw, 1.15rem) 0 0; border-top: 1px solid var(--home-rule); list-style: none; }
-.home-path-item { display: flex; align-items: baseline; gap: 0.65rem; color: var(--home-ink-soft); }
+.home-learning-journey { width: min(100%, 88rem); margin: clamp(1.2rem, 3.2vh, 2.2rem) auto 0; padding: clamp(0.7rem, 1.2vw, 1rem) 0 0; border-top: 1px solid var(--home-rule); }
+.home-learning-label { margin: 0 0 0.65rem; color: #7a8a83; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.15em; }
+.home-learning-path { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1rem, 3vw, 3rem); margin: 0; padding: 0; list-style: none; }
+.home-path-item { position: relative; display: flex; align-items: baseline; gap: 0.65rem; color: var(--home-ink-soft); }
+.home-path-item:not(:last-child)::after { content: "→"; position: absolute; top: 50%; right: clamp(-2.2rem, -2vw, -1.1rem); color: #b99a62; font-size: 0.9rem; line-height: 1; transform: translateY(-50%); }
 .home-path-number { color: var(--home-gold); font-family: Georgia, "Times New Roman", serif; font-size: clamp(0.82rem, 0.95vw, 0.98rem); }
 .home-path-label { font-size: clamp(0.78rem, 0.9vw, 0.92rem); font-weight: 700; letter-spacing: 0.06em; }
 
@@ -63,8 +66,9 @@
   .home-course-name { margin-top: 0.65rem; }
   .home-summary { margin-top: 0.75rem; line-height: 1.55; }
   .home-start-learning { min-height: 3rem; margin-top: 1.15rem; padding-block: 0.5rem; }
-  .home-math-visual .parabola-svg { height: min(46dvh, 23rem); }
-  .home-learning-path { margin-top: 0.85rem; padding-top: 0.65rem; }
+  .home-math-visual .parabola-svg { height: min(43dvh, 21rem); }
+  .home-learning-journey { margin-top: 0.85rem; padding-top: 0.55rem; }
+  .home-learning-label { margin-bottom: 0.4rem; }
 }
 
 @media (max-width: 760px) {
@@ -74,7 +78,9 @@
   .home-content { grid-template-columns: 1fr; gap: 2.4rem; padding-top: 2.5rem; }
   .home-title { max-width: 10ch; font-size: clamp(2.8rem, 12vw, 4.6rem); }
   .home-math-visual .parabola-svg { height: auto; min-height: 18rem; }
-  .home-learning-path { grid-template-columns: 1fr; gap: 0.7rem; margin-top: 1.8rem; }
+  .home-learning-journey { margin-top: 1.8rem; }
+  .home-learning-path { grid-template-columns: 1fr; gap: 0.7rem; }
+  .home-path-item::after { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
