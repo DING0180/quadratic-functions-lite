@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 describe("homepage mathematical motion", () => {
-  it("removes the duplicate learning journey and makes the highlighted vertex directly manipulable", () => {
+  it("removes the duplicate learning journey and makes the highlighted vertex directly manipulable", async () => {
     vi.stubGlobal("matchMedia", () => ({ matches: true }));
 
     const home = createHomeLanding();
@@ -34,6 +34,12 @@ describe("homepage mathematical motion", () => {
     expect(home.element.querySelector(".parabola-symmetry-axis").dataset.axisX).toBe("2");
     expect(home.element.querySelector(".home-graph-caption").textContent).toBe("顶点 V(2, −1) · 对称轴 x = 2");
     expect(home.element.querySelector(".home-general-form").getAttribute("aria-label")).toBe("一般式：y 等于 x 平方减 4x 加 3");
+
+    await Promise.resolve();
+    expect(document.activeElement).toBe(home.element.querySelector(".home-vertex-handle"));
+    document.activeElement.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "ArrowRight" }));
+    expect(home.element.querySelector(".home-graph-caption").textContent).toBe("顶点 V(2.5, −1) · 对称轴 x = 2.5");
+    expect(home.element.querySelector(".home-general-form").getAttribute("aria-label")).toBe("一般式：y 等于 x 平方减 5x 加 5.3");
     home.destroy();
   });
 
