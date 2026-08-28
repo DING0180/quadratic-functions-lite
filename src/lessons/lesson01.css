@@ -40,28 +40,28 @@
 .lesson01-token-separator.is-muted { opacity: .18; }
 .lesson01-token-prefix.is-consumed, .lesson01-token-separator.is-consumed { opacity: 0; }
 .lesson01-general-token, .lesson01-decomposed-token, .lesson01-flight-token { will-change: transform, opacity; position: relative; z-index: 1; }
-.lesson01-general-token.is-quadratic, .lesson01-decomposed-token.is-quadratic, .lesson01-flight-token.is-quadratic { color: #1f8a70; }
-.lesson01-general-token.is-linear, .lesson01-decomposed-token.is-linear, .lesson01-flight-token.is-linear { color: #5f67b8; }
-.lesson01-general-token.is-constant, .lesson01-decomposed-token.is-constant, .lesson01-flight-token.is-constant { color: #d06f24; }
+.lesson01-general-token[data-lesson01-token-color="red"], .lesson01-decomposed-token[data-lesson01-token-color="red"], .lesson01-flight-token[data-lesson01-token-color="red"] { color: #d32f2f; }
+.lesson01-general-token[data-lesson01-token-color="blue"], .lesson01-decomposed-token[data-lesson01-token-color="blue"], .lesson01-flight-token[data-lesson01-token-color="blue"] { color: #1d4ed8; }
+.lesson01-general-token[data-lesson01-token-color="green"], .lesson01-decomposed-token[data-lesson01-token-color="green"], .lesson01-flight-token[data-lesson01-token-color="green"] { color: #15803d; }
 .lesson01-flight-token { position: fixed; margin: 0; pointer-events: none; z-index: 20; }
 .lesson01-flight-token.is-flip-moving.is-css-fallback { transform: translate(0, 0); opacity: .82; }
 .lesson01-flight-token.is-flip-moving.is-css-fallback.is-flip-settled { transform: translate(var(--lesson01-flip-x), var(--lesson01-flip-y)); opacity: 1; transition: transform 560ms cubic-bezier(.2, .8, .2, 1), opacity 560ms cubic-bezier(.2, .8, .2, 1); }
 .lesson01-decomposition-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
-.lesson01-decomposition-card { visibility: hidden; min-width: 0; min-height: 5.4rem; padding: .8rem; border: 1px solid #d5e0da; border-top: 4px solid #1f8a70; border-radius: .75rem; background: #fff; opacity: 0; transition: opacity .18s ease; }
+.lesson01-decomposition-card { visibility: hidden; min-width: 0; min-height: 5.4rem; padding: .8rem; border: 1px solid #d5e0da; border-top: 4px solid #d32f2f; border-radius: .75rem; background: #fff; opacity: 0; transition: opacity .18s ease; }
 .lesson01-decomposition-card.is-revealed { visibility: visible; opacity: 1; }
-.lesson01-decomposition-card.is-linear { border-top-color: #5f67b8; }
-.lesson01-decomposition-card.is-constant { border-top-color: #d98935; }
+.lesson01-decomposition-card.is-linear { border-top-color: #1d4ed8; }
+.lesson01-decomposition-card.is-constant { border-top-color: #15803d; }
 .lesson01-token-slot { display: grid; min-height: 2.2rem; place-items: center; }
 .lesson01-decomposed-token { display: inline-flex; align-items: center; }
 .lesson01-decomposed-token .lesson01-formula { margin: 0; }
 .lesson01-coefficient-token { display: inline-block; position: relative; z-index: 1; transform-origin: center; transition: transform .32s cubic-bezier(.2, .9, .2, 1), color .24s ease, text-shadow .24s ease; }
 .lesson01-coefficient-token.is-coefficient-emphasized { transform: scale(1.52); font-weight: 800; animation: lesson01-coefficient-pulse .62s cubic-bezier(.2, 1.25, .3, 1) both; }
 .lesson01-coefficient-token.is-quadratic.is-coefficient-emphasized { color: #d84242; text-shadow: 0 .08em .18em rgb(216 66 66 / .23); }
-.lesson01-coefficient-token.is-linear.is-coefficient-emphasized { color: #5f46a7; text-shadow: 0 .08em .18em rgb(95 70 167 / .23); }
+.lesson01-coefficient-token.is-linear.is-coefficient-emphasized { color: #1d4ed8; text-shadow: 0 .08em .18em rgb(29 78 216 / .23); }
 .lesson01-decomposition-card.is-coefficient-focused.is-quadratic { border-top-color: #d84242; }
-.lesson01-decomposition-card.is-coefficient-focused.is-linear { border-top-color: #5f46a7; }
+.lesson01-decomposition-card.is-coefficient-focused.is-linear { border-top-color: #1d4ed8; }
 .lesson01-coefficient-callout { margin-top: .55rem !important; color: #d84242 !important; font-weight: 800; }
-.lesson01-decomposition-card.is-linear .lesson01-coefficient-callout { color: #5f46a7 !important; }
+.lesson01-decomposition-card.is-linear .lesson01-coefficient-callout { color: #1d4ed8 !important; }
 @keyframes lesson01-coefficient-pulse { 0% { transform: scale(1); } 55% { transform: scale(1.72); } 100% { transform: scale(1.52); } }
 .lesson01-token-label:not([hidden]) { animation: lesson01-decomposition-in .26s ease both; }
 .lesson01-decomposition-card h3 { margin: .35rem 0; }
@@ -99,10 +99,9 @@
 .lesson01-parameter-work { margin-top: .45rem; padding-top: .45rem; border-top: 1px dashed currentColor; color: #465a54; line-height: 1.45; }
 .lesson01-practice-expression { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0; min-height: 5rem; }
 .lesson01-practice-expression .lesson01-formula { display: inline-block; margin: 0; }
-.lesson01-practice-term { display: inline-flex; align-items: center; border: 2px solid transparent; border-radius: .42rem; transition: border-color .18s ease, background .18s ease; }
-.lesson01-practice-term.is-answer-term { border-color: #d84242; background: #fff1ef; }
-.lesson01-practice-coefficient { border-radius: .28rem; transition: background .18s ease, color .18s ease, box-shadow .18s ease; }
-.lesson01-practice-coefficient.is-answer-coefficient { background: #eee8ff; color: #5f46a7; box-shadow: inset 0 0 0 2px #8063c7; }
+.lesson01-practice-term { display: inline-flex; align-items: center; }
+.lesson01-practice-coefficient { transition: color .18s ease; }
+.lesson01-practice-term.is-answer-text-revealed, .lesson01-practice-coefficient.is-answer-text-revealed { color: #d32f2f; font-weight: 800; }
 .lesson01-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .lesson01-general-formula { display: flex; flex-wrap: wrap; gap: .25rem; align-items: center; padding: .85rem; border: 1px solid #d5e0da; border-radius: .8rem; background: #fff; }
 .lesson01-formula-part { margin: 0; padding: .35rem .45rem; border-radius: .45rem; transition: background .16s ease, box-shadow .16s ease; }
@@ -124,4 +123,5 @@
 .lesson01-step-count { color: #62736e; font-weight: 800; }
 @media (max-width: 760px) { .lesson01-compare-grid, .lesson01-example-grid, .lesson01-term-grid, .lesson01-summary-grid, .lesson01-decomposition-grid, .lesson01-case-grid, .lesson01-parameter-layout { grid-template-columns: 1fr; } .lesson01-arrow { min-height: 1.5rem; } .lesson01-case-prompt { min-height: auto; } }
 @media (min-width: 761px) and (max-height: 760px) { .lesson01-heading { margin-bottom: .6rem; } .lesson01-title { font-size: 1.7rem; } .lesson01-prompt, .lesson01-question { margin-block: .45rem; font-size: .96rem; line-height: 1.4; } .lesson01-card, .lesson01-worked-example { padding: .72rem; } .lesson01-action { min-height: 2.15rem; padding: .35rem .65rem; } .lesson01-step-controls { margin-top: .75rem; } .lesson01-model-diagram { height: calc(6rem + var(--lesson01-size) * .7rem); min-height: 6rem; } }
+
 
