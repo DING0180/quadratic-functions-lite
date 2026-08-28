@@ -30,6 +30,16 @@ function blackHole() {
   return hole;
 }
 
+function flightTunnel() {
+  const tunnel = element("div", "portal-flight-tunnel");
+  for (let index = 0; index < 5; index += 1) {
+    const ring = element("span", "portal-depth-ring");
+    ring.style.setProperty("--portal-ring-index", String(index));
+    tunnel.append(ring);
+  }
+  return tunnel;
+}
+
 function overlayFor(mode, home) {
   const overlay = element("aside", "parabola-portal");
   overlay.dataset.portalMode = mode;
@@ -41,6 +51,8 @@ function overlayFor(mode, home) {
   overlay.append(origin);
   overlay.append(blackHole());
   if (mode === "full") {
+    overlay.dataset.portalMotion = "flyby";
+    overlay.append(flightTunnel());
     const tunnel = element("div", "portal-math-tunnel");
     const mobile = window.matchMedia?.("(max-width: 760px)").matches;
     const tunnelItems = mobile ? MATH_ITEMS.slice(0, 3) : MATH_ITEMS;
@@ -48,13 +60,15 @@ function overlayFor(mode, home) {
     tunnelItems.forEach((item, index) => {
       const token = element("span", "portal-math-item", item);
       const [left, top] = positions[index];
+      const passMultiplier = mobile ? 0.72 : 1.28;
       token.style.setProperty("--portal-item-index", String(index));
+      token.dataset.portalTrajectory = "flyby";
       token.style.top = `${top}%`;
       token.style.left = `${left}%`;
-      token.style.setProperty("--portal-entry-x", `${50 - left}vw`);
-      token.style.setProperty("--portal-entry-y", `${50 - top}vh`);
-      token.style.setProperty("--portal-exit-x", `${(left - 50) * 0.12}vw`);
-      token.style.setProperty("--portal-exit-y", `${(top - 50) * 0.12}vh`);
+      token.style.setProperty("--portal-approach-x", `${50 - left}vw`);
+      token.style.setProperty("--portal-approach-y", `${50 - top}vh`);
+      token.style.setProperty("--portal-pass-x", `${(left - 50) * passMultiplier}vw`);
+      token.style.setProperty("--portal-pass-y", `${(top - 50) * passMultiplier}vh`);
       tunnel.append(token);
     });
     overlay.append(tunnel);

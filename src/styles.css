@@ -21,17 +21,20 @@ html.portal-is-active, body.portal-is-active { overflow: hidden; }
 .portal-origin .parabola-axis { stroke: #7a9188; }
 .portal-origin .parabola-curve { stroke-width: 3.75; }
 .portal-origin .home-vertex-handle { animation: portal-vertex 560ms 300ms ease-out both; }
-.portal-black-hole { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; }
+.portal-black-hole { position: absolute; z-index: 0; inset: 0; display: grid; place-items: center; opacity: 0; }
 .portal-event-horizon { width: clamp(15rem, 29vw, 28rem); aspect-ratio: 1; border: 1px solid rgb(185 146 76 / 0.2); border-radius: 50%; background: radial-gradient(circle, #020402 0 42%, #060906 53%, #111610 58%, transparent 72%); transform: scale(0.15); }
 .portal-singularity { position: absolute; width: clamp(5rem, 11vw, 10rem); aspect-ratio: 1; border-radius: 50%; background: #020402; transform: scale(0.2); }
-.portal-math-tunnel { position: absolute; inset: 0; overflow: hidden; }
-.portal-math-item { position: absolute; max-width: min(78vw, 31rem); color: #f1eee3; font-family: "Cambria Math", Georgia, "Times New Roman", serif; font-size: clamp(1rem, 2.25vw, 2.25rem); font-weight: 600; letter-spacing: 0.02em; line-height: 1.1; opacity: 0; filter: blur(8px); transform: translate3d(var(--portal-entry-x), var(--portal-entry-y), 0) scale(0.06); }
+.portal-flight-tunnel { position: absolute; z-index: 1; inset: -14vmax; display: grid; place-items: center; overflow: hidden; }
+.portal-depth-ring { position: absolute; width: clamp(7rem, 14vw, 15rem); aspect-ratio: 1.65; border: 1px solid rgb(185 146 76 / 0.32); border-radius: 50%; opacity: 0; transform: scale(0.08); }
+.portal-math-tunnel { position: absolute; z-index: 2; inset: 0; overflow: hidden; }
+.portal-math-item { position: absolute; max-width: min(78vw, 31rem); color: #f1eee3; font-family: "Cambria Math", Georgia, "Times New Roman", serif; font-size: clamp(1rem, 2.25vw, 2.25rem); font-weight: 600; letter-spacing: 0.02em; line-height: 1.1; opacity: 0; filter: blur(8px); transform: translate3d(var(--portal-approach-x), var(--portal-approach-y), 0) scale(0.06); transform-origin: center; will-change: transform, opacity, filter; }
 .parabola-portal[data-portal-mode="full"] { animation: portal-blackout 2400ms linear both; }
 .parabola-portal[data-portal-mode="full"] .portal-origin { animation: portal-origin-collapse 420ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .parabola-portal[data-portal-mode="full"] .portal-black-hole { animation: portal-hole-arrival 580ms 110ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .parabola-portal[data-portal-mode="full"] .portal-event-horizon { animation: portal-horizon-expand 1000ms 110ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .parabola-portal[data-portal-mode="full"] .portal-singularity { animation: portal-singularity-pulse 960ms 250ms ease-in-out both; }
-.parabola-portal[data-portal-mode="full"] .portal-math-item { animation: portal-math-flight 760ms calc(680ms + var(--portal-item-index) * 80ms) cubic-bezier(0.22, 1, 0.36, 1) both; }
+.parabola-portal[data-portal-mode="full"] .portal-depth-ring { animation: portal-depth-flyby 930ms calc(500ms + var(--portal-ring-index) * 80ms) cubic-bezier(0.22, 1, 0.36, 1) both; }
+.parabola-portal[data-portal-mode="full"] .portal-math-item { animation: portal-formula-flyby 900ms calc(620ms + var(--portal-item-index) * 80ms) cubic-bezier(0.22, 1, 0.36, 1) both; }
 .parabola-portal[data-portal-mode="compact"] { animation: portal-compact-blackout 720ms ease both; }
 .parabola-portal[data-portal-mode="compact"] .portal-origin { animation: portal-origin-compact 620ms cubic-bezier(0.18, 0.75, 0.28, 1) both; }
 .parabola-portal[data-portal-mode="compact"] .portal-black-hole { animation: portal-hole-arrival 620ms ease-out both; }
@@ -49,11 +52,12 @@ html.portal-is-active, body.portal-is-active { overflow: hidden; }
 @keyframes portal-hole-arrival { 0% { opacity: 0; } 24% { opacity: 1; } 100% { opacity: 1; } }
 @keyframes portal-horizon-expand { 0% { transform: scale(0.15); } 36% { transform: scale(1); } 100% { transform: scale(1.1); } }
 @keyframes portal-singularity-pulse { 0%, 100% { transform: scale(0.2); } 48% { transform: scale(0.82); } }
-@keyframes portal-math-flight { 0% { opacity: 0; filter: blur(8px); transform: translate3d(var(--portal-entry-x), var(--portal-entry-y), 0) scale(0.06); } 46% { opacity: 0.94; filter: blur(0); transform: translate3d(0, 0, 0) scale(1); } 72% { opacity: 0.88; } 100% { opacity: 0; filter: blur(3px); transform: translate3d(var(--portal-exit-x), var(--portal-exit-y), 0) scale(1.8); } }
-@keyframes portal-math-flight-mobile { 0% { opacity: 0; filter: blur(7px); transform: translate3d(var(--portal-entry-x), var(--portal-entry-y), 0) scale(0.08); } 48% { opacity: 0.94; filter: blur(0); transform: translate3d(0, 0, 0) scale(1); } 74% { opacity: 0.84; } 100% { opacity: 0; filter: blur(2px); transform: translate3d(var(--portal-exit-x), var(--portal-exit-y), 0) scale(1.25); } }
+@keyframes portal-depth-flyby { 0% { opacity: 0; transform: scale(0.08); } 25% { opacity: 0.42; } 62% { opacity: 0.28; transform: scale(1.55); } 100% { opacity: 0; transform: scale(3.2); } }
+@keyframes portal-formula-flyby { 0% { opacity: 0; filter: blur(9px); transform: translate3d(var(--portal-approach-x), var(--portal-approach-y), 0) scale(0.06); } 30% { opacity: 0.5; filter: blur(2px); } 54% { opacity: 0.96; filter: blur(0); transform: translate3d(0, 0, 0) scale(1); } 70% { opacity: 0.88; filter: blur(0.4px); transform: translate3d(calc(var(--portal-pass-x) * 0.26), calc(var(--portal-pass-y) * 0.26), 0) scale(1.55); } 100% { opacity: 0; filter: blur(4px); transform: translate3d(var(--portal-pass-x), var(--portal-pass-y), 0) scale(3.3); } }
+@keyframes portal-formula-flyby-mobile { 0% { opacity: 0; filter: blur(7px); transform: translate3d(var(--portal-approach-x), var(--portal-approach-y), 0) scale(0.08); } 54% { opacity: 0.95; filter: blur(0); transform: translate3d(0, 0, 0) scale(1); } 72% { opacity: 0.82; transform: translate3d(calc(var(--portal-pass-x) * 0.2), calc(var(--portal-pass-y) * 0.2), 0) scale(1.22); } 100% { opacity: 0; filter: blur(2px); transform: translate3d(var(--portal-pass-x), var(--portal-pass-y), 0) scale(1.75); } }
 @keyframes lesson-arrival { from { opacity: 0.24; } to { opacity: 1; } }
 @keyframes lesson-sidebar-arrival { from { opacity: 0; transform: translateX(-0.7rem); } to { opacity: 1; transform: translateX(0); } }
-@media (max-width: 760px) { .portal-source-graph { width: min(132vw, 44rem); } .portal-event-horizon { width: min(18rem, 82vw); } .portal-math-item { font-size: clamp(0.98rem, 5.2vw, 1.35rem); } .parabola-portal[data-portal-mode="full"] .portal-math-item { animation-name: portal-math-flight-mobile; animation-duration: 700ms; animation-delay: calc(700ms + var(--portal-item-index) * 80ms); } }
+@media (max-width: 760px) { .portal-source-graph { width: min(132vw, 44rem); } .portal-event-horizon { width: min(18rem, 82vw); } .portal-depth-ring { width: min(10rem, 46vw); } .portal-math-item { font-size: clamp(0.98rem, 5.2vw, 1.35rem); } .parabola-portal[data-portal-mode="full"] .portal-math-item { animation-name: portal-formula-flyby-mobile; animation-duration: 760ms; animation-delay: calc(650ms + var(--portal-item-index) * 80ms); } }
 @media (prefers-reduced-motion: reduce) { .parabola-portal *, .lesson-is-arriving * { animation-duration: 1ms !important; animation-delay: 0ms !important; } }
 
 .classroom {

@@ -46,14 +46,17 @@ describe("Parabola Portal transition", () => {
     expect(document.body.classList.contains("portal-is-active")).toBe(false);
   });
 
-  it("turns the first entry into a black hole with a quadratic-formula flight", () => {
+  it("builds a flyby tunnel so fixed formulas can pass the learner", () => {
     const { home, trigger, portal } = setupPortal();
 
     portal.start({ home, trigger });
 
     const overlay = document.querySelector(".parabola-portal");
     expect(overlay.dataset.portalScene).toBe("black-hole");
+    expect(overlay.dataset.portalMotion).toBe("flyby");
     expect(overlay.querySelector(".portal-black-hole")).not.toBeNull();
+    expect(overlay.querySelectorAll(".portal-depth-ring")).toHaveLength(5);
+    expect([...overlay.querySelectorAll(".portal-math-item")].every((item) => item.dataset.portalTrajectory === "flyby")).toBe(true);
     expect([...overlay.querySelectorAll(".portal-math-item")].map((item) => item.textContent)).toEqual([
       "y = x²",
       "x = (−b ± √(b² − 4ac)) / 2a",
@@ -70,6 +73,7 @@ describe("Parabola Portal transition", () => {
 
     portal.start({ home, trigger });
     expect(document.querySelector(".parabola-portal").dataset.portalMode).toBe("compact");
+    expect(document.querySelector(".parabola-portal").dataset.portalMotion).toBeUndefined();
     expect(document.querySelectorAll(".parabola-portal .portal-math-item")).toHaveLength(0);
     vi.advanceTimersByTime(720);
     expect(onComplete).toHaveBeenCalledTimes(1);
@@ -80,6 +84,7 @@ describe("Parabola Portal transition", () => {
 
     portal.start({ home, trigger });
     expect(document.querySelector(".parabola-portal").dataset.portalMode).toBe("reduced");
+    expect(document.querySelector(".parabola-portal").dataset.portalMotion).toBeUndefined();
     expect(document.querySelectorAll(".parabola-portal .portal-math-item")).toHaveLength(0);
     vi.advanceTimersByTime(340);
     expect(onComplete).toHaveBeenCalledTimes(1);
