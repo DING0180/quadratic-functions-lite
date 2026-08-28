@@ -24,22 +24,44 @@ function setupPortal({ reducedMotion = false } = {}) {
 }
 
 describe("Parabola Portal transition", () => {
-  it("runs the 2.8 second first-entry sequence once and then cleans up", () => {
+  it("runs the 2.4 second first-entry sequence once and then cleans up", () => {
     const { home, trigger, onComplete, portal } = setupPortal();
 
     expect(portal.start({ home, trigger })).toBe(true);
     expect(portal.start({ home, trigger })).toBe(false);
     expect(home.classList.contains("home-is-entering")).toBe(true);
     expect(trigger.getAttribute("aria-disabled")).toBe("true");
+    expect(document.documentElement.classList.contains("portal-is-active")).toBe(true);
+    expect(document.body.classList.contains("portal-is-active")).toBe(true);
     expect(document.querySelector(".parabola-portal").dataset.portalMode).toBe("full");
     expect(document.querySelectorAll(".parabola-portal .portal-math-item")).toHaveLength(6);
 
-    vi.advanceTimersByTime(2799);
+    vi.advanceTimersByTime(2399);
     expect(onComplete).not.toHaveBeenCalled();
     vi.advanceTimersByTime(1);
     expect(onComplete).toHaveBeenCalledTimes(1);
     expect(document.querySelector(".parabola-portal")).toBeNull();
     expect(home.classList.contains("home-is-entering")).toBe(false);
+    expect(document.documentElement.classList.contains("portal-is-active")).toBe(false);
+    expect(document.body.classList.contains("portal-is-active")).toBe(false);
+  });
+
+  it("turns the first entry into a black hole with a quadratic-formula flight", () => {
+    const { home, trigger, portal } = setupPortal();
+
+    portal.start({ home, trigger });
+
+    const overlay = document.querySelector(".parabola-portal");
+    expect(overlay.dataset.portalScene).toBe("black-hole");
+    expect(overlay.querySelector(".portal-black-hole")).not.toBeNull();
+    expect([...overlay.querySelectorAll(".portal-math-item")].map((item) => item.textContent)).toEqual([
+      "y = x²",
+      "x = (−b ± √(b² − 4ac)) / 2a",
+      "Δ = b² − 4ac",
+      "y = a(x − h)² + k",
+      "vertex",
+      "axis of symmetry",
+    ]);
   });
 
   it("uses the compact sequence after the session has seen the full portal", () => {
@@ -75,3 +97,4 @@ describe("Parabola Portal transition", () => {
     expect(trigger.hasAttribute("aria-disabled")).toBe(false);
   });
 });
+
