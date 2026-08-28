@@ -2,6 +2,7 @@ import "./styles.css";
 import { COURSE, getLessonFromHash } from "./course.js";
 import { renderFormula } from "./formula.js";
 import { createHomeLanding } from "./home.js";
+import { createParabolaPortal } from "./portal-transition.js";
 import { renderLesson01 } from "./lessons/lesson01.js";
 import { renderLesson02 } from "./lessons/lesson02.js";
 import { renderLesson03 } from "./lessons/lesson03.js";
@@ -88,7 +89,19 @@ const stageStatus = createElement("p", "stage-status", "课堂壳已就绪");
 const stageMessage = createElement("p", "stage-message", "本课教学内容将在后续逐课加入。");
 
 classroom.append(sidebar, stage);
-const home = createHomeLanding();
+let portal;
+const home = createHomeLanding({
+  onStartLearning({ home: homeElement, trigger }) {
+    portal.start({ home: homeElement, trigger });
+  },
+});
+portal = createParabolaPortal({
+  onComplete() {
+    document.body.classList.add("lesson-is-arriving");
+    window.location.hash = "#lesson-01/step-01";
+    window.setTimeout(() => document.body.classList.remove("lesson-is-arriving"), 720);
+  },
+});
 
 let activeLesson = null;
 let sidebarCollapsed = true;
@@ -150,6 +163,7 @@ function render() {
 
   const homeRoute = window.location.hash === "" || window.location.hash === "#home";
   if (homeRoute) {
+    portal.cancel();
     document.title = "二次函数互动课堂｜重庆德普外国语学校";
     root.replaceChildren(home.element);
     return;

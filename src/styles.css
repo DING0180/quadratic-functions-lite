@@ -13,6 +13,46 @@ html, body, #app { min-height: 100%; margin: 0; }
 
 body { min-width: 320px; }
 
+.parabola-portal { position: fixed; z-index: 30; inset: 0; overflow: hidden; pointer-events: none; isolation: isolate; background: #f7f4eb; color: #063f35; }
+.portal-origin { position: absolute; inset: 0; display: grid; place-items: center; transform-origin: center; }
+.portal-source-graph { width: min(74vw, 54rem); height: auto; overflow: visible; }
+.portal-origin .parabola-grid-line { stroke: #d7d2c4; }
+.portal-origin .parabola-axis { stroke: #7a9188; }
+.portal-origin .parabola-curve { stroke-width: 3.75; }
+.portal-origin .home-vertex-handle { animation: portal-vertex 560ms 300ms ease-out both; }
+.portal-math-tunnel { position: absolute; inset: 0; overflow: hidden; }
+.portal-math-item { position: absolute; color: #0d5547; font-family: Georgia, "Times New Roman", serif; font-size: clamp(1rem, 2.2vw, 2rem); font-weight: 700; letter-spacing: 0.02em; opacity: 0; filter: blur(5px); transform: translate3d(0, 2rem, 0) scale(0.42); }
+.portal-destination-lock { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; }
+.portal-lock-graph { width: min(86vw, 66rem); overflow: visible; }
+.portal-lock-grid { fill: none; stroke: #d3d8d1; stroke-width: 1; }
+.portal-lock-axis { fill: none; stroke: #6c877d; stroke-width: 1.6; }
+.portal-lock-parabola { fill: none; stroke: #075445; stroke-width: 4; stroke-linecap: round; }
+.portal-lock-point { fill: #e34d45; stroke: #fff9ed; stroke-width: 3; }
+.parabola-portal[data-portal-mode="full"] { animation: portal-paper 2800ms linear both; }
+.parabola-portal[data-portal-mode="full"] .portal-origin { animation: portal-origin-full 1450ms cubic-bezier(0.16, 0.78, 0.25, 1) both; }
+.parabola-portal[data-portal-mode="full"] .portal-math-item { animation: portal-tunnel-item 820ms calc(1380ms + var(--portal-item-index) * 105ms) cubic-bezier(0.16, 0.75, 0.24, 1) both; }
+.parabola-portal[data-portal-mode="full"] .portal-destination-lock { animation: portal-lock-in 650ms 2160ms cubic-bezier(0.2, 0.75, 0.3, 1) both; }
+.parabola-portal[data-portal-mode="full"] .portal-lock-graph { animation: portal-lock-zoom 640ms 2160ms cubic-bezier(0.16, 0.86, 0.3, 1) both; }
+.parabola-portal[data-portal-mode="compact"] .portal-origin { animation: portal-origin-compact 720ms cubic-bezier(0.18, 0.75, 0.28, 1) both; }
+.parabola-portal[data-portal-mode="compact"] .portal-destination-lock { animation: portal-lock-in 380ms 350ms ease-out both; }
+.parabola-portal[data-portal-mode="reduced"] { animation: portal-reduced-fade 340ms ease both; }
+.parabola-portal[data-portal-mode="reduced"] .portal-origin { opacity: 0.18; }
+.lesson-is-arriving .classroom { animation: lesson-arrival 540ms ease-out both; }
+.lesson-is-arriving .sidebar { animation: lesson-sidebar-arrival 420ms 110ms ease-out both; }
+@keyframes portal-vertex { 0% { r: 8; filter: none; } 55% { r: 13; filter: drop-shadow(0 0 0.45rem rgb(188 132 46 / 0.6)); } 100% { r: 10; filter: drop-shadow(0 0 0.22rem rgb(188 132 46 / 0.35)); } }
+@keyframes portal-paper { 0%, 11% { background: rgb(247 244 235 / 0); } 38% { background: #f7f4eb; } 100% { background: #fbfcfa; } }
+@keyframes portal-origin-full { 0% { opacity: 0; transform: scale(0.88); } 12% { opacity: 1; transform: scale(1); } 58% { opacity: 1; transform: scale(1.72); } 100% { opacity: 0; transform: scale(4.1); } }
+@keyframes portal-origin-compact { 0% { opacity: 0; transform: scale(0.95); } 24% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(3.2); } }
+@keyframes portal-tunnel-item { 0% { opacity: 0; filter: blur(6px); transform: translate3d(0, 2rem, 0) scale(0.42); } 45% { opacity: 0.94; filter: blur(0); transform: translate3d(0, -0.3rem, 0) scale(1); } 100% { opacity: 0; filter: blur(4px); transform: translate3d(var(--portal-exit-x), -2rem, 0) scale(1.8); } }
+@keyframes portal-tunnel-item-mobile { 0% { opacity: 0; filter: blur(5px); transform: translateY(1.2rem) scale(0.76); } 45% { opacity: 0.94; filter: blur(0); transform: translateY(0) scale(1); } 100% { opacity: 0; filter: blur(3px); transform: translateY(-1.25rem) scale(1); } }
+@keyframes portal-lock-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes portal-lock-zoom { from { transform: scale(0.72); } to { transform: scale(1.38); } }
+@keyframes portal-reduced-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lesson-arrival { from { opacity: 0.24; } to { opacity: 1; } }
+@keyframes lesson-sidebar-arrival { from { opacity: 0; transform: translateX(-0.7rem); } to { opacity: 1; transform: translateX(0); } }
+@media (max-width: 760px) { .portal-source-graph { width: min(132vw, 44rem); } .portal-math-item { font-size: clamp(0.98rem, 5.2vw, 1.35rem); } .parabola-portal[data-portal-mode="full"] .portal-math-item { animation-name: portal-tunnel-item-mobile; animation-duration: 560ms; animation-delay: calc(1360ms + var(--portal-item-index) * 100ms); } }
+@media (prefers-reduced-motion: reduce) { .parabola-portal *, .lesson-is-arriving * { animation-duration: 1ms !important; animation-delay: 0ms !important; } }
+
 .classroom {
   height: 100dvh;
   min-height: 100dvh;

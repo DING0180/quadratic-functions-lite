@@ -92,7 +92,7 @@ function easeInOut(progress) {
   return progress < 0.5 ? 4 * progress * progress * progress : 1 - ((-2 * progress + 2) ** 3) / 2;
 }
 
-export function createHomeLanding() {
+export function createHomeLanding({ onStartLearning } = {}) {
   const page = element("main", "home-shell");
   page.setAttribute("aria-labelledby", "home-title");
 
@@ -127,6 +127,11 @@ export function createHomeLanding() {
   const startEnglish = element("span", "home-start-learning-english", "Start Learning");
   startLearning.append(startEnglish);
   introduction.append(startLearning);
+  startLearning.addEventListener("click", (event) => {
+    if (!onStartLearning || startLearning.getAttribute("aria-disabled") === "true") return;
+    event.preventDefault();
+    onStartLearning({ home: page, trigger: startLearning, target: startLearning.hash });
+  });
 
   const figure = element("figure", "home-math-visual");
   const graphHost = element("div", "home-graph-host");
