@@ -32,13 +32,13 @@ describe("homepage mathematical motion", () => {
     graphHost.dispatchEvent(new MouseEvent("pointerup", { bubbles: true, clientX, clientY }));
 
     expect(home.element.querySelector(".parabola-symmetry-axis").dataset.axisX).toBe("2");
-    expect(home.element.querySelector(".home-graph-caption").textContent).toBe("顶点 V(2, −1) · 对称轴 x = 2");
+    expect(home.element.querySelector(".home-graph-caption").textContent).toBe("顶点 (vertex) V(2, −1) · 对称轴 (axis of symmetry) x = 2");
     expect(home.element.querySelector(".home-general-form").getAttribute("aria-label")).toBe("一般式：y 等于 x 平方减 4x 加 3");
 
     await Promise.resolve();
     expect(document.activeElement).toBe(home.element.querySelector(".home-vertex-handle"));
     document.activeElement.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "ArrowRight" }));
-    expect(home.element.querySelector(".home-graph-caption").textContent).toBe("顶点 V(2.5, −1) · 对称轴 x = 2.5");
+    expect(home.element.querySelector(".home-graph-caption").textContent).toBe("顶点 (vertex) V(2.5, −1) · 对称轴 (axis of symmetry) x = 2.5");
     expect(home.element.querySelector(".home-general-form").getAttribute("aria-label")).toBe("一般式：y 等于 x 平方减 5x 加 5.3");
     home.destroy();
   });
@@ -61,7 +61,7 @@ describe("homepage mathematical motion", () => {
 
     expect(graph.querySelector(".parabola-symmetry-axis").dataset.axisX).toBe("0");
     expect(equation.getAttribute("aria-label")).toBe("y 等于 x 平方");
-    expect(caption.textContent).toBe("顶点 V(0, 0) · 对称轴 x = 0");
+    expect(caption.textContent).toBe("顶点 (vertex) V(0, 0) · 对称轴 (axis of symmetry) x = 0");
 
     animationFrames.shift()(0);
     animationFrames.shift()(1200);
@@ -72,7 +72,7 @@ describe("homepage mathematical motion", () => {
     animationFrames.shift()(2500);
     expect(home.element.querySelector(".parabola-symmetry-axis").dataset.axisX).toBe("1");
     expect(equation.getAttribute("aria-label")).toBe("y 等于 x 减一的平方减二");
-    expect(caption.textContent).toBe("顶点 V(1, −2) · 对称轴 x = 1");
+    expect(caption.textContent).toBe("顶点 (vertex) V(1, −2) · 对称轴 (axis of symmetry) x = 1");
     home.destroy();
   });
 
