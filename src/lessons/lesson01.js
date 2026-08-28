@@ -150,12 +150,13 @@ function renderGeneral(root) {
   const source = element("div", "lesson01-token-formula lesson01-current");
   source.dataset.lesson01TokenSource = "";
   const parts = [
-    { id: "quadratic", latex: "ax^2", label: "ax²", title: "二次项", copy: "ax² 是二次项；其中 a 表示二次项系数，而且 a≠0。", coefficient: "a", remainder: "x^2", coefficientTitle: "a 是二次项系数" },
-    { id: "linear", latex: "bx", label: "bx", title: "一次项", copy: "bx 是一次项；其中 b 表示一次项系数。", coefficient: "b", remainder: "x", coefficientTitle: "b 是一次项系数" },
-    { id: "constant", latex: "c", label: "c", title: "常数项", copy: "c 是常数项；它不含 x，可以等于 0。" },
+    { id: "quadratic", color: "red", latex: "ax^2", label: "ax²", title: "二次项", copy: "ax² 是二次项；其中 a 表示二次项系数，而且 a≠0。", coefficient: "a", remainder: "x^2", coefficientTitle: "a 是二次项系数" },
+    { id: "linear", color: "blue", latex: "bx", label: "bx", title: "一次项", copy: "bx 是一次项；其中 b 表示一次项系数。", coefficient: "b", remainder: "x", coefficientTitle: "b 是一次项系数" },
+    { id: "constant", color: "green", latex: "c", label: "c", title: "常数项", copy: "c 是常数项；它不含 x，可以等于 0。" },
   ].map((part) => {
     const token = formula(part.latex, part.label, "lesson01-formula lesson01-general-token is-" + part.id);
     token.dataset.lesson01GeneralToken = part.id;
+    token.dataset.lesson01TokenColor = part.color;
     const separator = part.id === "constant" ? null : formula("+", "加号", "lesson01-formula lesson01-token-separator");
     if (separator) separator.dataset.lesson01TokenSeparator = part.id;
     const card = element("article", "lesson01-decomposition-card is-" + part.id);
@@ -183,10 +184,12 @@ function renderGeneral(root) {
     if (!part.coefficient) {
       const token = formula(part.latex, part.label, "lesson01-formula lesson01-decomposed-token is-" + part.id);
       token.dataset.lesson01DecomposedToken = part.id;
+      token.dataset.lesson01TokenColor = part.color;
       return token;
     }
     const token = element("div", "lesson01-formula lesson01-decomposed-token is-" + part.id);
     token.dataset.lesson01DecomposedToken = part.id;
+    token.dataset.lesson01TokenColor = part.color;
     const coefficient = formula(part.coefficient, part.coefficient, "lesson01-formula lesson01-coefficient-token is-" + part.id);
     coefficient.dataset.lesson01CoefficientToken = part.id;
     token.append(coefficient, formula(part.remainder, part.remainder, "lesson01-formula lesson01-term-remainder"));
@@ -198,6 +201,7 @@ function renderGeneral(root) {
     const after = part.slot.getBoundingClientRect();
     const flight = formula(part.latex, part.label, "lesson01-formula lesson01-flight-token is-" + part.id);
     flight.dataset.lesson01FlightToken = part.id;
+    flight.dataset.lesson01TokenColor = part.color;
     flight.style.left = before.left + "px";
     flight.style.top = before.top + "px";
     root.append(flight);
@@ -337,7 +341,7 @@ function renderPractice(root, random) {
     const question = PRACTICE_QUESTIONS[questionIndex];
     const selector = question.kind === "term" ? "[data-lesson01-practice-term='" : "[data-lesson01-practice-coefficient='";
     const answer = formulaHost.querySelector(selector + question.target + "']");
-    answer.classList.add(question.kind === "term" ? "is-answer-term" : "is-answer-coefficient");
+    answer.classList.add("is-answer-text-revealed");
     status.textContent = "答案已直接标注在原式中。";
   });
   reset.addEventListener("click", () => { index = (index + 1) % PRACTICE.length; questionIndex = (questionIndex + 1) % PRACTICE_QUESTIONS.length; render(); });
@@ -465,4 +469,5 @@ export function renderLesson01(stage, { step = 1, onStepChange = () => {}, rando
   stage.replaceChildren(root);
   return { destroy() { cleanup.forEach((handler) => handler()); } };
 }
+
 
