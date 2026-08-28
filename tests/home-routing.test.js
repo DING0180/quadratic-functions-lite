@@ -20,6 +20,8 @@ describe("home landing route", () => {
     expect(home.textContent).toContain("双语初中数学组");
     expect(home.textContent).toContain("二次函数互动课堂");
     expect(home.textContent).toContain("Quadratic Functions");
+    expect(home.textContent).toContain("顶点式 (vertex form)");
+    expect(home.textContent).toContain("一般式 (general form)");
     expect(home.querySelector(".home-school-logo").getAttribute("alt")).toBe("重庆德普外国语学校校徽");
     expect(home.querySelector(".home-math-visual .parabola-svg")).not.toBeNull();
 
@@ -32,5 +34,8 @@ describe("home landing route", () => {
     expect(document.querySelector(".home-shell")).toBeNull();
     expect(document.querySelector(".classroom")).not.toBeNull();
     expect(document.querySelector(".lesson01-step")).not.toBeNull();
+    expect(document.querySelector(".lesson-title-subtitle").textContent).toBe("Bridge In: Linear to Quadratic Functions");
+    expect(document.querySelector(".lesson01-step").textContent).toContain("Previous");
+    expect(document.querySelector(".lesson01-step").textContent).toContain("Next");
   });
 });

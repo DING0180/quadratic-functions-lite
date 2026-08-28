@@ -1,6 +1,7 @@
 import schoolLogoUrl from "./assets/depu-school-logo.jpg";
 import { renderFormula } from "./formula.js";
 import { createParabolaGraph } from "./graph/parabola-svg.js";
+import { term } from "./math-terms.js";
 import "./home.css";
 
 function element(tag, className, text = "") {
@@ -131,13 +132,13 @@ export function createHomeLanding() {
   const figure = element("figure", "home-math-visual");
   const graphHost = element("div", "home-graph-host");
   const equation = element("div", "home-equation");
-  const caption = element("figcaption", "home-graph-caption", "顶点 V(0, 0) · 对称轴 x = 0");
+  const caption = element("figcaption", "home-graph-caption", term("vertex") + " V(0, 0) · " + term("axisOfSymmetry") + " x = 0");
   const generalFormula = element("div", "home-general-form");
   const formulaDetails = element("div", "home-function-details");
   const vertexFormulaDetail = element("div", "home-vertex-form-detail");
-  vertexFormulaDetail.append(element("p", "home-formula-label", "顶点式"), equation, caption);
+  vertexFormulaDetail.append(element("p", "home-formula-label", term("vertexForm")), equation, caption);
   const generalFormulaDetail = element("div", "home-general-form-detail");
-  generalFormulaDetail.append(element("p", "home-formula-label", "一般式"), generalFormula);
+  generalFormulaDetail.append(element("p", "home-formula-label", term("generalForm")), generalFormula);
   formulaDetails.append(vertexFormulaDetail, generalFormulaDetail);
   figure.append(graphHost, formulaDetails);
 
@@ -154,7 +155,7 @@ export function createHomeLanding() {
       const generalFormulaData = generalFormulaState(state);
       renderFormula(generalFormula, generalFormulaData.latex, { ariaLabel: generalFormulaData.ariaLabel });
     }
-    caption.textContent = `顶点 V(${displayNumber(state.h)}, ${displayNumber(state.k)}) · 对称轴 x = ${displayNumber(state.h)}`;
+    caption.textContent = `${term("vertex")} V(${displayNumber(state.h)}, ${displayNumber(state.k)}) · ${term("axisOfSymmetry")} x = ${displayNumber(state.h)}`;
   }
 
   const graph = createParabolaGraph(graphHost, graphOptions(HOME_GRAPH_START));

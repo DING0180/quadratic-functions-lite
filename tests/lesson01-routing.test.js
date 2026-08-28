@@ -18,6 +18,7 @@ describe("Lesson 01 classroom routing", () => {
     expect(document.querySelector(".lesson01-step")).not.toBeNull();
     expect(document.querySelector(".lesson01-kicker").textContent).toContain("03 / 05");
     expect(document.querySelector(".lesson01-title").textContent).toContain("随机辨认");
+    expect(document.querySelector(".lesson-title-subtitle").textContent).toBe("Identify the Quadratic Coefficient");
     expect(document.querySelectorAll(".sidebar")).toHaveLength(1);
   });
 

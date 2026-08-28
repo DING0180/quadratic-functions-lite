@@ -126,6 +126,7 @@ body { min-width: 320px; }
 
 .lesson-number { margin: 0; color: #187057; font-size: clamp(0.9rem, 1.3vw, 1.15rem); font-weight: 700; letter-spacing: 0.16em; }
 .lesson-title { max-width: 13ch; margin: 0.8rem 0 0; color: #172523; font-size: clamp(2.5rem, 5.3vw, 6.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.04em; }
+.lesson-title-subtitle { margin: 0.25rem 0 0; color: #4d776a; font-size: clamp(0.78rem, 1.1vw, 0.98rem); font-weight: 700; letter-spacing: 0.04em; line-height: 1.35; }
 .stage-rule { width: clamp(4.5rem, 9vw, 8rem); height: 0.25rem; margin: clamp(1.6rem, 3vw, 2.8rem) 0; background: #d98935; }
 .stage-status { margin: 0; color: #1d6852; font-size: clamp(1rem, 1.5vw, 1.35rem); font-weight: 700; }
 .stage-message { max-width: 38rem; margin: 0.8rem 0 0; color: #52635e; font-size: clamp(1rem, 1.55vw, 1.4rem); line-height: 1.7; }
