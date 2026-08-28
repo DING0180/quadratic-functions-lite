@@ -56,13 +56,16 @@ describe("Lesson 01 quadratic-function concepts", () => {
     });
     expect(source).toContain(quadraticToken);
     expect(quadraticToken.classList).toContain("is-quadratic");
+    expect(quadraticToken.dataset.lesson01TokenColor).toBe("red");
     await new Promise((resolve) => window.setTimeout(resolve));
     expect(source).toContain(quadraticToken);
-    expect(quadraticSlot.querySelector("[data-lesson01-decomposed-token='quadratic']")).not.toBeNull();
+    const decomposedQuadratic = quadraticSlot.querySelector("[data-lesson01-decomposed-token='quadratic']");
+    expect(decomposedQuadratic).not.toBeNull();
+    expect(decomposedQuadratic.dataset.lesson01TokenColor).toBe("red");
     expect(quadraticCard.classList).toContain("is-revealed");
     expect(quadraticCard.querySelector("[data-lesson01-token-label]").hidden).toBe(false);
-    expect(stage.querySelector("[data-lesson01-token-slot='linear'] [data-lesson01-decomposed-token='linear']")).not.toBeNull();
-    expect(stage.querySelector("[data-lesson01-token-slot='constant'] [data-lesson01-decomposed-token='constant']")).not.toBeNull();
+    expect(stage.querySelector("[data-lesson01-token-slot='linear'] [data-lesson01-decomposed-token='linear']").dataset.lesson01TokenColor).toBe("blue");
+    expect(stage.querySelector("[data-lesson01-token-slot='constant'] [data-lesson01-decomposed-token='constant']").dataset.lesson01TokenColor).toBe("green");
     expect(advance.disabled).toBe(false);
     expect(advance.textContent).toContain("二次项系数 a");
     advance.click();
@@ -101,11 +104,11 @@ describe("Lesson 01 quadratic-function concepts", () => {
     expect(stage.querySelector("[data-lesson01-practice-function]").getAttribute("aria-label")).toContain("−3x²");
     expect(stage.querySelector("[data-lesson01-practice-answer-term='quadratic']")).toBeNull();
     stage.querySelector("[data-lesson01-practice-check]").click();
-    expect(stage.querySelector("[data-lesson01-practice-term='quadratic']").classList).toContain("is-answer-term");
+    expect(stage.querySelector("[data-lesson01-practice-term='quadratic']").classList).toContain("is-answer-text-revealed");
     stage.querySelector("[data-lesson01-practice-reset]").click();
     expect(stage.querySelector("[data-lesson01-practice-prompt]").textContent).toContain("二次项系数");
     stage.querySelector("[data-lesson01-practice-check]").click();
-    expect(stage.querySelector("[data-lesson01-practice-coefficient='quadratic']").classList).toContain("is-answer-coefficient");
+    expect(stage.querySelector("[data-lesson01-practice-coefficient='quadratic']").classList).toContain("is-answer-text-revealed");
     stage.querySelector("[data-lesson01-practice-reset]").click();
     expect(stage.querySelector("[data-lesson01-practice-prompt]").textContent).toContain("一次项");
     stage.querySelector("[data-lesson01-practice-reset]").click();
@@ -164,4 +167,5 @@ describe("Lesson 01 quadratic-function concepts", () => {
     lesson.destroy();
   });
 });
+
 
