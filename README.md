@@ -14,5 +14,4 @@
 
 ## 在线访问
 
-[打开二次函数互动教学网站](https://ding0180.github.io/quadratic-functions-lite/)
-
+[打开二次函数互动教学网站](https://ding0180.github.io/quadratic-functions-v1/)
